@@ -1,11 +1,11 @@
-# your-mvp
+# vaani
 
-pnpm workspace monorepo for the MVP. Two apps, one workspace root.
+pnpm workspace monorepo for vaani. Two apps, one workspace root.
 
 ## Structure
 
 ```
-your-mvp/
+Vaani/
 ├── apps/
 │   ├── web/     Angular 22 frontend
 │   └── api/     Node.js/Express backend
