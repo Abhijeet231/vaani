@@ -1,0 +1,9 @@
+/*
+ * Tailwind CSS entry point — kept separate from styles.scss (Angular Material theming).
+ * Loaded AFTER styles.scss in angular.json's "styles" array, so Tailwind's own
+ * cascade layers (theme, base, components, utilities) register after Material's
+ * `mat-theme` layer. That gives Tailwind utilities priority over anything WE author
+ * in styles.scss. See apps/web/CLAUDE.md for the one caveat re: Material's own
+ * internal component CSS, which ships unlayered.
+ */
+@import "tailwindcss";

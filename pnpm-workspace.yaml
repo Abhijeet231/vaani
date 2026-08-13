@@ -1,0 +1,5 @@
+packages:
+  - "apps/*"
+minimumReleaseAgeExclude:
+  - '@angular/cdk@22.1.2'
+  - '@angular/material@22.1.2'

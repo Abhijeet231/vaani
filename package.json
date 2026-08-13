@@ -1,0 +1,14 @@
+{
+  "name": "your-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter web start",
+    "dev:api": "pnpm --filter api dev",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

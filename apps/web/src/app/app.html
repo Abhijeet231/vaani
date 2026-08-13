@@ -1,0 +1,26 @@
+<mat-toolbar color="primary">
+  <span class="font-semibold">{{ title() }}</span>
+</mat-toolbar>
+
+<main class="flex flex-col items-center gap-6 p-8">
+  <mat-card class="max-w-md w-full p-4 rounded-xl!">
+    <mat-card-header>
+      <mat-card-title>Material + Tailwind</mat-card-title>
+      <mat-card-subtitle>Layout via Tailwind, component via Material</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="mt-2 text-sm opacity-80">
+      This card is a <code>mat-card</code> styled with Tailwind utility
+      classes (<code>p-4</code>, <code>rounded-xl</code>, layout via flex/gap)
+      to confirm the two systems coexist without conflicting.
+    </mat-card-content>
+    <mat-card-actions class="flex justify-end gap-2 mt-4">
+      <button mat-stroked-button>Cancel</button>
+      <button mat-flat-button color="primary">
+        <mat-icon>check</mat-icon>
+        Confirm
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <router-outlet />
+</main>
