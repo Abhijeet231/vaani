@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-08-15 — Phase 1 complete: Sarvam STT + Mayura translate validated
+
+- Fixed `apps/api/src/config/env.ts`'s unsafe `as string` cast on `sarvamApi` — replaced with a `getRequiredEnv()` helper that throws at startup if `SARVAM_API_KEY` is missing, instead of silently type-lying and failing later inside a Sarvam call.
+- Found and removed a real Sarvam API key that had been checked into the working copy of `apps/api/.env.example` (never reached git history); replaced with a placeholder. The real key lives only in the gitignored `apps/api/.env`.
+- Added `apps/api/src/scripts/prove-sarvam.ts` — a standalone script (not wired to any route) that sends a Hindi audio clip to Sarvam's REST speech-to-text endpoint, then feeds the resulting transcript into Mayura's translate endpoint (`hi-IN` → `kn-IN`). Verified against the real API: correct Hindi transcript, correct Kannada translation, end to end.
+- Installed ffmpeg (via winget) to trim the test clip under the REST endpoint's 30-second limit (original clip was 33.7s; anything longer needs the Batch API, which is why multi-speaker mode uses Batch instead).
+- Added the `sarvamai` SDK dependency; gitignored `**/test-assets/` so local audio fixtures never get committed.
+- **Open item carried into Phase 2:** translate `mode` is currently `code-mixed`, which leaves some English words untranslated in the Kannada output (e.g. "sunshine", "personal project"). Compare against `formal` mode on the same transcript before locking in which one the real pipeline uses.
+
+**Where Phase 2 picks up (scoped in conversation, not yet built):**
+- 1-1 mode needs continuous low-latency streaming, not batch upload: mic captures small (~100–250ms) audio chunks pushed continuously over a WebSocket to our own `apps/api` relay, which forwards them to Sarvam's Realtime STT websocket. On each `final` STT segment, call Mayura translate (same logic already proven in Phase 1) and push the translated result back over the same socket. A REST-only approach can't do this — it needs a persistent connection.
+- Multi-speaker mode (Phase 4, later) is architecturally different and NOT part of Phase 2: Sarvam's speaker diarization only works on the Batch API, not the streaming one, so that mode will buffer ~5–10s rolling audio chunks and submit each as a complete file instead of streaming continuously.
+- Bulbul TTS (planned, 1-1 mode only — see below) is a Phase 3 follow-up, also not part of Phase 2.
+
+Full phase-by-phase plan lives in the published roadmap artifact (link shared with the user in-session, not stored here since artifact URLs are per-session).
+
 ## 2026-08-15 — Planned addition: Bulbul TTS for 1-1 mode
 
 Decided (not yet implemented) to add spoken output to 1-1 conversation mode: alongside the live translated transcript, speak the translation aloud using Sarvam's Bulbul TTS model. Deliberately scoped to 1-1 mode only — multi-speaker mode stays transcript-only, since speaking a diarized multi-person translation aloud is a separate problem not being tackled now. Documented in root `README.md` and `CLAUDE.md`. Will be built after the core 1-1 text pipeline (Phases 2-3) works.
