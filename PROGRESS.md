@@ -1,5 +1,9 @@
 # Progress Log
 
+## 2026-08-15 — Planned addition: Bulbul TTS for 1-1 mode
+
+Decided (not yet implemented) to add spoken output to 1-1 conversation mode: alongside the live translated transcript, speak the translation aloud using Sarvam's Bulbul TTS model. Deliberately scoped to 1-1 mode only — multi-speaker mode stays transcript-only, since speaking a diarized multi-person translation aloud is a separate problem not being tackled now. Documented in root `README.md` and `CLAUDE.md`. Will be built after the core 1-1 text pipeline (Phases 2-3) works.
+
 ## 2026-08-15 — Product direction defined; DB/auth deferred
 
 Defined what vaani actually does (documented in root `README.md` and `CLAUDE.md`): a live speech-translation app used from one signed-in owner's device. The other person(s) never install the app or have an account.

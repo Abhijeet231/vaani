@@ -11,6 +11,8 @@ A live speech-translation app, used from a single signed-in owner's phone — th
 
 No accounts, invites, or data are attached to the other participants in either mode — everything is scoped to the owner's session.
 
+**Planned addition, 1-1 mode only (not yet built):** spoken output alongside the live transcript, using Sarvam's Bulbul text-to-speech model — so the other person can *hear* the translation, not just read it. Scoped to 1-1 mode for now; multi-speaker mode stays transcript-only.
+
 ## Structure
 
 ```
