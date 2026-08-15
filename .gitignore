@@ -14,6 +14,7 @@ build/
 # Editors
 .vscode/
 .idea/
+.claude/
 
 # OS
 .DS_Store
@@ -26,3 +27,6 @@ pnpm-debug.log*
 
 # Coverage
 coverage/
+
+# Test audio assets anywhere in the repo
+**/test-assets/
