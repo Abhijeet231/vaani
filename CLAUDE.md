@@ -2,6 +2,17 @@
 
 pnpm workspace monorepo for vaani. Two apps, one workspace root.
 
+## Product
+
+vaani is a live speech-translation app driven from a single signed-in owner's device. The other person(s) in the conversation never install the app or have an account — translation happens entirely on the owner's phone for them to read (and speak into).
+
+Two modes, both scoped to one owner session with no accounts/data for the other party:
+
+- **1-1 conversation mode** — owner sets a language direction (e.g. Hindi → Kannada), records, and gets a live translated transcript in the target language. To let the other person reply, the owner flips the direction (Kannada → Hindi) on the same device/session — it's a manual per-turn toggle, not two separate participant accounts.
+- **Multi-speaker mode** — owner records in a room with multiple people talking; the app auto-detects the number of distinct speakers (diarization) and produces a live translated transcript labeled by speaker (Speaker 1, Speaker 2, ...). Speaker labels are ephemeral to that session, not persisted identities.
+
+Current focus: get a working end-to-end model for both modes (no persistence) before adding accounts or a database. Auth and DB are deliberately deferred — see below.
+
 ## Structure
 
 ```
@@ -23,6 +34,9 @@ Each app has its own `CLAUDE.md` with app-specific conventions:
 - **apps/web** — Angular 22 (standalone components, no NgModules), Angular Material (M3, azure-blue prebuilt theme), Tailwind CSS v4, SCSS, signals for state.
 - **apps/api** — Node.js, Express, TypeScript, nodemon + ts-node for dev, dotenv for config.
 - **Tooling** — pnpm workspaces (`apps/*`). No shared/packages directory yet — add one only when web and api actually need to share code (e.g. types).
+- **Database (planned, not yet implemented)** — Postgres via Drizzle ORM, hosted on NeonDB.
+- **Auth (planned, not yet implemented)** — Firebase Auth.
+- Both are intentionally deferred: the priority is a working, polished 1-1 / multi-speaker model first; accounts and persistence get added when the app goes public (targeted ~1 month out from 2026-08-15).
 
 ## Commands (run from repo root)
 
