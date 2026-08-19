@@ -6,7 +6,8 @@
 - Step 1 done: `apps/api/src/config/sarvam.ts` now holds the single exported `sarvamClient` instance (mirrors the `env.ts` pattern). `prove-sarvam.ts` updated to import it instead of constructing its own client — re-ran against the real API, same Hindi transcript → Kannada translation as before.
 - Confirmed `code-mixed` translate mode still leaves English words untranslated in real output (e.g. "sunshine", "clothes", "personal project") — still need to compare against `formal` mode before Step 2.
 - Step 2 started: scaffolded empty `apps/api/src/services/translation.service.ts` (file created, no implementation yet).
-- Fixed `apps/api/tsconfig.json`: `moduleResolution: "node"` is deprecated on TypeScript 5.9 (editor flagged it); renamed to `"node10"`, same resolution behavior, no more warning.
+- Fixed `apps/api/tsconfig.json`: `moduleResolution: "node"` (and its alias `"node10"`) is deprecated on TypeScript 5.9, slated for removal in TS 7.0. Switched `module`/`moduleResolution` to `"nodenext"` (the current recommended pairing for a plain CommonJS Node backend — `apps/api/package.json` has no `"type": "module"`, so this resolves identically to before). Verified `tsc` still emits CommonJS (`require`/`exports`) output and `dist/server.js` runs the same as before.
+- That resolution change surfaced 2 real (pre-existing, previously masked) type errors in `translation.service.ts`: `sourceLanguageCode`/`targetLanguageCode` were typed as plain `string` instead of the Sarvam SDK's `SarvamAI.TranslateSourceLanguage` / `TranslateTargetLanguage` literal unions. Narrowed the param types to match; `tsc --noEmit` now passes clean.
 
 **Pending / not yet built (Phase 2):**
 - `services/translation.service.ts` — Mayura translate wrapper, extracted out of `prove-sarvam.ts`'s inline translate call (in progress, file is currently empty).
