@@ -1,11 +1,6 @@
-import { SarvamAIClient } from "sarvamai";
-import { env } from "../config/env";
+import { sarvamClient } from "../config/sarvam";
 import fs from "fs";
 import path from "path";
-
-const client = new SarvamAIClient({
-    apiSubscriptionKey: env.sarvamApi
-});
 
 async function proveSarvamPipeline() {
     const audioPath = path.join(__dirname, "../../test-assets/sarvam demo trimmed.mp3");
@@ -13,7 +8,7 @@ async function proveSarvamPipeline() {
 
     try {
         // Speech-to-text
-        const response = await client.speechToText.transcribe({
+        const response = await sarvamClient.speechToText.transcribe({
             file: audioFile,
             model: "saaras:v3",
             mode: "transcribe"
@@ -24,7 +19,7 @@ async function proveSarvamPipeline() {
         console.log("Transcript:", response.transcript)
 
         // Translating the trnascript with Mayura
-        const translateResponse = await client.text.translate({
+        const translateResponse = await sarvamClient.text.translate({
             input: hindiText,
             source_language_code: "hi-IN",
             target_language_code: "kn-IN",

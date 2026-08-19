@@ -3,11 +3,11 @@
 ## 2026-08-20 — Phase 2 kickoff: streaming pipeline dependency added
 
 - Added `ws` + `@types/ws` to `apps/api` (Step 0 of the Phase 2 build plan).
-- In progress: centralizing the `SarvamAIClient` instance into `apps/api/src/config/sarvam.ts` so it isn't constructed separately in every script/gateway (mirrors the `env.ts` pattern). Not yet committed — first attempt duplicated the whole `prove-sarvam.ts` script into the config file instead of just the client instance; user is redoing it correctly.
+- Step 1 done: `apps/api/src/config/sarvam.ts` now holds the single exported `sarvamClient` instance (mirrors the `env.ts` pattern). `prove-sarvam.ts` updated to import it instead of constructing its own client — re-ran against the real API, same Hindi transcript → Kannada translation as before.
+- Confirmed `code-mixed` translate mode still leaves English words untranslated in real output (e.g. "sunshine", "clothes", "personal project") — still need to compare against `formal` mode before Step 2.
 
 **Pending / not yet built (Phase 2):**
-- `config/sarvam.ts` — client centralization (in progress, not correct yet).
-- `services/translate.service.ts` — Mayura translate wrapper.
+- `services/translate.service.ts` — Mayura translate wrapper (next up).
 - `server.ts` restructure — explicit `http.Server` + attached `ws.Server`.
 - `ws/oneToOne.gateway.ts` — the actual relay (browser WS ↔ Sarvam realtime STT ↔ translate).
 - `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
