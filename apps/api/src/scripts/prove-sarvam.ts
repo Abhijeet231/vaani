@@ -1,4 +1,5 @@
 import { sarvamClient } from "../config/sarvam";
+import { translateText } from "../services/translation.service";
 import fs from "fs";
 import path from "path";
 
@@ -19,16 +20,13 @@ async function proveSarvamPipeline() {
         console.log("Transcript:", response.transcript)
 
         // Translating the trnascript with Mayura
-        const translateResponse = await sarvamClient.text.translate({
-            input: hindiText,
-            source_language_code: "hi-IN",
-            target_language_code: "kn-IN",
-            model: "mayura:v1",
-            numerals_format: "native",
-            mode: "code-mixed"
-        })
+        const translatedText = await translateText({
+            text: hindiText,
+            sourceLanguageCode: "hi-IN",
+            targetLanguageCode: "kn-IN",
+        });
 
-        console.log("Translated:", translateResponse.translated_text);
+        console.log("Translated:", translatedText);
     } catch (error) {
         console.error("Error:", error)
     }

@@ -8,10 +8,10 @@
 - Step 2 started: scaffolded empty `apps/api/src/services/translation.service.ts` (file created, no implementation yet).
 - Fixed `apps/api/tsconfig.json`: `moduleResolution: "node"` (and its alias `"node10"`) is deprecated on TypeScript 5.9, slated for removal in TS 7.0. Switched `module`/`moduleResolution` to `"nodenext"` (the current recommended pairing for a plain CommonJS Node backend — `apps/api/package.json` has no `"type": "module"`, so this resolves identically to before). Verified `tsc` still emits CommonJS (`require`/`exports`) output and `dist/server.js` runs the same as before.
 - That resolution change surfaced 2 real (pre-existing, previously masked) type errors in `translation.service.ts`: `sourceLanguageCode`/`targetLanguageCode` were typed as plain `string` instead of the Sarvam SDK's `SarvamAI.TranslateSourceLanguage` / `TranslateTargetLanguage` literal unions. Narrowed the param types to match; `tsc --noEmit` now passes clean.
+- Step 2 done: `translation.service.ts` exports `translateText({ text, sourceLanguageCode, targetLanguageCode, ... })`, wrapping the Mayura call with sane defaults (`numeralsFormat: "native"`, `mode: "code-mixed"`) and no swallowed errors. `prove-sarvam.ts` was missing the actual switch-over — it still had its own inline `sarvamClient.text.translate(...)` call, so the service existed but nothing used it. Updated `prove-sarvam.ts` to import and call `translateText` instead; re-ran against the real API, same transcript/translation output as before, `tsc --noEmit` clean.
 
 **Pending / not yet built (Phase 2):**
-- `services/translation.service.ts` — Mayura translate wrapper, extracted out of `prove-sarvam.ts`'s inline translate call (in progress, file is currently empty).
-- `server.ts` restructure — explicit `http.Server` + attached `ws.Server`.
+- `server.ts` restructure — explicit `http.Server` + attached `ws.Server` (next up).
 - `ws/oneToOne.gateway.ts` — the actual relay (browser WS ↔ Sarvam realtime STT ↔ translate).
 - `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
 - Two open decisions: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
