@@ -6,6 +6,7 @@
 - Step 1 done: `apps/api/src/config/sarvam.ts` now holds the single exported `sarvamClient` instance (mirrors the `env.ts` pattern). `prove-sarvam.ts` updated to import it instead of constructing its own client — re-ran against the real API, same Hindi transcript → Kannada translation as before.
 - Confirmed `code-mixed` translate mode still leaves English words untranslated in real output (e.g. "sunshine", "clothes", "personal project") — still need to compare against `formal` mode before Step 2.
 - Step 2 started: scaffolded empty `apps/api/src/services/translation.service.ts` (file created, no implementation yet).
+- Fixed `apps/api/tsconfig.json`: `moduleResolution: "node"` is deprecated on TypeScript 5.9 (editor flagged it); renamed to `"node10"`, same resolution behavior, no more warning.
 
 **Pending / not yet built (Phase 2):**
 - `services/translation.service.ts` — Mayura translate wrapper, extracted out of `prove-sarvam.ts`'s inline translate call (in progress, file is currently empty).
