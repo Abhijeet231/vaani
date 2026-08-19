@@ -6,6 +6,3 @@ export const sarvamClient = new SarvamAIClient({
     apiSubscriptionKey: env.sarvamApi
 });
 
-
-
-
