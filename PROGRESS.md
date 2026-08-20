@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-08-20 — Phase 2 Step 4 (partial): extract WS connection handler into its own gateway file
+
+- Pulled the inline `wss.on('connection', ...)` echo handler out of `server.ts` into `apps/api/src/ws/oneToOne.gateway.ts` (`handleOneToOneConnection`), matching the codebase's thin-entrypoint / logic-lives-in-its-own-module pattern. `server.ts` now just creates the `http.Server` + `WebSocketServer` and wires the connection event to the imported handler.
+- Still echo-only — no real Sarvam relay logic yet. Verified: `tsc --noEmit` clean, server boots, `GET /api/health` still responds.
+
+**Pending / not yet built (Phase 2):**
+- Replace the echo handler in `ws/oneToOne.gateway.ts` with the actual relay: browser WS → Sarvam realtime STT WS → `translateText` → back to browser WS.
+- `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
+- Two open decisions: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
+
 ## 2026-08-20 — Phase 2 Step 3: explicit HTTP server + WebSocket upgrade
 
 - `apps/api/src/server.ts` no longer uses the implicit `app.listen(...)`. It now wraps Express in an explicit `http.Server` via `createServer(app)`, then attaches a `ws.WebSocketServer` to that same server so it can handle the WebSocket upgrade handshake.
@@ -7,10 +17,7 @@
 - Reviewed for bugs: none functional — `tsc --noEmit` clean, `pnpm dev:api` boots and `GET /api/health` still responds `{"status":"ok"}`. Fixed two boot-log typos ("listning" → "listening").
 - Structural note carried forward: the connection handler currently lives inline in `server.ts` rather than in its own `ws/oneToOne.gateway.ts` file (the original Step 4 plan). Fine for now while proving the echo path; worth extracting once real Sarvam-relay logic replaces the echo.
 
-**Pending / not yet built (Phase 2):**
-- Replace the echo handler with the actual relay: browser WS → Sarvam realtime STT WS → `translateText` → back to browser WS. Likely extracted into `ws/oneToOne.gateway.ts` at that point.
-- `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
-- Two open decisions: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
+(Superseded by the 2026-08-20 Step 4 entry above — connection handler now lives in `ws/oneToOne.gateway.ts`.)
 
 ## 2026-08-20 — Phase 2 kickoff: streaming pipeline dependency added
 
