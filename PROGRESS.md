@@ -1,5 +1,17 @@
 # Progress Log
 
+## 2026-08-20 — Phase 2 Step 3: explicit HTTP server + WebSocket upgrade
+
+- `apps/api/src/server.ts` no longer uses the implicit `app.listen(...)`. It now wraps Express in an explicit `http.Server` via `createServer(app)`, then attaches a `ws.WebSocketServer` to that same server so it can handle the WebSocket upgrade handshake.
+- Went a step further than originally scoped: rather than stopping at just the bare `http.Server`, also wired up a first WebSocket connection handler inline in `server.ts` (`wss.on('connection', ...)` with message/close/error logging and an echo response) to prove the upgrade path works end-to-end before building the real Sarvam relay.
+- Reviewed for bugs: none functional — `tsc --noEmit` clean, `pnpm dev:api` boots and `GET /api/health` still responds `{"status":"ok"}`. Fixed two boot-log typos ("listning" → "listening").
+- Structural note carried forward: the connection handler currently lives inline in `server.ts` rather than in its own `ws/oneToOne.gateway.ts` file (the original Step 4 plan). Fine for now while proving the echo path; worth extracting once real Sarvam-relay logic replaces the echo.
+
+**Pending / not yet built (Phase 2):**
+- Replace the echo handler with the actual relay: browser WS → Sarvam realtime STT WS → `translateText` → back to browser WS. Likely extracted into `ws/oneToOne.gateway.ts` at that point.
+- `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
+- Two open decisions: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
+
 ## 2026-08-20 — Phase 2 kickoff: streaming pipeline dependency added
 
 - Added `ws` + `@types/ws` to `apps/api` (Step 0 of the Phase 2 build plan).
@@ -10,11 +22,7 @@
 - That resolution change surfaced 2 real (pre-existing, previously masked) type errors in `translation.service.ts`: `sourceLanguageCode`/`targetLanguageCode` were typed as plain `string` instead of the Sarvam SDK's `SarvamAI.TranslateSourceLanguage` / `TranslateTargetLanguage` literal unions. Narrowed the param types to match; `tsc --noEmit` now passes clean.
 - Step 2 done: `translation.service.ts` exports `translateText({ text, sourceLanguageCode, targetLanguageCode, ... })`, wrapping the Mayura call with sane defaults (`numeralsFormat: "native"`, `mode: "code-mixed"`) and no swallowed errors. `prove-sarvam.ts` was missing the actual switch-over — it still had its own inline `sarvamClient.text.translate(...)` call, so the service existed but nothing used it. Updated `prove-sarvam.ts` to import and call `translateText` instead; re-ran against the real API, same transcript/translation output as before, `tsc --noEmit` clean.
 
-**Pending / not yet built (Phase 2):**
-- `server.ts` restructure — explicit `http.Server` + attached `ws.Server` (next up).
-- `ws/oneToOne.gateway.ts` — the actual relay (browser WS ↔ Sarvam realtime STT ↔ translate).
-- `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
-- Two open decisions: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
+(Superseded by the 2026-08-20 Step 3 entry above — `server.ts` restructure is done.)
 
 ## 2026-08-15 — Phase 1 complete: Sarvam STT + Mayura translate validated
 
