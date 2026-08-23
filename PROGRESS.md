@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-08-23 — UI theme locked: "Slate Minimal" + Piazzolla/Hanken Grotesk
+
+- Explored 4 visual directions with the user via two published Artifacts (theme mockups on the real 1-1 screen, then a focused type-pairing comparison once "Slate Minimal" was picked). Locked: **Slate Minimal** palette (charcoal ground, single brass accent) with the "Soft Minimal" type pairing — **Piazzolla** (upright, not italic) for brand/display text, **Hanken Grotesk** for body/UI.
+- `apps/web/src/styles.scss`: Angular Material's `mat.theme()` Sass mixin only ships pre-generated M3 tonal palettes (no live hex→palette generation in this version), so it's now used just for typography/density/elevation plumbing (`typography: (plain-family: 'Hanken Grotesk', brand-family: 'Piazzolla', ...)`, `theme-type: dark`) — the actual brand colors are hard-set afterward as `--mat-sys-*` custom-property overrides (primary/surface/outline/etc., all named `$brass`/`$ground`/`$ink`/... at the top of the file) so every Material component renders in our exact hexes instead of an algorithmic approximation. `body`'s `color-scheme` changed from `light` to `dark` — this is a single committed dark theme, not a light/dark toggle (no such toggle was requested).
+- `apps/web/src/tailwind.css`: added a `@theme` block (`--color-ground`, `--color-ink`, `--color-brass`, `--font-display`, etc.) numerically in sync with the Material overrides, so Tailwind utility classes and Material components draw from one palette.
+- `apps/web/src/index.html`: swapped the Roboto font link for Piazzolla + Hanken Grotesk; fixed the `<title>` (was still the scaffold's "Web").
+- `app.html`/`app.scss`: toolbar no longer uses Material's `color="primary"` (would've painted the whole bar brass — too loud for "one considered accent"); wordmark now renders in Piazzolla via a `.wordmark` class instead.
+- Verified in a real browser: wordmark, record button, and language-select dropdown all render correctly against the dark ground with legible contrast and the brass accent showing up only on interactive elements. `ng build` clean; confirmed the override hexes actually landed in the compiled CSS via grep.
+
+**Pending / not yet built:**
+- Landing, About, and Contact pages — theme is now locked so these can start immediately (user asked to build the landing page next).
+- No app favicon set yet (still the CLI-default `favicon.ico`).
+
 ## 2026-08-23 — Bulbul TTS: speaker button on translated turns, synthesize-once-cache-and-replay
 
 - Backend: `apps/api/src/services/speech.service.ts` — `synthesizeSpeech({ text, languageCode })` wraps `sarvamClient.textToSpeech.convert` (`bulbul:v3`), decodes the base64 WAV response into a `Buffer`. New route `POST /api/one-to-one/speak?language=kn-IN` with `{ text }` JSON body, returns raw `audio/wav` bytes (`controllers/oneToOne.controller.ts`'s new `speakText`, mounted in `routes/oneToOne.routes.ts`). Verified against the real API via `curl` — valid WAV came back (RIFF/WAVE, 16-bit mono).

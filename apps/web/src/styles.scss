@@ -5,38 +5,93 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
-// Wrapped in a named layer (registered before Tailwind's layers, since this file
-// loads before tailwind.css in angular.json) so Tailwind utilities can win cascade
-// ties against these theme tokens. See apps/web/CLAUDE.md for details.
+// vaani brand — "Slate Minimal": charcoal ground, one brass accent, Piazzolla for
+// display/brand text, Hanken Grotesk for body/UI. Locked 2026-08-23 (see PROGRESS.md).
+// Material only ships pre-generated M3 tonal palettes via Sass (no live hex->palette
+// generation in this version), so `mat.theme()` below just supplies typography/density/
+// elevation plumbing off a stock palette — the actual brand colors are hard-set as
+// --mat-sys-* overrides afterward, so every Material component renders in our exact hexes
+// rather than an algorithmically-generated approximation.
+$brass: #c9a15c;
+$on-brass: #1a1408;
+$ground: #17181c;
+$surface: #1f2025;
+$surface-high: #232429;
+$surface-low: #131317;
+$surface-lowest: #0e0f12;
+$surface-bright: #2c2d33;
+$ink: #ededef;
+$ink-muted: #9b9ca3;
+$outline: #2a2b30;
+$outline-variant: #35363c;
+
 @layer mat-theme {
   html {
     height: 100%;
     @include mat.theme(
       (
         color: (
-          primary: mat.$azure-palette,
-          tertiary: mat.$blue-palette,
+          primary: mat.$violet-palette,
+          tertiary: mat.$violet-palette,
+          theme-type: dark,
         ),
-        typography: Roboto,
+        typography: (
+          plain-family: 'Hanken Grotesk',
+          brand-family: 'Piazzolla',
+          bold-weight: 700,
+          medium-weight: 600,
+          regular-weight: 400,
+        ),
         density: 0,
       )
     );
+
+    // Brand color overrides — see note above on why these are hard-set rather
+    // than generated. Keep in sync with the Tailwind tokens in tailwind.css.
+    --mat-sys-primary: #{$brass};
+    --mat-sys-on-primary: #{$on-brass};
+    --mat-sys-primary-container: #2a2115;
+    --mat-sys-on-primary-container: #{$brass};
+    --mat-sys-inverse-primary: #{$brass};
+
+    --mat-sys-secondary: #{$ink-muted};
+    --mat-sys-on-secondary: #{$ground};
+    --mat-sys-secondary-container: #{$surface-high};
+    --mat-sys-on-secondary-container: #{$ink};
+
+    --mat-sys-tertiary: #{$brass};
+    --mat-sys-on-tertiary: #{$on-brass};
+    --mat-sys-tertiary-container: #2a2115;
+    --mat-sys-on-tertiary-container: #{$brass};
+
+    --mat-sys-surface: #{$ground};
+    --mat-sys-on-surface: #{$ink};
+    --mat-sys-on-surface-variant: #{$ink-muted};
+    --mat-sys-surface-variant: #{$surface};
+    --mat-sys-surface-container: #{$surface};
+    --mat-sys-surface-container-low: #{$surface-low};
+    --mat-sys-surface-container-lowest: #{$surface-lowest};
+    --mat-sys-surface-container-high: #{$surface-high};
+    --mat-sys-surface-container-highest: #{$surface-bright};
+    --mat-sys-surface-dim: #{$surface-lowest};
+    --mat-sys-surface-bright: #{$surface-bright};
+    --mat-sys-background: #{$ground};
+    --mat-sys-on-background: #{$ink};
+
+    --mat-sys-outline: #{$outline};
+    --mat-sys-outline-variant: #{$outline-variant};
+
+    --mat-sys-inverse-surface: #{$ink};
+    --mat-sys-inverse-on-surface: #{$ground};
   }
 
   body {
-    // Default the application to a light color theme. This can be changed to
-    // `dark` to enable the dark color theme, or to `light dark` to defer to the
-    // user's system settings.
-    color-scheme: light;
-
-    // Set a default background, font and text colors for the application using
-    // Angular Material's system-level CSS variables. Learn more about these
-    // variables at https://material.angular.dev/guide/system-variables
+    // Slate Minimal is a single committed dark theme, not a light/dark toggle —
+    // see the styles.scss note above.
+    color-scheme: dark;
     background-color: var(--mat-sys-surface);
     color: var(--mat-sys-on-surface);
     font: var(--mat-sys-body-medium);
-
-    // Reset the user agent margin.
     margin: 0;
     height: 100%;
   }
