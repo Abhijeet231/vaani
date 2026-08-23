@@ -1,0 +1,22 @@
+// Dark hero band — lavender reads brighter/richer against graphite than it
+// does on the light ground (the light theme has to deepen it for text
+// contrast; here the raw accent works directly). Unlayered component styles
+// beat Tailwind's layered utilities by default, so no `!important` needed to
+// override .hero-sub's `text-ink-muted` class below.
+.hero-dark {
+  background: #2b2a30;
+  color: #f2f1f7;
+}
+
+.hero-dark .hero-sub {
+  color: #b6bbd6;
+}
+
+// The preview card is a light "floating" card inside the dark hero — reset
+// its own text color explicitly, otherwise its un-classed text (the plain
+// "Hindi"/"Kannada" labels, the translated line) inherits .hero-dark's
+// near-white color straight through and goes nearly invisible on the light
+// card background.
+.hero-card {
+  color: var(--color-ink);
+}

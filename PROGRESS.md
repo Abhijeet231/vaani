@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-08-23 — Dark hero band on landing (lavender-on-graphite, as originally moodboarded)
+
+- User asked what combining both moodboard colors on one page (light lavender page + dark graphite section) would look like, rather than treating graphite as pure text-ink. Restructured the landing hero into a full-bleed dark band (`landing.html`'s `.hero-dark` wrapper, styled in `landing.scss`) with the light preview card floating on top — lavender reads brighter on the dark ground than the deepened `#4a5fa8` text variant needed on light backgrounds, so this is arguably a better use of the color than the all-light version from the previous entry. Rest of the page (How it works, features, closing CTA) stays on the existing light `.theme-lavender` background — one dark band up top, not a full dark page.
+- **Found and fixed a real bug this surfaced**, not a testing artifact: the preview card's un-classed text (`Hindi`/`Kannada` labels, the Kannada translated line) has no explicit color of its own, so it was inheriting `.hero-dark`'s near-white text color straight through the light card and rendering almost invisible against the light card background. Fixed with `.hero-card { color: var(--color-ink); }` in `landing.scss`, resetting the card's own text color explicitly rather than letting it inherit from its dark ancestor. Caught via a real screenshot at full opacity, not the earlier reveal-animation confusion — this one was genuinely wrong on screen, not a rAF-throttling artifact.
+- Verified: `ng build`/`tsc --noEmit` clean; confirmed in a real browser with a saved screenshot (sent to the user) — dark hero, legible light card, lavender accent on the CTA/swap-icon/speaker-icon, and a clean transition into the light "How it works" section below.
+
+**Pending / not yet built:**
+- **Decision needed from user**: keep this dark-hero/light-body landing structure, or revert. Still undecided (from the previous entry) whether Lavender Haze extends to About/Pricing/Contact/App or stays landing-only.
+- Real contact email and a manual mobile-nav check are still outstanding (carried over, unchanged).
+
 ## 2026-08-23 — Lavender Haze experiment on landing; fixed a real site-wide icon-color bug
 
 - User liked a "Lavender Haze / Soft Graphite" moodboard palette (#92A9E1 + dark graphite) and asked to see the landing page in it, to compare against Slate Minimal. Added a third scoped theme, `.theme-lavender` in `styles.scss` (same pattern as `.theme-light`), applied only to `''`'s route data (`app.routes.ts`) — `/about`, `/pricing`, `/contact` stay on `.theme-light` (brass), `/app` stays dark. Same Piazzolla/Hanken Grotesk type system throughout — only color tokens differ, to isolate what's actually being judged. Raw `#92A9E1` fails text contrast on a light ground (~2.2:1, computed and checked) the same way raw brass did, so text/icon usage gets a deepened `#4a5fa8` (`$accent-ink-lav`) while `#92A9E1` itself stays the *fill* color for buttons — same split pattern as the brass/light theme.
