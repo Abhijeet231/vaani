@@ -8,6 +8,22 @@ export interface SaarasStream {
     close: () => void;
 }
 
+export interface TranscribeAudioParams {
+    audio: Buffer;
+    languageCode: SarvamAI.SpeechToTextLanguage;
+}
+
+export async function transcribeAudio({ audio, languageCode }: TranscribeAudioParams): Promise<string> {
+    const response = await sarvamClient.speechToText.transcribe({
+        file: audio,
+        model: "saaras:v3",
+        mode: "transcribe",
+        language_code: languageCode,
+    });
+
+    return response.transcript;
+}
+
 export async function openSaarasStream(
     languageCode: SarvamAI.SpeechToTextRealtimeStreamingLanguageCode,
     onFinalTranscript: (text: string) => void

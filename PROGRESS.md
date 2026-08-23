@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-08-23 — Phase 2 pivot: batch (record-then-send) 1-1 endpoint, verified working end-to-end
+
+- Decided to unblock 1-1 mode on the batch REST path instead of waiting on Sarvam realtime-WS access (still unresolved — see entry below). Same approach already planned for multi-speaker mode, so no throwaway work; the realtime relay (`ws/oneToOne.gateway.ts`, `openSaarasStream`) is untouched and stays ready to swap back in once that access comes through.
+- Added `transcribeAudio({ audio, languageCode })` to `transcription.service.ts` — wraps the batch `sarvamClient.speechToText.transcribe` call (`saaras:v3`, `mode: "transcribe"`), same one already proven in `prove-sarvam.ts`. Accepts a `Buffer` directly (no temp file needed — the SDK's `Uploadable` type takes a `Buffer` as-is).
+- New route: `POST /api/one-to-one/translate?source=hi-IN&target=kn-IN` with the raw audio bytes as the request body (`express.raw({ type: '*/*', limit: '25mb' })`, scoped to this route only — global `express.json()` in `app.ts` is untouched). New files: `routes/oneToOne.routes.ts`, `controllers/oneToOne.controller.ts`, mounted in `routes/index.ts`. Controller validates query params + body presence (400 on either missing), then calls `transcribeAudio` → `translateText`, returns `{ transcript, translatedText }`.
+- Verified against the real API: booted the dev server, POSTed the existing `test-assets/sarvam demo trimmed.mp3` fixture directly — got back the correct Hindi transcript + Kannada translation (same output as `prove-sarvam.ts`). Also verified both 400 paths (missing query params, missing body). `tsc --noEmit` clean.
+
+**Pending / not yet built (Phase 2):**
+- Frontend: `apps/web` needs to record a clip (silence/VAD or manual stop trigger, given the ~30s REST clip cap noted in Phase 1), POST it to this endpoint, and render `{ transcript, translatedText }`.
+- Sarvam support message about the realtime-WS `invalid_subscription_key` blocker — still not sent (see entry below); once resolved, revisit whether to switch 1-1 mode to the streaming relay or keep batch mode (it may be good enough).
+
 ## 2026-08-23 — Robustness fix + re-confirmed: still blocked on Sarvam realtime access
 
 - Found a real crash bug while re-testing: `transcription.service.ts`'s `sendAudioChunk` called `sendRealtimeAudioInput` unconditionally, which throws if the underlying socket isn't open (e.g. mid-reconnect). Since nothing caught it, an uncaught exception took down the entire `node` process — one flaky/rejected connection would have killed every active session, not just the one that failed. Fixed: `sendAudioChunk` now checks `socket.readyState !== WS.OPEN` and silently drops the chunk instead of throwing. Also surfaced Sarvam's `event: "error"` protocol messages to the console (previously only `transcript.final` was handled; auth/protocol errors were silently ignored).
