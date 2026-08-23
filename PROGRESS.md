@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-08-23 — Bulbul TTS: speaker button on translated turns, synthesize-once-cache-and-replay
+
+- Backend: `apps/api/src/services/speech.service.ts` — `synthesizeSpeech({ text, languageCode })` wraps `sarvamClient.textToSpeech.convert` (`bulbul:v3`), decodes the base64 WAV response into a `Buffer`. New route `POST /api/one-to-one/speak?language=kn-IN` with `{ text }` JSON body, returns raw `audio/wav` bytes (`controllers/oneToOne.controller.ts`'s new `speakText`, mounted in `routes/oneToOne.routes.ts`). Verified against the real API via `curl` — valid WAV came back (RIFF/WAVE, 16-bit mono).
+- Frontend: `Turn` gained `audioUrl`/`isSynthesizing`. Each translated turn gets a speaker icon (gated to `TTS_SUPPORTED_LANGUAGE_CODES` in `languages.ts`, since Bulbul supports fewer languages than STT/translate and Odia uses a different code there — `od-IN` vs. the `or-IN` used elsewhere in Sarvam's own APIs). First tap POSTs to `/one-to-one/speak`, caches the response as an object URL on that turn, and plays it; every tap after that just replays the cached `Audio` — no repeat API call, so repeat listens cost nothing extra (this was explicitly the point — Bulbul is billed per character synthesized).
+- Verified end-to-end in a real browser: proxy path confirmed via direct `fetch()`, then exercised the actual button through the running Angular component (injected a fake turn via `ng.getComponent`, since real turns require a mic recording automation can't grant permission for) — clicking synthesized real audio, cached the blob URL, and a second click made zero additional network requests to `/speak` (confirmed via network log — one request total across two clicks). `ng build` clean.
+
+**Pending / not yet built:**
+- Manual full round trip still needed from the user: record real speech → get a translation → tap the speaker → confirm actual audio plays audibly (automation could drive the click and confirm the network/caching behavior, but couldn't itself judge whether the audio *sounds* right).
+- No cleanup of object URLs (`URL.revokeObjectURL`) on unmount — fine at MVP scale (a handful of turns per session, page reload clears them), revisit if this ever becomes a long-running single session.
+- Speaker/voice, pace, temperature all left at Bulbul v3 defaults — no UI to change them yet.
+
 ## 2026-08-23 — 1-1 mode frontend: record, translate, display
 
 - New feature `apps/web/src/app/features/one-to-one/` (`OneToOne` component): language direction pickers (`mat-select` x2 + swap button, signals-based, from a hardcoded `LANGUAGES` list matching Sarvam's supported BCP-47 codes), a record button (`MediaRecorder` — tap to start, tap to stop, no VAD/auto-stop yet), and a running list of `{transcript, translatedText}` turns rendered newest-first. POSTs the recorded blob straight to `/api/one-to-one/translate` (the batch endpoint from the entry above) with the audio's own MIME type (Chrome records `audio/webm`, which Sarvam's batch STT accepts directly — no client-side transcoding needed).

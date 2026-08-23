@@ -20,3 +20,20 @@ export const LANGUAGES: Language[] = [
   { code: 'ur-IN', label: 'Urdu' },
   { code: 'ne-IN', label: 'Nepali' },
 ];
+
+// Sarvam's Bulbul TTS supports a smaller language set than STT/translate
+// (and Odia uses "od-IN" here, not the "or-IN" used elsewhere) — gate the
+// speaker button on this instead of assuming every LANGUAGES entry works.
+export const TTS_SUPPORTED_LANGUAGE_CODES = new Set([
+  'bn-IN',
+  'en-IN',
+  'gu-IN',
+  'hi-IN',
+  'kn-IN',
+  'ml-IN',
+  'mr-IN',
+  'od-IN',
+  'pa-IN',
+  'ta-IN',
+  'te-IN',
+]);

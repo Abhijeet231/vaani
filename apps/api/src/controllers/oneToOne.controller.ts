@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import type { SarvamAI } from 'sarvamai';
 import { transcribeAudio } from '../services/transcription.service';
 import { translateText } from '../services/translation.service';
+import { synthesizeSpeech } from '../services/speech.service';
 
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
   const sourceLanguageCode = req.query.source as SarvamAI.SpeechToTextLanguage | undefined;
@@ -26,6 +27,23 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
     });
 
     res.status(200).json({ transcript, translatedText });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function speakText(req: Request, res: Response, next: NextFunction) {
+  const languageCode = req.query.language as SarvamAI.TextToSpeechLanguage | undefined;
+  const text = typeof req.body?.text === 'string' ? req.body.text : undefined;
+
+  if (!languageCode || !text) {
+    res.status(400).json({ error: 'Missing language query param or text body' });
+    return;
+  }
+
+  try {
+    const audio = await synthesizeSpeech({ text, languageCode });
+    res.status(200).set('Content-Type', 'audio/wav').send(audio);
   } catch (err) {
     next(err);
   }

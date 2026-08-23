@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LANGUAGES } from './languages';
+import { LANGUAGES, TTS_SUPPORTED_LANGUAGE_CODES } from './languages';
 
 interface Turn {
   id: string;
@@ -14,6 +14,8 @@ interface Turn {
   targetLanguage: string;
   transcript: string;
   translatedText: string;
+  audioUrl: string | null;
+  isSynthesizing: boolean;
 }
 
 interface TranslateAudioResponse {
@@ -111,6 +113,8 @@ export class OneToOne {
               targetLanguage,
               transcript: response.transcript,
               translatedText: response.translatedText,
+              audioUrl: null,
+              isSynthesizing: false,
             },
             ...existing,
           ]);
@@ -125,5 +129,37 @@ export class OneToOne {
 
   protected languageLabel(code: string): string {
     return this.languages.find((lang) => lang.code === code)?.label ?? code;
+  }
+
+  protected ttsSupported(code: string): boolean {
+    return TTS_SUPPORTED_LANGUAGE_CODES.has(code);
+  }
+
+  protected playTranslation(turn: Turn): void {
+    if (turn.audioUrl) {
+      new Audio(turn.audioUrl).play();
+      return;
+    }
+
+    this.updateTurn(turn.id, { isSynthesizing: true });
+
+    const url = `/api/one-to-one/speak?language=${turn.targetLanguage}`;
+    this.http.post(url, { text: turn.translatedText }, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const audioUrl = URL.createObjectURL(blob);
+        this.updateTurn(turn.id, { audioUrl, isSynthesizing: false });
+        new Audio(audioUrl).play();
+      },
+      error: () => {
+        this.errorMessage.set('Could not generate speech. Please try again.');
+        this.updateTurn(turn.id, { isSynthesizing: false });
+      },
+    });
+  }
+
+  private updateTurn(id: string, changes: Partial<Turn>): void {
+    this.turns.update((existing) =>
+      existing.map((turn) => (turn.id === id ? { ...turn, ...changes } : turn))
+    );
   }
 }

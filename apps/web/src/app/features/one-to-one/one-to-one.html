@@ -70,7 +70,24 @@
           {{ languageLabel(turn.sourceLanguage) }} &rarr; {{ languageLabel(turn.targetLanguage) }}
         </div>
         <div class="text-sm opacity-70 mb-1">{{ turn.transcript }}</div>
-        <div class="text-lg font-medium">{{ turn.translatedText }}</div>
+        <div class="flex items-center gap-2">
+          <div class="text-lg font-medium flex-1">{{ turn.translatedText }}</div>
+          @if (ttsSupported(turn.targetLanguage)) {
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Play translation"
+              [disabled]="turn.isSynthesizing"
+              (click)="playTranslation(turn)"
+            >
+              @if (turn.isSynthesizing) {
+                <mat-spinner diameter="20" />
+              } @else {
+                <mat-icon>volume_up</mat-icon>
+              }
+            </button>
+          }
+        </div>
       </mat-card>
     }
   </div>
