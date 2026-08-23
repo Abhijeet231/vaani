@@ -41,6 +41,22 @@ $ink-muted-light: #8a8172;
 $outline-light: #e8e0d0;
 $outline-variant-light: #ddd4c0;
 
+// EXPERIMENTAL — "Lavender Haze / Soft Graphite", scoped to the landing page
+// only (see app.routes.ts: landing's `data.theme` is 'lavender', not 'light')
+// while it's being compared against Slate Minimal. Not adopted for /about,
+// /pricing, /contact, or /app yet. Same Piazzolla/Hanken Grotesk type system —
+// only the color tokens differ, to isolate what's actually being evaluated.
+$lavender: #92a9e1;
+$on-lavender: #2e2e33; // "soft graphite" — used as both the on-lavender text and main ink
+$accent-ink-lav: #4a5fa8; // raw lavender fails text contrast on a light ground (~2.2:1) — deepened for text/icon use
+$ground-lav: #f7f7fb;
+$surface-lav: #ffffff;
+$surface-high-lav: #ecedf9;
+$surface-bright-lav: #ffffff;
+$ink-muted-lav: #6b6b76;
+$outline-lav: #e2e4f1;
+$outline-variant-lav: #d3d7ee;
+
 @layer mat-theme {
   html {
     height: 100%;
@@ -167,6 +183,58 @@ $outline-variant-light: #ddd4c0;
     --color-ink-muted: #{$ink-muted-light};
     --color-accent-ink: #{$accent-ink-light};
     --color-border: #{$outline-light};
+  }
+
+  // See the "Lavender Haze / Soft Graphite" note above — landing-only experiment.
+  .theme-lavender {
+    color-scheme: light;
+    min-height: 100%;
+    background-color: #{$ground-lav};
+    color: #{$on-lavender};
+
+    --mat-sys-primary: #{$lavender};
+    --mat-sys-on-primary: #{$on-lavender};
+    --mat-sys-primary-container: #{$surface-high-lav};
+    --mat-sys-on-primary-container: #{$on-lavender};
+    --mat-sys-inverse-primary: #{$lavender};
+
+    --mat-sys-secondary: #{$ink-muted-lav};
+    --mat-sys-on-secondary: #{$ground-lav};
+    --mat-sys-secondary-container: #{$surface-high-lav};
+    --mat-sys-on-secondary-container: #{$on-lavender};
+
+    --mat-sys-tertiary: #{$lavender};
+    --mat-sys-on-tertiary: #{$on-lavender};
+    --mat-sys-tertiary-container: #{$surface-high-lav};
+    --mat-sys-on-tertiary-container: #{$on-lavender};
+
+    --mat-sys-surface: #{$ground-lav};
+    --mat-sys-on-surface: #{$on-lavender};
+    --mat-sys-on-surface-variant: #{$ink-muted-lav};
+    --mat-sys-surface-variant: #{$surface-lav};
+    --mat-sys-surface-container: #{$surface-lav};
+    --mat-sys-surface-container-low: #{$surface-high-lav};
+    --mat-sys-surface-container-lowest: #{$surface-lav};
+    --mat-sys-surface-container-high: #{$surface-high-lav};
+    --mat-sys-surface-container-highest: #{$outline-lav};
+    --mat-sys-surface-dim: #{$outline-lav};
+    --mat-sys-surface-bright: #{$surface-bright-lav};
+    --mat-sys-background: #{$ground-lav};
+    --mat-sys-on-background: #{$on-lavender};
+
+    --mat-sys-outline: #{$outline-lav};
+    --mat-sys-outline-variant: #{$outline-variant-lav};
+
+    --mat-sys-inverse-surface: #{$on-lavender};
+    --mat-sys-inverse-on-surface: #{$ground-lav};
+
+    --color-ground: #{$ground-lav};
+    --color-surface: #{$surface-lav};
+    --color-surface-high: #{$surface-high-lav};
+    --color-ink: #{$on-lavender};
+    --color-ink-muted: #{$ink-muted-lav};
+    --color-accent-ink: #{$accent-ink-lav};
+    --color-border: #{$outline-lav};
   }
 }
 /* Angular Material component theming lives here. Tailwind lives in tailwind.css — do not mix @tailwind/@import "tailwindcss" directives into this file. */

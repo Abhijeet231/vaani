@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-08-23 — Lavender Haze experiment on landing; fixed a real site-wide icon-color bug
+
+- User liked a "Lavender Haze / Soft Graphite" moodboard palette (#92A9E1 + dark graphite) and asked to see the landing page in it, to compare against Slate Minimal. Added a third scoped theme, `.theme-lavender` in `styles.scss` (same pattern as `.theme-light`), applied only to `''`'s route data (`app.routes.ts`) — `/about`, `/pricing`, `/contact` stay on `.theme-light` (brass), `/app` stays dark. Same Piazzolla/Hanken Grotesk type system throughout — only color tokens differ, to isolate what's actually being judged. Raw `#92A9E1` fails text contrast on a light ground (~2.2:1, computed and checked) the same way raw brass did, so text/icon usage gets a deepened `#4a5fa8` (`$accent-ink-lav`) while `#92A9E1` itself stays the *fill* color for buttons — same split pattern as the brass/light theme.
+- **Found and fixed a real, pre-existing bug while checking this**, unrelated to the color pivot: every `<mat-icon>` using a `text-accent-ink`/`text-ink-muted` Tailwind color utility was silently rendering in the default ink color instead, site-wide (pricing checkmarks, landing's feature icons and hero speaker icon, contact's mail icon, the direction-swap icon) — Material's own unlayered `.mat-icon-no-color` CSS was winning the cascade over Tailwind's layered utility, the exact gotcha already documented in `apps/web/CLAUDE.md` but not applied here. Fixed by adding the `!` important modifier to every affected `mat-icon` color class (`text-accent-ink!`, `text-ink-muted!`) across `landing.html`, `pricing.html`, `contact.html`. Confirmed via computed-style checks in a real browser, not just visually — the bug was subtle enough that a screenshot alone didn't clearly show it.
+- Verified: `ng build`/`tsc --noEmit` clean; landing (lavender), pricing (light/brass, icon fix), and `/app` (dark, untouched) all checked in a real browser.
+
+**Pending / not yet built:**
+- **Decision needed from user**: keep Lavender Haze for the landing page (and possibly extend it to About/Pricing/Contact, replacing brass), or revert to Slate Minimal brass and drop the lavender experiment. Nothing is deleted yet — `.theme-light` (brass) is untouched and still one route-data change away from being restored on `''`.
+- Still pending from the previous entry: real contact email, and a manual check of the mobile nav menu on an actual narrow viewport.
+
 ## 2026-08-23 — About, Pricing, Contact pages + navbar wiring
 
 - New pages under `apps/web/src/app/features/`: `about/`, `pricing/`, `contact/` — all light theme (`data: { theme: 'light' }` in `app.routes.ts`), all using the shared `appReveal` directive for scroll-in.
