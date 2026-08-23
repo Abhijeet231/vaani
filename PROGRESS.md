@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-08-23 — Landing page; OneToOne moved off root to /app
+
+- New `apps/web/src/app/features/landing/` (`Landing` component): hero (headline, subhead, CTA, a live-styled preview of the actual turn-card UI reusing the real Hindi→Kannada example), a 3-step "How it works" (a genuine sequence, so numbered), a 3-up feature grid (live 1-1 translation, speaker playback, multi-speaker — the last one dimmed and explicitly labeled "Coming soon" since it isn't built, not implied as available), and a closing CTA. All copy is specific to what the product actually does today, not generic SaaS boilerplate.
+- Routing changed: landing now owns `''`; the actual recorder/translator (`OneToOne`) moved to `/app`. Toolbar wordmark is now a link back to `/`.
+- Verified in a real browser end-to-end: landing renders correctly (hero, steps, features), "Start a conversation" navigates to `/app`, and the translator still works there unchanged. `ng build` clean (same pre-existing bundle-budget warning, now a bit larger from the added routed component).
+
+**Pending / not yet built:**
+- About and Contact pages (next, per the user's original 3-page ask) — no nav links to them yet since they don't exist, to avoid dead links.
+- No shared header/footer nav component yet between pages — will be worth extracting once About/Contact exist and there's real cross-page navigation to build.
+
 ## 2026-08-23 — UI theme locked: "Slate Minimal" + Piazzolla/Hanken Grotesk
 
 - Explored 4 visual directions with the user via two published Artifacts (theme mockups on the real 1-1 screen, then a focused type-pairing comparison once "Slate Minimal" was picked). Locked: **Slate Minimal** palette (charcoal ground, single brass accent) with the "Soft Minimal" type pairing — **Piazzolla** (upright, not italic) for brand/display text, **Hanken Grotesk** for body/UI.
