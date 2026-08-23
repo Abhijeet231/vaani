@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-08-23 — 1-1 mode frontend: record, translate, display
+
+- New feature `apps/web/src/app/features/one-to-one/` (`OneToOne` component): language direction pickers (`mat-select` x2 + swap button, signals-based, from a hardcoded `LANGUAGES` list matching Sarvam's supported BCP-47 codes), a record button (`MediaRecorder` — tap to start, tap to stop, no VAD/auto-stop yet), and a running list of `{transcript, translatedText}` turns rendered newest-first. POSTs the recorded blob straight to `/api/one-to-one/translate` (the batch endpoint from the entry above) with the audio's own MIME type (Chrome records `audio/webm`, which Sarvam's batch STT accepts directly — no client-side transcoding needed).
+- Wired up: `app.routes.ts` now routes `''` to `OneToOne`; `app.config.ts` gained `provideHttpClient()`; `app.html`/`app.ts` stripped down to just the toolbar + `router-outlet` (removed the scaffold's placeholder Material+Tailwind demo card), title changed from `'web'` to `'vaani'`.
+- Verified: `ng build` clean (one pre-existing bundle-size budget warning, not from this work). Ran both dev servers and drove the real page in a browser — language selects and the direction-swap button work correctly (confirmed via screenshot: Hindi/Kannada swapped to Kannada/Hindi, dropdown opens with the current selection checked). **Could not verify the actual record → mic-permission → upload → translate round trip this way**: clicking the record button hangs on Chrome's native mic-permission prompt, which lives outside the page DOM and isn't clickable by the browser-automation tool. The backend half of that path is already proven separately (`prove-realtime.ts`'s sibling batch test via `curl` in the previous entry got a correct real transcript+translation back from this exact endpoint) — the unverified part is purely "does a real browser's `MediaRecorder` blob reach it correctly," which is standard Web API usage but genuinely untested end-to-end.
+- Pre-existing, unrelated: `app.spec.ts`'s "should render title" test already asserted on an `<h1>` that hasn't existed since the Material+Tailwind demo replaced the CLI's default scaffold template, well before this session — left as-is, not something this change broke or was asked to fix.
+
+**Pending / not yet built:**
+- **User: please manually test the record button in a real browser** (grant mic permission when prompted) and confirm you get a transcript+translation back — this is the one path automation couldn't reach.
+- No auto-stop (silence/VAD) — recording is manual tap-to-stop only; fine for MVP, revisit if it feels awkward in practice.
+- No loading/error snackbar polish beyond inline text — acceptable for MVP.
+- Multi-speaker mode UI — not started, out of scope for this phase.
+
 ## 2026-08-23 — Phase 2 pivot: batch (record-then-send) 1-1 endpoint, verified working end-to-end
 
 - Decided to unblock 1-1 mode on the batch REST path instead of waiting on Sarvam realtime-WS access (still unresolved — see entry below). Same approach already planned for multi-speaker mode, so no throwaway work; the realtime relay (`ws/oneToOne.gateway.ts`, `openSaarasStream`) is untouched and stays ready to swap back in once that access comes through.

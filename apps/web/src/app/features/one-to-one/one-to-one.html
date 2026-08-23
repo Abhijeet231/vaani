@@ -1,0 +1,77 @@
+<div class="flex flex-col items-center gap-6 p-6 max-w-xl mx-auto w-full">
+  <mat-card class="w-full p-4 rounded-xl!">
+    <div class="flex items-center gap-2">
+      <mat-form-field class="flex-1" subscriptSizing="dynamic">
+        <mat-label>From</mat-label>
+        <mat-select
+          [value]="sourceLanguage()"
+          (selectionChange)="sourceLanguage.set($event.value)"
+        >
+          @for (lang of languages; track lang.code) {
+            <mat-option [value]="lang.code">{{ lang.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Swap direction"
+        (click)="flipDirection()"
+      >
+        <mat-icon>swap_horiz</mat-icon>
+      </button>
+
+      <mat-form-field class="flex-1" subscriptSizing="dynamic">
+        <mat-label>To</mat-label>
+        <mat-select
+          [value]="targetLanguage()"
+          (selectionChange)="targetLanguage.set($event.value)"
+        >
+          @for (lang of languages; track lang.code) {
+            <mat-option [value]="lang.code">{{ lang.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col items-center gap-3 mt-6">
+      <button
+        mat-fab
+        type="button"
+        [color]="isRecording() ? 'warn' : 'primary'"
+        [disabled]="isProcessing()"
+        (click)="toggleRecording()"
+      >
+        <mat-icon>{{ isRecording() ? 'stop' : 'mic' }}</mat-icon>
+      </button>
+
+      @if (isProcessing()) {
+        <div class="flex items-center gap-2 text-sm opacity-70">
+          <mat-spinner diameter="18" />
+          Translating...
+        </div>
+      } @else if (isRecording()) {
+        <span class="text-sm opacity-70">Recording... tap to stop</span>
+      } @else {
+        <span class="text-sm opacity-70">Tap to record</span>
+      }
+
+      @if (errorMessage()) {
+        <span class="text-sm text-red-600">{{ errorMessage() }}</span>
+      }
+    </div>
+  </mat-card>
+
+  <div class="flex flex-col gap-3 w-full">
+    @for (turn of turns(); track turn.id) {
+      <mat-card class="w-full p-4 rounded-xl!">
+        <div class="text-xs opacity-60 mb-2">
+          {{ languageLabel(turn.sourceLanguage) }} &rarr; {{ languageLabel(turn.targetLanguage) }}
+        </div>
+        <div class="text-sm opacity-70 mb-1">{{ turn.transcript }}</div>
+        <div class="text-lg font-medium">{{ turn.translatedText }}</div>
+      </mat-card>
+    }
+  </div>
+</div>
