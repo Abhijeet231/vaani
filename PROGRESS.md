@@ -1,13 +1,12 @@
 # Progress Log
 
-## 2026-08-23 — Phase 2 Step 4 (in progress): scaffolding the Sarvam STT helper
+## 2026-08-23 — Phase 2 Step 4: Sarvam realtime STT helper (`transcription.service.ts`)
 
-- Started `apps/api/src/services/transcription.service.ts` — the realtime-STT counterpart to `translation.service.ts`, wrapping `sarvamClient.speechToTextRealtimeStreaming` (`saaras:v3-realtime`) instead of the batch `speechToText.transcribe` used in `prove-sarvam.ts`. Currently just a stub interface, not functional yet (WIP, hand-written).
-- Agreed shape/plan for the rest of Step 4 (not yet built): helper opens the Sarvam realtime socket, listens for `RealtimeTranscriptFinal` events, and hands finished transcript text back via callback; `ws/oneToOne.gateway.ts` then parses direction from `req.url`, feeds incoming browser audio into the helper, and on each final transcript calls `translateText` + sends the result back over the browser WS.
+- `apps/api/src/services/transcription.service.ts` now implemented — the realtime-STT counterpart to `translation.service.ts`. Exports `openSaarasStream(languageCode, onFinalTranscript)`, which opens `sarvamClient.speechToTextRealtimeStreaming` (`saaras:v3-realtime`, keyed off `env.sarvamApi`), listens for `transcript.final` events and calls `onFinalTranscript(text)` for each, awaits the socket actually being open, then hands back `{ sendAudioChunk, close }` for a caller to drive. Deliberately ignores partial transcripts — only finals get surfaced, so the gateway won't re-translate mid-utterance. `tsc --noEmit` clean.
+- Written by Claude at the user's request (earlier stub was hand-written and had a syntax error).
 
 **Pending / not yet built (Phase 2):**
-- Finish `transcription.service.ts` (currently a broken/incomplete stub — has a syntax error).
-- Wire `ws/oneToOne.gateway.ts` to use it, replacing the current echo handler.
+- Wire `ws/oneToOne.gateway.ts` to use `openSaarasStream`, replacing the current echo handler: parse direction from `req.url`, open the stream with the source language, forward incoming browser audio chunks into `sendAudioChunk`, and on each final transcript call `translateText` + send the result back over the browser WS. Close the Saaras socket on `ws.on('close')`.
 - `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture.
 - Two open decisions carried over: direction handshake shape (query params vs. first message) and Mayura translate mode (`code-mixed` vs `formal`).
 
