@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-08-23 — Phase 2 proof script run: relay confirmed working, blocked on Sarvam account access
+
+- Added `apps/api/src/scripts/prove-realtime.ts` — spins up the gateway on a local test port, converts the existing `test-assets/sarvam demo trimmed.mp3` fixture to raw 16kHz mono PCM via `ffmpeg`, streams it into the relay as ~100ms binary chunks over a real WS client, and logs whatever comes back.
+- Ran it against the real Sarvam API. Result: our side of the pipeline works correctly — WS connects, `Welcome` message received, audio chunks forwarded into the Saaras socket, and the socket's `message`/`close` events are received and parsed as expected (added a `close` handler to `transcription.service.ts` for this — was previously silent on unexpected disconnects).
+- **Blocked**: Sarvam's realtime WS endpoint rejects the current `SARVAM_API_KEY` with `{"event":"error","code":"invalid_subscription_key","status_code":401}`. The same key works fine for the REST speech-to-text and text-translate endpoints (re-verified via `prove-sarvam.ts` in this session) — so this looks like the account/plan doesn't have realtime streaming access enabled, not a bad key or a code bug.
+- **Action needed (user, not code):** check the Sarvam API dashboard for realtime-streaming access/plan enablement on this key before Step 4 can be verified end-to-end.
+
 ## 2026-08-23 — Phase 2 Step 4 complete: gateway wired to the real relay
 
 - `apps/api/src/ws/oneToOne.gateway.ts` no longer echoes — `handleOneToOneConnection` now reads `?source=..&target=..` off `req.url`, opens a Saaras stream via `openSaarasStream(sourceLanguageCode, ...)`, forwards incoming **binary** WS frames from the browser into it as base64 (buffering any that arrive before the async `openSaarasStream` resolves), and on each final transcript calls `translateText` and sends `{ type: 'translation', text }` back to the browser. Closes the Saaras socket on `ws.on('close')`. Missing/invalid query params get an error message + immediate close. `tsc --noEmit` clean.

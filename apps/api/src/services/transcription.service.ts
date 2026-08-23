@@ -27,6 +27,10 @@ export async function openSaarasStream(
         console.error("Saaras realtime socket error:", error);
     });
 
+    socket.on("close", (event) => {
+        console.log("Saaras socket closed:", event);
+    });
+
     await socket.waitForOpen();
 
     return {
