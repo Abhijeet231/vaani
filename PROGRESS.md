@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-08-24 — Meta/OG tags added to index.html (placeholder domain)
+
+- Added a real `<meta name="description">`, full Open Graph tag set (`og:title`, `og:description`, `og:type`, `og:site_name`, `og:url`, `og:image`), and Twitter Card tags to `apps/web/src/index.html`. Also fixed the `<title>` (was still the bare "vaani", now "vaani — say it once, hear it back in theirs"). Without these, sharing a vaani link anywhere (WhatsApp, LinkedIn, X, Slack) previously showed a bare/blank link card.
+- **`og:url` and `og:image` use a `TODO_DOMAIN` placeholder** — there's no real domain yet. `og:image` also has no actual file behind it yet (`public/og-image.png` doesn't exist — needs an actual 1200×630 designed image, not just the meta tag).
+- Verified the tags land correctly in the compiled `dist/web/browser/index.html` via `ng build` + grep.
+
+**Pending / not yet built:**
+- **User asked to be reminded once the project is done / ready to go live**: swap `TODO_DOMAIN` in `index.html` for the real domain (two `og:url`/`og:image` values, one `twitter:image`), and create the actual `og-image.png` asset. Saved as a project memory too so this surfaces proactively in a future session, not just here.
+
 ## 2026-08-23 — Dark hero band on landing (lavender-on-graphite, as originally moodboarded)
 
 - User asked what combining both moodboard colors on one page (light lavender page + dark graphite section) would look like, rather than treating graphite as pure text-ink. Restructured the landing hero into a full-bleed dark band (`landing.html`'s `.hero-dark` wrapper, styled in `landing.scss`) with the light preview card floating on top — lavender reads brighter on the dark ground than the deepened `#4a5fa8` text variant needed on light backgrounds, so this is arguably a better use of the color than the all-light version from the previous entry. Rest of the page (How it works, features, closing CTA) stays on the existing light `.theme-lavender` background — one dark band up top, not a full dark page.
