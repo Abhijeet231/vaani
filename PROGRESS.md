@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-08-23 — Phase 2 Step 4 complete: gateway wired to the real relay
+
+- `apps/api/src/ws/oneToOne.gateway.ts` no longer echoes — `handleOneToOneConnection` now reads `?source=..&target=..` off `req.url`, opens a Saaras stream via `openSaarasStream(sourceLanguageCode, ...)`, forwards incoming **binary** WS frames from the browser into it as base64 (buffering any that arrive before the async `openSaarasStream` resolves), and on each final transcript calls `translateText` and sends `{ type: 'translation', text }` back to the browser. Closes the Saaras socket on `ws.on('close')`. Missing/invalid query params get an error message + immediate close. `tsc --noEmit` clean.
+- Written by Claude at the user's request.
+- Protocol decided (not yet used by any frontend code — `apps/web` doesn't speak to this gateway yet): direction via query params on the WS URL, audio in as raw binary frames, results out as JSON text frames (`{type: 'translation' | 'error' | 'Welcome', ...}`).
+
+**Pending / not yet built (Phase 2):**
+- Frontend: connect `apps/web` to this WS endpoint — capture mic audio, chunk it, send as binary frames; render incoming `translation` messages live.
+- `scripts/prove-realtime.ts` — end-to-end proof script with a 16kHz mono PCM WAV fixture, to validate the relay against the real Sarvam API before wiring the frontend.
+- Two open decisions carried over: confirm the query-param direction handshake is what the frontend should actually use, and lock in Mayura translate mode (`code-mixed` vs `formal`).
+
 ## 2026-08-23 — Phase 2 Step 4: Sarvam realtime STT helper (`transcription.service.ts`)
 
 - `apps/api/src/services/transcription.service.ts` now implemented — the realtime-STT counterpart to `translation.service.ts`. Exports `openSaarasStream(languageCode, onFinalTranscript)`, which opens `sarvamClient.speechToTextRealtimeStreaming` (`saaras:v3-realtime`, keyed off `env.sarvamApi`), listens for `transcript.final` events and calls `onFinalTranscript(text)` for each, awaits the socket actually being open, then hands back `{ sendAudioChunk, close }` for a caller to drive. Deliberately ignores partial transcripts — only finals get surfaced, so the gateway won't re-translate mid-utterance. `tsc --noEmit` clean.
