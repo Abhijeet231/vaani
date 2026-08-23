@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-08-23 — Robustness fix + re-confirmed: still blocked on Sarvam realtime access
+
+- Found a real crash bug while re-testing: `transcription.service.ts`'s `sendAudioChunk` called `sendRealtimeAudioInput` unconditionally, which throws if the underlying socket isn't open (e.g. mid-reconnect). Since nothing caught it, an uncaught exception took down the entire `node` process — one flaky/rejected connection would have killed every active session, not just the one that failed. Fixed: `sendAudioChunk` now checks `socket.readyState !== WS.OPEN` and silently drops the chunk instead of throwing. Also surfaced Sarvam's `event: "error"` protocol messages to the console (previously only `transcript.final` was handled; auth/protocol errors were silently ignored).
+- Reran `prove-realtime.ts` after the user reported seeing billing usage and asked about a "realtime access" toggle. The usage graph they saw was from the REST `prove-sarvam.ts` run (labeled "Saaras v3"), not the realtime one — re-running the actual realtime script shows it's still rejected: `invalid_subscription_key` (WS close code 1003), retried automatically by the SDK's reconnect logic and failing identically every time. No toggle for this was visible on the Sarvam API Keys dashboard page (screenshot showed only the key list, no scopes/permissions column).
+- **Still blocked, action needed (user, not code):** find where Sarvam gates realtime-streaming access for this key — try their Model Catalogue page, Pricing page, or contact Sarvam support directly and ask specifically why `saaras:v3-realtime` returns `invalid_subscription_key` while REST `saaras:v3` and Mayura work fine on the same key.
+
 ## 2026-08-23 — Phase 2 proof script run: relay confirmed working, blocked on Sarvam account access
 
 - Added `apps/api/src/scripts/prove-realtime.ts` — spins up the gateway on a local test port, converts the existing `test-assets/sarvam demo trimmed.mp3` fixture to raw 16kHz mono PCM via `ffmpeg`, streams it into the relay as ~100ms binary chunks over a real WS client, and logs whatever comes back.

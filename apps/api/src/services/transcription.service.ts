@@ -1,5 +1,6 @@
 import { sarvamClient } from "../config/sarvam";
 import { env } from "../config/env";
+import { WebSocket as WS } from "ws";
 import type { SarvamAI } from "sarvamai";
 
 export interface SaarasStream {
@@ -20,6 +21,8 @@ export async function openSaarasStream(
     socket.on("message", (message) => {
         if (message.event === "transcript.final") {
             onFinalTranscript(message.text);
+        } else if (message.event === "error") {
+            console.error("Saaras protocol error:", message.code, message.message);
         }
     });
 
@@ -28,13 +31,16 @@ export async function openSaarasStream(
     });
 
     socket.on("close", (event) => {
-        console.log("Saaras socket closed:", event);
+        console.log("Saaras socket closed:", event.code, event.reason);
     });
 
     await socket.waitForOpen();
 
     return {
         sendAudioChunk: (base64Audio) => {
+            if (socket.readyState !== WS.OPEN) {
+                return;
+            }
             socket.sendRealtimeAudioInput({ event: "audio_input", audio: base64Audio });
         },
         close: () => {
