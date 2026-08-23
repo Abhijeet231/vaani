@@ -25,6 +25,22 @@ $ink-muted: #9b9ca3;
 $outline: #2a2b30;
 $outline-variant: #35363c;
 
+// Light "soothing" variant of the same brand — same brass fill + type system,
+// warm soft ground instead of charcoal. Scoped to marketing pages only (see
+// `.theme-light` below and app.ts's route-based theme class); the app itself
+// (/app) stays dark. Brass as a *fill* color (buttons) stays identical to the
+// dark theme; brass as *text* needs a deeper shade for contrast on a light
+// ground, hence $accent-ink-light below differing from $brass.
+$accent-ink-light: #8a6a30;
+$ground-light: #f7f4ee;
+$surface-light: #ffffff;
+$surface-high-light: #f1ece1;
+$surface-bright-light: #ffffff;
+$ink-light: #262019;
+$ink-muted-light: #8a8172;
+$outline-light: #e8e0d0;
+$outline-variant-light: #ddd4c0;
+
 @layer mat-theme {
   html {
     height: 100%;
@@ -94,6 +110,63 @@ $outline-variant: #35363c;
     font: var(--mat-sys-body-medium);
     margin: 0;
     height: 100%;
+  }
+
+  // Scoped light override for marketing pages (landing, about, contact, pricing).
+  // Applied by app.ts as a class on the shell wrapper based on the active route's
+  // `data.theme` — overrides the same --mat-sys-*/--color-* custom properties set
+  // above, so both Material components and Tailwind utilities re-resolve correctly
+  // for everything inside it, no second `mat.theme()` call needed.
+  .theme-light {
+    color-scheme: light;
+    min-height: 100%;
+    background-color: #{$ground-light};
+    color: #{$ink-light};
+
+    --mat-sys-primary: #{$brass};
+    --mat-sys-on-primary: #{$on-brass};
+    --mat-sys-primary-container: #{$surface-high-light};
+    --mat-sys-on-primary-container: #{$accent-ink-light};
+    --mat-sys-inverse-primary: #{$brass};
+
+    --mat-sys-secondary: #{$ink-muted-light};
+    --mat-sys-on-secondary: #{$ground-light};
+    --mat-sys-secondary-container: #{$surface-high-light};
+    --mat-sys-on-secondary-container: #{$ink-light};
+
+    --mat-sys-tertiary: #{$brass};
+    --mat-sys-on-tertiary: #{$on-brass};
+    --mat-sys-tertiary-container: #{$surface-high-light};
+    --mat-sys-on-tertiary-container: #{$accent-ink-light};
+
+    --mat-sys-surface: #{$ground-light};
+    --mat-sys-on-surface: #{$ink-light};
+    --mat-sys-on-surface-variant: #{$ink-muted-light};
+    --mat-sys-surface-variant: #{$surface-light};
+    --mat-sys-surface-container: #{$surface-light};
+    --mat-sys-surface-container-low: #{$surface-high-light};
+    --mat-sys-surface-container-lowest: #{$surface-light};
+    --mat-sys-surface-container-high: #{$surface-high-light};
+    --mat-sys-surface-container-highest: #{$outline-light};
+    --mat-sys-surface-dim: #{$outline-light};
+    --mat-sys-surface-bright: #{$surface-bright-light};
+    --mat-sys-background: #{$ground-light};
+    --mat-sys-on-background: #{$ink-light};
+
+    --mat-sys-outline: #{$outline-light};
+    --mat-sys-outline-variant: #{$outline-variant-light};
+
+    --mat-sys-inverse-surface: #{$ink-light};
+    --mat-sys-inverse-on-surface: #{$ground-light};
+
+    // Tailwind brand tokens (see tailwind.css) — re-pointed for this subtree.
+    --color-ground: #{$ground-light};
+    --color-surface: #{$surface-light};
+    --color-surface-high: #{$surface-high-light};
+    --color-ink: #{$ink-light};
+    --color-ink-muted: #{$ink-muted-light};
+    --color-accent-ink: #{$accent-ink-light};
+    --color-border: #{$outline-light};
   }
 }
 /* Angular Material component theming lives here. Tailwind lives in tailwind.css — do not mix @tailwind/@import "tailwindcss" directives into this file. */

@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-08-23 — Light "soothing" variant for marketing pages + GSAP on the landing page
+
+- Decided the split: `/app` (the actual recorder/translator) stays dark Slate Minimal; the landing page and future About/Contact/Pricing pages get a **light** variant of the same brand — same brass accent + Piazzolla/Hanken Grotesk, warm soft ground instead of charcoal (Wispr-Flow-style calm, without forking into an unrelated second identity). Brass as a *fill* color (buttons) stays identical across both themes; brass as *text* needed a deeper shade (`$accent-ink-light: #8a6a30`) for contrast on a light ground, since the original `#c9a15c` fails as literal text on white.
+- `apps/web/src/styles.scss`: added a `.theme-light` block redefining the same `--mat-sys-*` tokens (plus the Tailwind `--color-*` tokens) — no second `mat.theme()` call needed, since it's just CSS custom-property overrides on a wrapping element, which both Material components and Tailwind utilities re-resolve against automatically.
+- Route-based theming: `app.routes.ts` routes now carry `data: { theme: 'light' | 'dark' }`; `app.ts` derives a `theme-light`/`theme-dark` class from the active route (via `Router` events + `ActivatedRoute`, as a signal) and `app.html` applies it to a wrapper around both the toolbar and `<router-outlet>`, so the toolbar itself flips too — no jarring dark-navbar-on-light-page seam.
+- Added **GSAP** (+ `ScrollTrigger`) to `apps/web`, scoped to marketing pages only (the app UI doesn't need it). Landing page now has a real entrance choreography (headline → subhead → CTA → preview card, staggered) and scroll-triggered reveals on the "how it works" steps and feature grid, all skipped outright under `prefers-reduced-motion`. `ScrollTrigger` instances are killed in `ngOnDestroy` to avoid leaking listeners on navigation.
+- Verified: `ng build` and `tsc --noEmit` clean. Confirmed the light theme, toolbar, and both dropdown/card contrast render correctly in a real browser, and confirmed `/app` is untouched (still dark). **Could not visually confirm the GSAP animations playing in real time** — this automation environment's tabs report `document.visibilityState: "hidden"` even when focused, which freezes `requestAnimationFrame` entirely (this is correct, intentional browser/GSAP behavior, not a bug to work around). Traced through partial-tween evidence (fractional opacity/transform values mid-animation) to confirm the timeline and ScrollTrigger wiring are structurally correct; actual smooth playback needs a check in a normal, real browser tab.
+
+**Pending / not yet built:**
+- **User: please eyeball the landing page animations yourself** (`http://localhost:4200`) — hero entrance and the scroll-reveals on "how it works"/features — automation couldn't watch them play.
+- About, Contact, and Pricing pages — will use the same light theme + GSAP pattern now established here.
+- No shared "reveal on scroll" utility/directive extracted yet — the pattern in `landing.ts` is copy-worthy but still one-off; worth factoring into `src/app/shared/` once a second page needs the same scroll-reveal behavior.
+- Bundle budget warning in `angular.json` is now further over (GSAP added ~140KB) — not fixed, just noting it's grown; worth revisiting the budget number once the marketing pages are done, rather than chasing it mid-build.
+
 ## 2026-08-23 — Landing page; OneToOne moved off root to /app
 
 - New `apps/web/src/app/features/landing/` (`Landing` component): hero (headline, subhead, CTA, a live-styled preview of the actual turn-card UI reusing the real Hindi→Kannada example), a 3-step "How it works" (a genuine sequence, so numbered), a 3-up feature grid (live 1-1 translation, speaker playback, multi-speaker — the last one dimmed and explicitly labeled "Coming soon" since it isn't built, not implied as available), and a closing CTA. All copy is specific to what the product actually does today, not generic SaaS boilerplate.

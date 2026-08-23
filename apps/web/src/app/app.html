@@ -1,7 +1,9 @@
-<mat-toolbar class="border-b border-border!">
-  <a routerLink="/" class="wordmark no-underline text-inherit!">{{ title() }}</a>
-</mat-toolbar>
+<div [class]="themeClass()">
+  <mat-toolbar class="border-b border-border!">
+    <a routerLink="/" class="wordmark no-underline text-inherit!">{{ title() }}</a>
+  </mat-toolbar>
 
-<main>
-  <router-outlet />
-</main>
+  <main>
+    <router-outlet />
+  </main>
+</div>
