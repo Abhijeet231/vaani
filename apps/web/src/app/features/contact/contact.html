@@ -1,0 +1,24 @@
+<section class="max-w-2xl mx-auto px-6 pt-16 pb-12 md:pt-24 text-center">
+  <h1 appReveal class="font-display text-4xl md:text-5xl leading-tight text-balance mb-5">
+    Say hello.
+  </h1>
+  <p appReveal class="text-ink-muted text-lg max-w-md mx-auto">
+    Found a bug, have a language you wish vaani supported, or just want to say
+    something? Email works best right now — there's no ticket system to lose your
+    message in.
+  </p>
+</section>
+
+<section class="max-w-2xl mx-auto px-6 py-8">
+  <div appReveal class="bg-surface border border-border rounded-2xl p-8 flex flex-col items-center gap-4 text-center">
+    <mat-icon class="text-accent-ink">mail_outline</mat-icon>
+    <a
+      [href]="'mailto:' + contactEmail"
+      mat-flat-button
+      color="primary"
+      class="px-6! py-2!"
+      >{{ contactEmail }}</a
+    >
+    <p class="text-ink-muted text-sm">Usually hear back within a few days.</p>
+  </div>
+</section>

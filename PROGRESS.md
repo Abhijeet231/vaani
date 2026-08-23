@@ -1,5 +1,20 @@
 # Progress Log
 
+## 2026-08-23 — About, Pricing, Contact pages + navbar wiring
+
+- New pages under `apps/web/src/app/features/`: `about/`, `pricing/`, `contact/` — all light theme (`data: { theme: 'light' }` in `app.routes.ts`), all using the shared `appReveal` directive for scroll-in.
+  - **About**: honest product-mission copy (why single-device translation, how it works, names the actual Sarvam models used — Saaras/Mayura/Bulbul — and an explicit "where it stands today" section distinguishing built vs. planned). No fabricated company/team backstory — there isn't one to tell yet.
+  - **Pricing**: "Free, while it's early" — one card listing what's actually included today. Explicitly no invented tiers/prices; vaani has no monetization model decided yet (confirmed with the user before building this).
+  - **Contact**: mailto-based (no backend/email service exists to back a real form). **Email is a placeholder** (`TODO@vaani.app`, in `contact.ts`) — user was mid-way through providing the real address when this was built; swap `CONTACT_EMAIL` once given.
+- Factored the landing page's scroll-reveal logic (previously bespoke `querySelectorAll` + `ScrollTrigger` loop in `landing.ts`) out into `apps/web/src/app/shared/reveal.directive.ts` (`Reveal`, selector `[appReveal]`) — same behavior, reusable via one attribute instead of copy-pasted wiring per page. `landing.ts` now only keeps its own bespoke hero-entrance timeline; `landing.html` uses `appReveal` for its scroll sections. This was flagged as pending in the previous entry and is now done.
+- Navbar: `app.html`/`app.ts` gained real navigation — About/Pricing/Contact links (`routerLinkActive` for the current-page indicator) plus an "Open vaani" CTA, in the same toolbar that already theme-switches per route. Responsive: full links on `md:` and up, a `mat-menu`-based hamburger below that (`MatMenuModule` added) — **not visually verified narrow** (this session's browser-automation tool couldn't actually shrink the tab's viewport despite `resize_window` reporting success; `innerWidth` stayed at 1536px), so this needs a manual check on a real narrow window/phone.
+- Verified: `ng build` and `tsc --noEmit` clean; navigated to all 4 marketing routes plus `/app` in a real browser and confirmed correct theme, content, and nav active-state on each.
+
+**Pending / not yet built:**
+- **User: give the real contact email** so `CONTACT_EMAIL` in `contact.ts` can be swapped in (currently a visible `TODO@vaani.app` placeholder on the live Contact page).
+- **User: check the mobile nav menu** on an actually narrow viewport — automation couldn't verify it.
+- No dedicated 404/not-found route yet (unmatched paths currently just don't match any route — no wildcard `**` route configured).
+
 ## 2026-08-23 — Light "soothing" variant for marketing pages + GSAP on the landing page
 
 - Decided the split: `/app` (the actual recorder/translator) stays dark Slate Minimal; the landing page and future About/Contact/Pricing pages get a **light** variant of the same brand — same brass accent + Piazzolla/Hanken Grotesk, warm soft ground instead of charcoal (Wispr-Flow-style calm, without forking into an unrelated second identity). Brass as a *fill* color (buttons) stays identical across both themes; brass as *text* needed a deeper shade (`$accent-ink-light: #8a6a30`) for contrast on a light ground, since the original `#c9a15c` fails as literal text on white.
