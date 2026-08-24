@@ -6,7 +6,7 @@ import { Contact } from './features/contact/contact';
 import { OneToOne } from './features/one-to-one/one-to-one';
 
 export const routes: Routes = [
-  { path: '', component: Landing, data: { theme: 'lavender' } },
+  { path: '', component: Landing, data: { theme: 'lavender', hideChrome: true } },
   { path: 'about', component: About, data: { theme: 'light' } },
   { path: 'pricing', component: Pricing, data: { theme: 'light' } },
   { path: 'contact', component: Contact, data: { theme: 'light' } },

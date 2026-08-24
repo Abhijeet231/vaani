@@ -41,21 +41,22 @@ $ink-muted-light: #8a8172;
 $outline-light: #e8e0d0;
 $outline-variant-light: #ddd4c0;
 
-// EXPERIMENTAL — "Lavender Haze / Soft Graphite", scoped to the landing page
-// only (see app.routes.ts: landing's `data.theme` is 'lavender', not 'light')
-// while it's being compared against Slate Minimal. Not adopted for /about,
-// /pricing, /contact, or /app yet. Same Piazzolla/Hanken Grotesk type system —
-// only the color tokens differ, to isolate what's actually being evaluated.
+// "Lavender Haze / Soft Graphite", scoped to the landing page only (see
+// app.routes.ts: landing's `data.theme` is 'lavender', not 'light'). Started
+// as a light-ground experiment; the "Vaani Hero" design (see PROGRESS.md)
+// settled it the other way — lavender reads richer against dark graphite than
+// against a light ground, so this is now the full dark palette landing.html
+// actually paints with. Not adopted for /about, /pricing, /contact, or /app.
 $lavender: #92a9e1;
-$on-lavender: #2e2e33; // "soft graphite" — used as both the on-lavender text and main ink
-$accent-ink-lav: #4a5fa8; // raw lavender fails text contrast on a light ground (~2.2:1) — deepened for text/icon use
-$ground-lav: #f7f7fb;
-$surface-lav: #ffffff;
-$surface-high-lav: #ecedf9;
-$surface-bright-lav: #ffffff;
-$ink-muted-lav: #6b6b76;
-$outline-lav: #e2e4f1;
-$outline-variant-lav: #d3d7ee;
+$on-lavender: #edebf7; // ink on the dark ground
+$accent-ink-lav: #92a9e1; // dark ground gives the raw accent enough contrast to use directly
+$ground-lav: #1c1b1f;
+$surface-lav: #17161a;
+$surface-high-lav: #232128;
+$surface-bright-lav: #2c2a33;
+$ink-muted-lav: #9c99ac;
+$outline-lav: #2a2830;
+$outline-variant-lav: #3b3849;
 
 @layer mat-theme {
   html {
@@ -185,15 +186,15 @@ $outline-variant-lav: #d3d7ee;
     --color-border: #{$outline-light};
   }
 
-  // See the "Lavender Haze / Soft Graphite" note above — landing-only experiment.
+  // See the "Lavender Haze / Soft Graphite" note above — landing-only.
   .theme-lavender {
-    color-scheme: light;
+    color-scheme: dark;
     min-height: 100%;
     background-color: #{$ground-lav};
     color: #{$on-lavender};
 
     --mat-sys-primary: #{$lavender};
-    --mat-sys-on-primary: #{$on-lavender};
+    --mat-sys-on-primary: #{$ground-lav};
     --mat-sys-primary-container: #{$surface-high-lav};
     --mat-sys-on-primary-container: #{$on-lavender};
     --mat-sys-inverse-primary: #{$lavender};
@@ -204,7 +205,7 @@ $outline-variant-lav: #d3d7ee;
     --mat-sys-on-secondary-container: #{$on-lavender};
 
     --mat-sys-tertiary: #{$lavender};
-    --mat-sys-on-tertiary: #{$on-lavender};
+    --mat-sys-on-tertiary: #{$ground-lav};
     --mat-sys-tertiary-container: #{$surface-high-lav};
     --mat-sys-on-tertiary-container: #{$on-lavender};
 

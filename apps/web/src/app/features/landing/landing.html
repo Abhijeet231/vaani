@@ -1,83 +1,300 @@
-<section class="hero-dark w-full">
-  <div class="max-w-5xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28 grid md:grid-cols-2 gap-12 items-center">
-    <div>
-      <h1 class="hero-title font-display text-4xl md:text-5xl leading-tight text-balance mb-5">
-        Say it once.<br />Hear it back in theirs.
-      </h1>
-      <p class="hero-sub text-lg max-w-md mb-8">
-        vaani listens in one language and replies in another — live, from your phone.
-        No account, no app install for the person you're talking to.
-      </p>
-      <a mat-flat-button color="primary" routerLink="/app" class="hero-cta px-6! py-2!">
-        Start a conversation
-        <mat-icon class="ml-1!" iconPositionEnd>arrow_forward</mat-icon>
-      </a>
+<div class="vh-hero" data-role="hero">
+  <div class="vh-bg" aria-hidden="true">
+    @for (g of bgGlyphs; track $index) {
+      <span
+        class="vh-bg-glyph"
+        [style.top]="g.top"
+        [style.left]="g.left"
+        [style.font-family]="g.font"
+        [style.font-size]="g.size"
+        [style.color]="g.color"
+        [style.animation]="g.anim + ' ' + g.dur + ' ease-in-out ' + g.delay + ' infinite'"
+        >{{ g.ch }}</span
+      >
+    }
+  </div>
+
+  <div class="vh-sentinel" data-role="sentinel" aria-hidden="true"></div>
+
+  <nav class="vh-nav" data-role="nav" [style]="navStyle()">
+    <div class="vh-nav-inner" [style]="navInnerStyle()">
+      <a routerLink="/" class="vh-brand" [style.font-size]="brandSize()">Vaani</a>
+      <div class="vh-nav-links" [style.display]="navLinksDisplay()">
+        <a routerLink="/about">About</a>
+        <a routerLink="/contact">Contact</a>
+        <a routerLink="/pricing">Pricing</a>
+      </div>
+      <div class="vh-nav-actions">
+        <a routerLink="/app" class="vh-nav-login" [style.display]="navLoginDisplay()">Log in</a>
+        <a routerLink="/app" class="vh-nav-cta">Start free</a>
+      </div>
+    </div>
+  </nav>
+
+  <canvas class="vh-sparks" data-role="sparks" aria-hidden="true"></canvas>
+
+  <div class="vh-hero-content">
+    <div class="vh-eyebrow">
+      <span>live &middot; no install &middot; 11 Indian languages</span>
     </div>
 
-    <div class="hero-card bg-surface border border-border rounded-2xl p-6">
-      <div class="flex items-center gap-2 mb-5">
-        <span class="flex-1 bg-surface-high border border-border rounded-lg px-3 py-2 text-sm">
-          <span class="block text-xs text-ink-muted">From</span>Hindi
-        </span>
-        <mat-icon class="text-ink-muted!">swap_horiz</mat-icon>
-        <span class="flex-1 bg-surface-high border border-border rounded-lg px-3 py-2 text-sm">
-          <span class="block text-xs text-ink-muted">To</span>Kannada
-        </span>
+    <div class="vh-headline">
+      <h1>
+        <span class="vh-h1-line">Say it once. Hear it back</span>
+        <em class="vh-h1-em">in theirs.</em>
+      </h1>
+      <p class="vh-sub">
+        vaani listens in one language and replies in another — live, from your phone, no account
+        needed.
+      </p>
+    </div>
+
+    <div class="vh-card" data-role="card">
+      <div class="vh-card-chain-row">
+        @for (line of [activeLine()]; track lineStep()) {
+          <div class="vh-card-chain">{{ line.chain }}</div>
+        }
       </div>
-      <div class="bg-surface-high border border-border rounded-xl p-4">
-        <p class="text-xs text-ink-muted mb-2">Hindi &rarr; Kannada</p>
-        <p class="text-sm text-ink-muted mb-1">नमस्ते, आप कैसे हैं?</p>
-        <div class="flex items-center gap-2">
-          <p class="text-lg font-medium flex-1">ನಮಸ್ಕಾರ, ನೀವು ಹೇಗಿದ್ದೀರಿ?</p>
-          <mat-icon class="text-accent-ink!">volume_up</mat-icon>
+      <div class="vh-card-bars">
+        @for (bar of heroBars; track $index) {
+          <div
+            class="vh-bar"
+            [style.height]="bar.h"
+            [style.animation]="'vaaniBar ' + bar.dur + ' ease-in-out ' + bar.delay + ' infinite'"
+          ></div>
+        }
+      </div>
+      <div class="vh-card-transcript">
+        @for (line of [activeLine()]; track lineStep()) {
+          <div class="vh-card-transcript-text">{{ line.transcript }}</div>
+        }
+        <div class="vh-card-label">{{ activeLine().label }}</div>
+      </div>
+    </div>
+
+    <a routerLink="/app" class="vh-cta-button">Start a conversation &rarr;</a>
+  </div>
+</div>
+
+<section id="languages" class="vh-section">
+  <div class="vh-section-inner vh-languages-inner">
+    <div class="vh-section-head">
+      <span class="vh-eyebrow-label">supported languages</span>
+      <h2 class="vh-h2">14 languages, 11 with voice.</h2>
+    </div>
+
+    <div class="vh-languages-grid">
+      <div class="vh-lang-list">
+        @for (row of langRows(); track row.index) {
+          <button
+            type="button"
+            class="vh-lang-row"
+            [style.animation]="row.flash"
+            (click)="selectLang(row.index)"
+          >
+            <span class="vh-lang-bar" [style.background]="row.bar" [style.animation]="row.pop"></span>
+            <span class="vh-lang-name" [style.color]="row.tone" [style.animation]="row.glitch">{{
+              row.lang.name
+            }}</span>
+            <span class="vh-lang-tag" [style.color]="row.tagTone">{{ row.tag }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="vh-lang-panel">
+        <div class="vh-panel-head">
+          <span class="vh-mono">{{ activeMeta() }}</span>
+          <span class="vh-mono vh-mono-dim">{{ activeIndex() }}</span>
+        </div>
+
+        <div class="vh-panel-body">
+          <div class="vh-glyph-display" [style.font-family]="activeLang().font">
+            @for (g of glyphs(); track $index) {
+              <span [style.color]="g.tone">{{ g.ch }}</span>
+            }
+          </div>
+
+          <div class="vh-sample-block">
+            <span
+              class="vh-sample-text"
+              [style.font-family]="activeLang().font"
+              [style.animation]="wipeAnim()"
+              >{{ activeLang().sample }}</span
+            >
+            <span class="vh-sample-en"><span class="vh-mono vh-en-tag">EN</span>Hello, how are you?</span>
+          </div>
+
+          <div class="vh-panel-foot">
+            <span class="vh-voice-chip" [style.color]="chipColor()">
+              <span class="vh-dot" [style.background]="activeDot()"></span>{{ activeVoiceLabel() }}
+            </span>
+            <span class="vh-mono vh-mono-dim">{{ cycleHint() }}</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="max-w-5xl mx-auto px-6 py-16 border-t border-border">
-  <h2 appReveal class="font-display text-2xl mb-10">How it works</h2>
-  <div class="grid md:grid-cols-3 gap-8">
-    <div appReveal>
-      <p class="font-display text-accent-ink text-2xl mb-2">01</p>
-      <h3 class="font-medium mb-1">Pick a direction</h3>
-      <p class="text-ink-muted text-sm">Hindi to Kannada, or flip it — one toggle sets which way the conversation is going.</p>
+<section id="difference" class="vh-section">
+  <div class="vh-section-inner vh-differ-inner">
+    <div class="vh-section-head vh-differ-head">
+      <span class="vh-eyebrow-label">how it differs</span>
+      <h2 class="vh-h2">Not just another translate app.</h2>
     </div>
-    <div appReveal>
-      <p class="font-display text-accent-ink text-2xl mb-2">02</p>
-      <h3 class="font-medium mb-1">Tap to record</h3>
-      <p class="text-ink-muted text-sm">Say what you mean, tap again to stop. vaani transcribes and translates it.</p>
-    </div>
-    <div appReveal>
-      <p class="font-display text-accent-ink text-2xl mb-2">03</p>
-      <h3 class="font-medium mb-1">Read it, or hear it</h3>
-      <p class="text-ink-muted text-sm">The translation shows up instantly. Tap the speaker to have it read aloud.</p>
+
+    <div class="vh-differ-grid">
+      <div class="vh-differ-steps">
+        @for (step of differSteps; track step.num; let i = $index) {
+          <div class="vh-differ-step" [attr.data-step]="i">
+            <div class="vh-differ-step-inner">
+              <span class="vh-differ-bar" [class.vh-differ-bar-on]="stepIndex() === i"></span>
+              <div class="vh-differ-copy" [class.vh-differ-copy-on]="stepIndex() === i">
+                <span class="vh-differ-num" [class.vh-differ-num-on]="stepIndex() === i">{{
+                  step.num
+                }}</span>
+                <h3>{{ step.title }}</h3>
+                <p>{{ step.body }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="vh-differ-sticky">
+        <div class="vh-differ-panel">
+          <div class="vh-panel-head">
+            <span class="vh-mono vh-panel-label">
+              <span class="vh-pulse-dot"></span>{{ panelLabel() }}
+            </span>
+            <span class="vh-mono vh-mono-dim">{{ panelIndex() }}</span>
+          </div>
+
+          @switch (stepIndex()) {
+            @case (0) {
+              <div class="vh-demo vh-demo-waveform">
+                <div class="vh-wave">
+                  @for (bar of waveBars; track $index) {
+                    <span
+                      class="vh-wave-bar"
+                      [style.height]="bar.h"
+                      [style.animation]="'vaaniBar ' + bar.dur + ' ease-in-out ' + bar.delay + ' infinite'"
+                    ></span>
+                  }
+                </div>
+                <div class="vh-demo-line">
+                  <span class="vh-mono vh-mono-dim">heard &middot; Hindi</span>
+                  <span class="vh-demo-devanagari">क्या यह ट्रेन दिल्ली जाती है?</span>
+                </div>
+                <div class="vh-demo-line vh-demo-line-divided">
+                  <span class="vh-mono vh-mono-dim">spoken back &middot; English</span>
+                  <span class="vh-demo-en">Does this train go to Delhi?</span>
+                </div>
+              </div>
+            }
+            @case (1) {
+              <div class="vh-demo vh-demo-codeswitch">
+                <div class="vh-demo-line">
+                  <span class="vh-mono vh-mono-dim">heard &middot; code-switched</span>
+                  <span class="vh-demo-devanagari"
+                    >कल मेरा <span class="vh-demo-inline-en">flight</span> है,
+                    <span class="vh-demo-inline-en">can you confirm?</span></span
+                  >
+                </div>
+                <div class="vh-demo-box">
+                  <span class="vh-mono vh-demo-box-label">read as one sentence</span>
+                  <span class="vh-demo-box-text">My flight is tomorrow — can you confirm?</span>
+                </div>
+                <div class="vh-demo-tags">
+                  <span class="vh-tag">Indian accents</span>
+                  <span class="vh-tag">code-switching</span>
+                  <span class="vh-tag">regional phrasing</span>
+                </div>
+                <div class="vh-demo-footer">
+                  <span class="vh-mono vh-mono-dim">models by</span>
+                  <span class="vh-mono vh-sarvam-label">Sarvam AI</span>
+                </div>
+              </div>
+            }
+            @case (2) {
+              <div class="vh-demo vh-demo-devices">
+                <div class="vh-device vh-device-you">
+                  <div class="vh-device-box">
+                    <span class="vh-device-bars">
+                      <span class="vh-device-bar" style="animation: vaaniBar 0.9s ease-in-out infinite"></span>
+                      <span class="vh-device-bar" style="animation: vaaniBar 1.2s ease-in-out -.4s infinite"></span>
+                      <span class="vh-device-bar" style="animation: vaaniBar 0.75s ease-in-out -.7s infinite"></span>
+                    </span>
+                  </div>
+                  <span class="vh-mono vh-device-caption">you &middot; vaani open</span>
+                </div>
+                <div class="vh-device-mid">
+                  <span class="vh-device-rule"></span>
+                  <span class="vh-mono vh-mono-dim">talk</span>
+                  <span class="vh-device-rule"></span>
+                </div>
+                <div class="vh-device vh-device-them">
+                  <div class="vh-device-box vh-device-box-dashed">
+                    <span class="vh-mono vh-device-noapp">no app</span>
+                  </div>
+                  <span class="vh-mono vh-mono-dim">them &middot; nothing to install</span>
+                </div>
+              </div>
+            }
+            @case (3) {
+              <div class="vh-demo vh-demo-pipeline">
+                <div class="vh-pipeline-track">
+                  <span class="vh-pipeline-flow"></span>
+                </div>
+                <div class="vh-pipeline-list">
+                  <div class="vh-pipeline-row">
+                    <span class="vh-pipeline-name">record</span>
+                    <span class="vh-mono vh-mono-dim">mic in</span>
+                  </div>
+                  <div class="vh-pipeline-row">
+                    <span class="vh-pipeline-name">transcribe</span>
+                    <span class="vh-mono vh-mono-dim">speech &rarr; text</span>
+                  </div>
+                  <div class="vh-pipeline-row">
+                    <span class="vh-pipeline-name">translate</span>
+                    <span class="vh-mono vh-mono-dim">hi &rarr; en</span>
+                  </div>
+                  <div class="vh-pipeline-row vh-pipeline-row-last">
+                    <span class="vh-pipeline-name">speak</span>
+                    <span class="vh-mono vh-mono-dim">audio out</span>
+                  </div>
+                </div>
+                <span class="vh-mono vh-pipeline-hint">one pipeline &middot; no handoffs</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="max-w-5xl mx-auto px-6 py-16 border-t border-border">
-  <div class="grid md:grid-cols-3 gap-8">
-    <div appReveal class="flex flex-col gap-2">
-      <mat-icon class="text-accent-ink!">translate</mat-icon>
-      <h3 class="font-medium">Live 1-1 translation</h3>
-      <p class="text-ink-muted text-sm">Real speech in, real translated text out — no typing on either side.</p>
+<section id="faq" class="vh-section">
+  <div class="vh-section-inner vh-faq-inner">
+    <div class="vh-section-head">
+      <span class="vh-eyebrow-label">questions</span>
+      <h2 class="vh-h2">Before you start talking.</h2>
     </div>
-    <div appReveal class="flex flex-col gap-2">
-      <mat-icon class="text-accent-ink!">volume_up</mat-icon>
-      <h3 class="font-medium">Hear it out loud</h3>
-      <p class="text-ink-muted text-sm">Every translation can be spoken aloud, so the other person can listen instead of read.</p>
-    </div>
-    <div appReveal class="flex flex-col gap-2 opacity-60">
-      <mat-icon>groups</mat-icon>
-      <h3 class="font-medium">Multi-speaker rooms</h3>
-      <p class="text-ink-muted text-sm">A live transcript labeled by speaker, for conversations with more than two people. Coming soon.</p>
+
+    <div class="vh-faq-list">
+      @for (item of faqRows(); track item.q; let i = $index) {
+        <div class="vh-faq-item">
+          <button type="button" class="vh-faq-question" (click)="toggleFaq(i)">
+            <span>{{ item.q }}</span>
+            <span class="vh-faq-icon" [class.vh-faq-icon-open]="item.open">+</span>
+          </button>
+          @if (item.open) {
+            <div class="vh-faq-answer">
+              <p>{{ item.a }}</p>
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
-</section>
-
-<section class="max-w-5xl mx-auto px-6 py-16 border-t border-border flex flex-col items-start gap-4">
-  <h2 appReveal class="font-display text-2xl">Ready when you are.</h2>
-  <a mat-stroked-button routerLink="/app" class="px-6! py-2!">Open vaani</a>
 </section>

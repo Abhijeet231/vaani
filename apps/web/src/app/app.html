@@ -1,45 +1,47 @@
 <div [class]="themeClass()">
-  <mat-toolbar class="border-b border-border! flex! items-center justify-between px-4! md:px-6!">
-    <a routerLink="/" class="wordmark no-underline text-inherit!">{{ title() }}</a>
+  @if (!hideChrome()) {
+    <mat-toolbar class="border-b border-border! flex! items-center justify-between px-4! md:px-6!">
+      <a routerLink="/" class="wordmark no-underline text-inherit!">{{ title() }}</a>
 
-    <nav class="hidden md:flex items-center gap-6 text-sm">
-      <a
-        routerLink="/about"
-        routerLinkActive="nav-link-active"
-        class="nav-link no-underline text-inherit!"
-        >About</a
-      >
-      <a
-        routerLink="/pricing"
-        routerLinkActive="nav-link-active"
-        class="nav-link no-underline text-inherit!"
-        >Pricing</a
-      >
-      <a
-        routerLink="/contact"
-        routerLinkActive="nav-link-active"
-        class="nav-link no-underline text-inherit!"
-        >Contact</a
-      >
-      <a mat-flat-button color="primary" routerLink="/app" class="px-4! py-1!">Open vaani</a>
-    </nav>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a
+          routerLink="/about"
+          routerLinkActive="nav-link-active"
+          class="nav-link no-underline text-inherit!"
+          >About</a
+        >
+        <a
+          routerLink="/pricing"
+          routerLinkActive="nav-link-active"
+          class="nav-link no-underline text-inherit!"
+          >Pricing</a
+        >
+        <a
+          routerLink="/contact"
+          routerLinkActive="nav-link-active"
+          class="nav-link no-underline text-inherit!"
+          >Contact</a
+        >
+        <a mat-flat-button color="primary" routerLink="/app" class="px-4! py-1!">Open vaani</a>
+      </nav>
 
-    <button
-      mat-icon-button
-      type="button"
-      class="md:hidden!"
-      [matMenuTriggerFor]="mobileMenu"
-      aria-label="Open menu"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-menu #mobileMenu="matMenu">
-      <a mat-menu-item routerLink="/about">About</a>
-      <a mat-menu-item routerLink="/pricing">Pricing</a>
-      <a mat-menu-item routerLink="/contact">Contact</a>
-      <a mat-menu-item routerLink="/app">Open vaani</a>
-    </mat-menu>
-  </mat-toolbar>
+      <button
+        mat-icon-button
+        type="button"
+        class="md:hidden!"
+        [matMenuTriggerFor]="mobileMenu"
+        aria-label="Open menu"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #mobileMenu="matMenu">
+        <a mat-menu-item routerLink="/about">About</a>
+        <a mat-menu-item routerLink="/pricing">Pricing</a>
+        <a mat-menu-item routerLink="/contact">Contact</a>
+        <a mat-menu-item routerLink="/app">Open vaani</a>
+      </mat-menu>
+    </mat-toolbar>
+  }
 
   <main>
     <router-outlet />

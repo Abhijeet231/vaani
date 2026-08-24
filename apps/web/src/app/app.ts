@@ -43,8 +43,23 @@ export class App {
     { initialValue: 'theme-dark' }
   );
 
+  // Landing owns its own nav (a scroll-morphing pill matching the "Vaani Hero"
+  // design) instead of the shared toolbar every other route uses.
+  protected readonly hideChrome = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => this.currentHideChrome()),
+      startWith(this.currentHideChrome())
+    ),
+    { initialValue: false }
+  );
+
   private currentThemeClass(): string {
     const theme = this.route.firstChild?.snapshot.data['theme'] ?? 'dark';
     return `theme-${theme}`;
+  }
+
+  private currentHideChrome(): boolean {
+    return this.route.firstChild?.snapshot.data['hideChrome'] ?? false;
   }
 }
