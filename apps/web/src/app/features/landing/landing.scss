@@ -546,6 +546,9 @@
 .vh-differ-steps {
   display: flex;
   flex-direction: column;
+  // Extra scroll room after the last step so the centered sticky panel isn't
+  // forced up against the nav as it runs out of container to center within.
+  padding-bottom: 30vh;
 }
 
 .vh-differ-step {
@@ -613,8 +616,11 @@
 }
 
 .vh-differ-sticky {
+  // Centered in the viewport (not pinned near the top) so it clears the
+  // floating nav pill at every scroll position instead of sliding under it.
   position: sticky;
-  top: 28px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .vh-differ-panel {
