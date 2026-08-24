@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, computed, inject, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewEncapsulation,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 interface LineExample {
@@ -255,6 +264,14 @@ function graphemes(s: string): string[] {
   imports: [RouterLink],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
+  // Several animations are built as plain strings at runtime (background
+  // glyph drift, waveform bars, language-row glitch/flash) and bound via
+  // [style.animation]. Angular's emulated encapsulation renames @keyframes
+  // in the compiled stylesheet but can't rewrite those runtime strings, so
+  // the names stop matching. Disabling encapsulation keeps the keyframe
+  // names as-authored — safe here since every class/keyframe in this file
+  // uses a unique vh-/vaani prefix.
+  encapsulation: ViewEncapsulation.None,
 })
 export class Landing implements AfterViewInit, OnDestroy {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
