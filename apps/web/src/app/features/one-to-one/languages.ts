@@ -11,7 +11,7 @@ export const LANGUAGES: Language[] = [
   { code: 'kn-IN', label: 'Kannada' },
   { code: 'ml-IN', label: 'Malayalam' },
   { code: 'mr-IN', label: 'Marathi' },
-  { code: 'or-IN', label: 'Odia' },
+  { code: 'od-IN', label: 'Odia' },
   { code: 'pa-IN', label: 'Punjabi' },
   { code: 'ta-IN', label: 'Tamil' },
   { code: 'te-IN', label: 'Telugu' },
@@ -21,9 +21,8 @@ export const LANGUAGES: Language[] = [
   { code: 'ne-IN', label: 'Nepali' },
 ];
 
-// Sarvam's Bulbul TTS supports a smaller language set than STT/translate
-// (and Odia uses "od-IN" here, not the "or-IN" used elsewhere) — gate the
-// speaker button on this instead of assuming every LANGUAGES entry works.
+// Sarvam's Bulbul TTS supports a smaller language set than STT/translate —
+// gate the speaker button on this instead of assuming every LANGUAGES entry works.
 export const TTS_SUPPORTED_LANGUAGE_CODES = new Set([
   'bn-IN',
   'en-IN',

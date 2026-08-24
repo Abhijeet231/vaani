@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-08-24 — Fixed real 500 bug: wrong Odia language code in 1-1 mode
+
+- User hit a 500 error while running the app locally. Traced it through the API log to a `400 Bad Request` from Sarvam's translate endpoint: `LANGUAGES` in `apps/web/src/app/features/one-to-one/languages.ts` listed Odia as `or-IN`, but Sarvam's Saaras/Mayura APIs only accept `od-IN` for that language — the code comment right below `TTS_SUPPORTED_LANGUAGE_CODES` already documented this exact mismatch, it just hadn't been applied to the main list. Selecting Odia as source or target sent the invalid code straight through to Sarvam, and since `oneToOne.controller.ts` does no runtime validation on the query params, the resulting error just fell through to Express's generic error handler as a 500.
+- Fixed: `LANGUAGES` now uses `od-IN` for Odia, matching `TTS_SUPPORTED_LANGUAGE_CODES`. Also trimmed the now-redundant part of the code comment that called out the old mismatch.
+- Verified: Angular dev server rebuilt clean after the change (no compile errors).
+
+**Pending / not yet built:**
+- `oneToOne.controller.ts` still passes `req.query.source`/`target` to Sarvam with only a type cast, no runtime validation — any other bad/unsupported code will still surface as an unhandled 500 instead of a clean 400. Worth adding an allowlist check against `LANGUAGES` before calling Sarvam.
+
 ## 2026-08-24 — Meta/OG tags added to index.html (placeholder domain)
 
 - Added a real `<meta name="description">`, full Open Graph tag set (`og:title`, `og:description`, `og:type`, `og:site_name`, `og:url`, `og:image`), and Twitter Card tags to `apps/web/src/index.html`. Also fixed the `<title>` (was still the bare "vaani", now "vaani — say it once, hear it back in theirs"). Without these, sharing a vaani link anywhere (WhatsApp, LinkedIn, X, Slack) previously showed a bare/blank link card.
