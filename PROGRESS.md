@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-08-25 — Cursor sparks no longer spawn/render over the "Powered by Sarvam AI" badge
+
+- User reported the hero's cursor-triggered spark particles (random Indic glyphs arcing up from the pointer) were flying over the new "Powered by Sarvam AI" badge, which reads as visual noise on a small trust element.
+- `landing.ts`: added a `badgeEl` reference (queries `.vh-powered-badge`), following the exact same pattern already used to exclude the nav and hero card — excluded from spawn (`onMove` returns early over its bounding box) and from render (particles are despawned early if they drift into its box in the animation `tick`), same as `navBox`/`cardBox`.
+- Verified: `tsc --noEmit` clean, dev server rebuilt clean.
+
 ## 2026-08-25 — Waveform-baseline section dividers between landing sections
 
 - User specified an exact hairline divider design: a full-width 1px rule broken at center by 5 short vertical ticks rising from the baseline (4/7/11/7/4px, colors stepping `#2F2C39` → `#3B3849` → `#6FD3C0` teal accent at the peak) — meant to read like an audio waveform's baseline, echoing the waveform motif used throughout the rest of the page (hero card, wave demo panel).

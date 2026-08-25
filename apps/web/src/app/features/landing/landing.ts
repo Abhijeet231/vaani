@@ -386,6 +386,7 @@ export class Landing implements AfterViewInit, OnDestroy {
   private navEl: HTMLElement | null = null;
   private sentinelEl: HTMLElement | null = null;
   private cardEl: HTMLElement | null = null;
+  private badgeEl: HTMLElement | null = null;
   private canvasEl: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private stepEls: HTMLElement[] = [];
@@ -418,6 +419,7 @@ export class Landing implements AfterViewInit, OnDestroy {
     this.navEl = root.querySelector<HTMLElement>('[data-role="nav"]');
     this.sentinelEl = root.querySelector<HTMLElement>('[data-role="sentinel"]');
     this.cardEl = root.querySelector<HTMLElement>('[data-role="card"]');
+    this.badgeEl = root.querySelector<HTMLElement>('.vh-powered-badge');
     this.canvasEl = root.querySelector<HTMLCanvasElement>('[data-role="sparks"]');
     this.stepEls = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
 
@@ -586,6 +588,10 @@ export class Landing implements AfterViewInit, OnDestroy {
         const cb = this.cardEl.getBoundingClientRect();
         if (e.clientX >= cb.left && e.clientX <= cb.right && e.clientY >= cb.top && e.clientY <= cb.bottom) return;
       }
+      if (this.badgeEl) {
+        const bb = this.badgeEl.getBoundingClientRect();
+        if (e.clientX >= bb.left && e.clientX <= bb.right && e.clientY >= bb.top && e.clientY <= bb.bottom) return;
+      }
       const r = hero.getBoundingClientRect();
       const x = e.clientX - r.left;
       const y = e.clientY - r.top;
@@ -643,6 +649,12 @@ export class Landing implements AfterViewInit, OnDestroy {
         const hb = this.heroEl.getBoundingClientRect();
         navBox = { l: nb.left - hb.left, r: nb.right - hb.left, t: nb.top - hb.top, b: nb.bottom - hb.top };
       }
+      let badgeBox: { l: number; r: number; t: number; b: number } | null = null;
+      if (this.badgeEl && this.heroEl) {
+        const bb = this.badgeEl.getBoundingClientRect();
+        const hb3 = this.heroEl.getBoundingClientRect();
+        badgeBox = { l: bb.left - hb3.left, r: bb.right - hb3.left, t: bb.top - hb3.top, b: bb.bottom - hb3.top };
+      }
 
       for (let i = ps.length - 1; i >= 0; i--) {
         const p = ps[i];
@@ -662,6 +674,10 @@ export class Landing implements AfterViewInit, OnDestroy {
           continue;
         }
         if (cardBox && p.x > cardBox.l && p.x < cardBox.r && p.y > cardBox.t && p.y < cardBox.b) {
+          ps.splice(i, 1);
+          continue;
+        }
+        if (badgeBox && p.x > badgeBox.l - 6 && p.x < badgeBox.r + 6 && p.y > badgeBox.t - 6 && p.y < badgeBox.b + 6) {
           ps.splice(i, 1);
           continue;
         }
