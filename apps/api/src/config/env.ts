@@ -15,4 +15,11 @@ export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
 
   sarvamApi: getRequiredEnv('SARVAM_API_KEY'),
+
+  // Optional at boot — only required once a route that touches the DB or verifies
+  // a Firebase token actually runs, so the server can still start without them.
+  databaseUrl: process.env.DATABASE_URL,
+  firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+  firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY,
 };

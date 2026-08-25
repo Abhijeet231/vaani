@@ -1,0 +1,62 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-16">
+  <mat-card class="w-full max-w-sm p-6! flex flex-col gap-4">
+    <h1 class="text-xl font-semibold">
+      {{ mode() === 'signUp' ? 'Create your account' : 'Log in to vaani' }}
+    </h1>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="w-full!"
+      [disabled]="loading()"
+      (click)="continueWithGoogle()"
+    >
+      Continue with Google
+    </button>
+
+    <div class="flex items-center gap-3 text-sm opacity-60">
+      <span class="flex-1 border-t border-current"></span>
+      or
+      <span class="flex-1 border-t border-current"></span>
+    </div>
+
+    <form class="flex flex-col gap-3" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          name="email"
+          required
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          type="password"
+          name="password"
+          required
+          minlength="6"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+      </mat-form-field>
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      <button mat-flat-button color="primary" type="submit" class="w-full!" [disabled]="loading()">
+        {{ mode() === 'signUp' ? 'Sign up' : 'Log in' }}
+      </button>
+    </form>
+
+    <button mat-button type="button" (click)="toggleMode()">
+      {{ mode() === 'signUp' ? 'Already have an account? Log in' : "New here? Create an account" }}
+    </button>
+  </mat-card>
+</div>

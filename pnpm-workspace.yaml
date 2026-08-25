@@ -1,5 +1,9 @@
 packages:
   - "apps/*"
+allowBuilds:
+  '@firebase/util': true
+  esbuild: true
+  protobufjs: true
 minimumReleaseAgeExclude:
   - '@angular/cdk@22.1.2'
   - '@angular/material@22.1.2'
