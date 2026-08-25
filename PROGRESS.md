@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-08-25 — Waveform-baseline section dividers between landing sections
+
+- User specified an exact hairline divider design: a full-width 1px rule broken at center by 5 short vertical ticks rising from the baseline (4/7/11/7/4px, colors stepping `#2F2C39` → `#3B3849` → `#6FD3C0` teal accent at the peak) — meant to read like an audio waveform's baseline, echoing the waveform motif used throughout the rest of the page (hero card, wave demo panel).
+- Added `.vh-divider`/`.vh-divider-inner`/`.vh-divider-rule`/`.vh-divider-tick(-sm|-md|-lg)` to `landing.scss` (flex row, `align-items: flex-end`, the two `flex:1` hairlines keep the tick cluster centered at any width, container height fixed to the tallest tick at 11px) and inserted the markup (`aria-hidden="true"`, no shared component needed — it's a fixed 7-span structure reused verbatim) between all three landing section boundaries in `landing.html`: hero→languages, languages→difference, difference→faq. Same `max-width: 1060px` / `32px` side padding as the sections it sits between; adds no vertical margin of its own, per spec — rhythm comes from the adjacent sections' existing padding.
+- Verified: `tsc --noEmit` clean, dev server rebuilt clean. Confirmed in a real browser (zoomed screenshot) that the divider renders centered under the hero, with the teal center tick and symmetric step-up on both sides matching the spec exactly.
+
 ## 2026-08-25 — Hero section tightened to fit one viewport; added "Powered by Sarvam AI" badge
 
 - User asked to fit the hero's headline, tagline, and waveform card in the first viewport (no scroll needed to see the wave card), and to swap the generic eyebrow/subhead copy for something shorter plus a Sarvam AI trust badge.

@@ -981,6 +981,48 @@
   text-wrap: pretty;
 }
 
+// ---- section divider: waveform-baseline hairline between sections ----
+
+.vh-divider {
+  background: #1c1b1f;
+  padding: 0 32px;
+}
+
+.vh-divider-inner {
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  height: 11px;
+}
+
+.vh-divider-rule {
+  flex: 1;
+  height: 1px;
+  background: #26242c;
+}
+
+.vh-divider-tick {
+  width: 1px;
+}
+
+.vh-divider-tick-sm {
+  height: 4px;
+  background: #2f2c39;
+}
+
+.vh-divider-tick-md {
+  height: 7px;
+  background: #3b3849;
+}
+
+.vh-divider-tick-lg {
+  height: 11px;
+  background: #6fd3c0;
+}
+
 // ---- keyframes ----
 
 @keyframes vaaniBar {
