@@ -224,7 +224,7 @@ function heroBars(): Bar[] {
     const detail = 0.55 + 0.45 * Math.abs(Math.sin(i * 1.9) * Math.cos(i * 0.73));
     const jitter = 0.7 + 0.3 * Math.abs((Math.sin(i * 12.9898) * 43758.5453) % 1);
     bars.push({
-      h: Math.max(5, Math.round(96 * env * detail * jitter)) + 'px',
+      h: Math.max(4, Math.round(58 * env * detail * jitter)) + 'px',
       dur: (0.9 + ((i * 37) % 11) / 10).toFixed(2) + 's',
       delay: '-' + (((i * 53) % 19) / 10).toFixed(2) + 's',
     });

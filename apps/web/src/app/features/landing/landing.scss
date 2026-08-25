@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 124px 32px 80px;
+  padding: 88px 32px 40px;
 }
 
 .vh-bg {
@@ -158,25 +158,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 44px;
+  gap: 24px;
   text-align: center;
-}
-
-.vh-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: #9c99ac;
 }
 
 .vh-headline {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 
   h1 {
     margin: 0;
@@ -208,20 +198,61 @@
   text-wrap: pretty;
 }
 
+// "Powered by Sarvam AI" — a small trust badge in the "Backed by YC" mold:
+// logo + label in a bordered pill, linking out to the partner's site.
+.vh-powered-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border: 1px solid #3b3849;
+  border-radius: 999px;
+  background: rgba(146, 169, 225, 0.05);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #9c99ac;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+
+  strong {
+    color: #edebf7;
+    font-weight: 600;
+  }
+
+  &:hover {
+    border-color: #92a9e1;
+    background: rgba(146, 169, 225, 0.1);
+  }
+}
+
+.vh-powered-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+// Card is scaled to ~0.6x its original box dimensions (padding, radius, bar
+// area, min-heights) so the hero fits headline + badge + card in one
+// viewport without scrolling — text sizes are held slightly above a strict
+// 0.6x scale to stay legible.
 .vh-card {
   width: 100%;
-  max-width: 700px;
+  max-width: 420px;
   background: #17161a;
   border: 1px solid #322f3a;
-  border-radius: 20px;
-  padding: 32px 36px 36px;
+  border-radius: 12px;
+  padding: 19px 22px 22px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 
 .vh-card-chain-row {
-  height: 22px;
+  height: 13px;
   position: relative;
 }
 
@@ -238,7 +269,7 @@
     'Noto Sans Bengali',
     'Noto Sans Telugu',
     sans-serif;
-  font-size: 14px;
+  font-size: 10px;
   letter-spacing: 0.02em;
   color: #92a9e1;
   animation: vaaniFadeUp 0.45s ease-out both;
@@ -248,23 +279,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  height: 96px;
+  gap: 2px;
+  height: 58px;
 }
 
 .vh-bar {
-  width: 3px;
-  border-radius: 2px;
+  width: 2px;
+  border-radius: 1px;
   background: #92a9e1;
 }
 
 .vh-card-transcript {
-  min-height: 58px;
+  min-height: 35px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .vh-card-transcript-text {
@@ -275,7 +306,7 @@
     'Noto Sans Bengali',
     'Noto Sans Telugu',
     sans-serif;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1.45;
   color: #edebf7;
   animation: vaaniFadeUp 0.45s ease-out both;
@@ -283,7 +314,7 @@
 
 .vh-card-label {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.06em;
   color: #9c99ac;
 }
