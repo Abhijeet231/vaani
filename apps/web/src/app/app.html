@@ -22,7 +22,35 @@
           class="nav-link no-underline text-inherit!"
           >Contact</a
         >
-        <a mat-flat-button color="primary" routerLink="/app" class="px-4! py-1!">Open vaani</a>
+        @if (isAuthed()) {
+          <a mat-flat-button color="primary" routerLink="/app" class="px-4! py-1!">Open vaani</a>
+          <button
+            mat-icon-button
+            type="button"
+            [matMenuTriggerFor]="userMenu"
+            aria-label="Account"
+            class="p-0! overflow-hidden!"
+          >
+            @if (userPhoto() && !photoFailed()) {
+              <img
+                [src]="userPhoto()"
+                (error)="photoFailed.set(true)"
+                alt=""
+                class="w-8 h-8 rounded-full object-cover"
+              />
+            } @else {
+              <mat-icon>account_circle</mat-icon>
+            }
+          </button>
+          <mat-menu #userMenu="matMenu">
+            <div class="px-4 py-2 text-sm text-ink-muted">{{ userLabel() }}</div>
+            <a mat-menu-item routerLink="/app">Translate</a>
+            <button mat-menu-item type="button" (click)="logOut()">Log out</button>
+          </mat-menu>
+        } @else {
+          <a mat-button routerLink="/login" class="px-4! py-1!">Log in</a>
+          <a mat-flat-button color="primary" routerLink="/login" class="px-4! py-1!">Sign up</a>
+        }
       </nav>
 
       <button
@@ -38,7 +66,12 @@
         <a mat-menu-item routerLink="/about">About</a>
         <a mat-menu-item routerLink="/pricing">Pricing</a>
         <a mat-menu-item routerLink="/contact">Contact</a>
-        <a mat-menu-item routerLink="/app">Open vaani</a>
+        @if (isAuthed()) {
+          <a mat-menu-item routerLink="/app">Open vaani</a>
+          <button mat-menu-item type="button" (click)="logOut()">Log out</button>
+        } @else {
+          <a mat-menu-item routerLink="/login">Log in / Sign up</a>
+        }
       </mat-menu>
     </mat-toolbar>
   }

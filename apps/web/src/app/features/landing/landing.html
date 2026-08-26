@@ -26,7 +26,7 @@
       </div>
       <div class="vh-nav-actions">
         <a routerLink="/login" class="vh-nav-login" [style.display]="navLoginDisplay()">Log in</a>
-        <a routerLink="/app" class="vh-nav-cta">Start free</a>
+        <a routerLink="/app" class="vh-nav-cta">{{ isAuthed() ? 'Open vaani' : 'Start free' }}</a>
       </div>
     </div>
   </nav>
@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <a routerLink="/app" class="vh-cta-button">Start a conversation &rarr;</a>
+    <a routerLink="/app" class="vh-cta-button">{{ isAuthed() ? 'Open vaani' : 'Start a conversation' }} &rarr;</a>
   </div>
 </div>
 

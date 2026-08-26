@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth.service';
 
 interface LineExample {
   chain: string;
@@ -275,6 +276,9 @@ function graphemes(s: string): string[] {
 })
 export class Landing implements AfterViewInit, OnDestroy {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly auth = inject(AuthService);
+
+  protected readonly isAuthed = computed(() => this.auth.ready() && !!this.auth.user());
 
   protected readonly lines = LINES;
   protected readonly langs = LANGS;
@@ -363,7 +367,9 @@ export class Landing implements AfterViewInit, OnDestroy {
 
   protected readonly brandSize = computed(() => (this.navScrolled() ? '18px' : '20px'));
   protected readonly navLinksDisplay = computed(() => (this.navCompact() ? 'none' : 'flex'));
-  protected readonly navLoginDisplay = computed(() => (this.navCompact() ? 'none' : 'inline'));
+  protected readonly navLoginDisplay = computed(() =>
+    this.navCompact() || this.isAuthed() ? 'none' : 'inline'
+  );
 
   protected readonly panelLabel = computed(() => STEP_LABELS[this.stepIndex()]);
   protected readonly panelIndex = computed(() => `0${this.stepIndex() + 1} / 04`);

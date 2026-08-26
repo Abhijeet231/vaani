@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
@@ -13,6 +13,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +34,21 @@ export class App {
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  protected readonly auth = inject(AuthService);
+
+  protected readonly isAuthed = computed(() => this.auth.ready() && !!this.auth.user());
+  protected readonly userLabel = computed(() => {
+    const user = this.auth.user();
+    return user?.displayName || user?.email || 'Account';
+  });
+  protected readonly userPhoto = computed(() => this.auth.user()?.photoURL ?? null);
+  // Google's photoURL occasionally 429s/fails to load — fall back to the icon rather than a broken image.
+  protected readonly photoFailed = signal(false);
+
+  async logOut(): Promise<void> {
+    await this.auth.signOut();
+    this.router.navigateByUrl('/');
+  }
 
   protected readonly themeClass = toSignal(
     this.router.events.pipe(

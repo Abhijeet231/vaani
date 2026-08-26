@@ -29,22 +29,27 @@ export class AuthService {
     onAuthStateChanged(auth, (user) => {
       this.user.set(user);
       this.ready.set(true);
+      // Runs on every real sign-in AND on session restore (page reload with an
+      // existing session) — not just the explicit sign-in/sign-up calls below —
+      // so a DB row gets (re)created whenever we see an authenticated user, and
+      // a sync failure never blocks or errors the login flow itself (Firebase
+      // auth already succeeded by this point; the DB row is best-effort).
+      if (user) {
+        this.syncUser().catch((err) => console.error('Failed to sync user with backend:', err));
+      }
     });
   }
 
   async signInWithGoogle(): Promise<void> {
     await signInWithPopup(auth, new GoogleAuthProvider());
-    await this.syncUser();
   }
 
   async signUpWithEmail(email: string, password: string): Promise<void> {
     await createUserWithEmailAndPassword(auth, email, password);
-    await this.syncUser();
   }
 
   async signInWithEmail(email: string, password: string): Promise<void> {
     await signInWithEmailAndPassword(auth, email, password);
-    await this.syncUser();
   }
 
   async signOut(): Promise<void> {

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,6 +16,7 @@ import { AuthService } from '../../../core/auth.service';
 export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly mode = signal<'signIn' | 'signUp'>('signIn');
   readonly email = signal('');
@@ -37,7 +38,7 @@ export class Login {
       } else {
         await this.auth.signInWithEmail(this.email(), this.password());
       }
-      this.router.navigateByUrl('/app');
+      this.router.navigateByUrl(this.returnUrl());
     } catch (err) {
       this.error.set(this.messageFor(err));
     } finally {
@@ -50,12 +51,16 @@ export class Login {
     this.loading.set(true);
     try {
       await this.auth.signInWithGoogle();
-      this.router.navigateByUrl('/app');
+      this.router.navigateByUrl(this.returnUrl());
     } catch (err) {
       this.error.set(this.messageFor(err));
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private returnUrl(): string {
+    return this.route.snapshot.queryParamMap.get('returnUrl') || '/app';
   }
 
   private messageFor(err: unknown): string {

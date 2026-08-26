@@ -1,3 +1,4 @@
+import './config/dns-override';
 import { app } from './app';
 import { env } from './config/env';
 import { createServer } from 'http';
