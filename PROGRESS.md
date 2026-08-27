@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-08-27 — Conversation history: frontend (`/history` page)
+
+- New `apps/web/src/app/features/history/` (`History` component): loads `GET /api/history` on init, renders entries newest-first as `mat-card` rows matching `/app`'s existing card style (language pair + date/time in a muted header, transcript muted, translation prominent), with loading/error/empty states. Each row has a delete icon button wired to `DELETE /api/history/:id`, removing it from the local list on success.
+- New route `/history` in `app.routes.ts` — `authGuard`-gated, `theme: 'dark'` (matches `/app`, the screen it's reached from, rather than the landing page's separate lavender palette — a deliberate call since the two live in different parts of the site). Added a "History" link to the toolbar's account menu (`app.html`, both desktop and mobile), next to "Translate"/"Log out".
+- Deliberately bare-minimum per the user's ask ("just plug in and make it work, look decent") — no pagination, no per-row loading skeletons, styling reuses `/app`'s existing card pattern rather than anything new. Real UI polish deferred to a later pass, same as `/account`.
+- **Decided with the user**: no 30-day auto-purge yet — manual delete only (already built) is enough for now. Auto-purge needs something to actually trigger it on a schedule, and this app has no scheduler and no deployment target yet; revisit once it's actually deployed somewhere with native cron (Vercel/Render Cron, etc.) rather than build throwaway scheduling infra against local dev.
+- Verified for real in a running browser, not just `tsc --noEmit`: opened `/history` in an already-signed-in session (bonus: this was also the first live confirmation the Google-photo avatar from the earlier "account avatar" entry actually renders correctly), seeded two real rows directly in Neon under the real account, reloaded and confirmed both rendered correctly newest-first (Hindi→Kannada and English→Tamil, correct script rendering), then deleted each through the actual UI and confirmed they disappeared and the empty state returned. No test data left behind.
+
+**Pending / not yet built:**
+- Real UI design pass on `/history` (and `/account`) — user wants to design these once the rest of the app is further along; current UI is intentionally minimal.
+- No 30-day auto-purge (see decision above) — revisit after deployment.
+- Usage-limit enforcement (5 turns trial / 500 paid) — separate feature, discussed but not started.
+
 ## 2026-08-27 — Conversation history: backend (auto-save on translate, list, delete)
 
 - New `conversations` table (`apps/api/src/db/schema.ts`): `id`, `user_id` (FK → `users.id`, indexed), `source_language`, `target_language`, `transcript`, `translated_text`, `created_at`. Migration generated and run against the real Neon DB via the existing `run-migrate.ts` script.

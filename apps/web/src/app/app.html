@@ -45,6 +45,7 @@
           <mat-menu #userMenu="matMenu">
             <div class="px-4 py-2 text-sm text-ink-muted">{{ userLabel() }}</div>
             <a mat-menu-item routerLink="/app">Translate</a>
+            <a mat-menu-item routerLink="/history">History</a>
             <button mat-menu-item type="button" (click)="logOut()">Log out</button>
           </mat-menu>
         } @else {
@@ -68,6 +69,7 @@
         <a mat-menu-item routerLink="/contact">Contact</a>
         @if (isAuthed()) {
           <a mat-menu-item routerLink="/app">Open vaani</a>
+          <a mat-menu-item routerLink="/history">History</a>
           <button mat-menu-item type="button" (click)="logOut()">Log out</button>
         } @else {
           <a mat-menu-item routerLink="/login">Log in / Sign up</a>

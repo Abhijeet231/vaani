@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-4 p-6 max-w-xl mx-auto w-full">
+  <h1 class="text-xl font-medium">History</h1>
+
+  @if (isLoading()) {
+    <div class="flex items-center gap-2 text-sm opacity-70">
+      <mat-spinner diameter="18" />
+      Loading...
+    </div>
+  } @else if (errorMessage()) {
+    <span class="text-sm text-red-600">{{ errorMessage() }}</span>
+  } @else if (entries().length === 0) {
+    <span class="text-sm opacity-70">No conversations yet. Recorded turns from /app will show up here.</span>
+  } @else {
+    <div class="flex flex-col gap-3 w-full">
+      @for (entry of entries(); track entry.id) {
+        <mat-card class="w-full p-4 rounded-xl!">
+          <div class="flex items-start justify-between gap-2">
+            <div class="text-xs opacity-60 mb-2">
+              {{ languageLabel(entry.sourceLanguage) }} &rarr; {{ languageLabel(entry.targetLanguage) }}
+              &middot; {{ entry.createdAt | date: 'medium' }}
+            </div>
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Delete entry"
+              [disabled]="deletingId() === entry.id"
+              (click)="deleteEntry(entry.id)"
+            >
+              @if (deletingId() === entry.id) {
+                <mat-spinner diameter="18" />
+              } @else {
+                <mat-icon>delete_outline</mat-icon>
+              }
+            </button>
+          </div>
+          <div class="text-sm opacity-70 mb-1">{{ entry.transcript }}</div>
+          <div class="text-lg font-medium">{{ entry.translatedText }}</div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

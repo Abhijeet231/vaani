@@ -5,6 +5,7 @@ import { Pricing } from './features/pricing/pricing';
 import { Contact } from './features/contact/contact';
 import { Login } from './features/auth/login/login';
 import { OneToOne } from './features/one-to-one/one-to-one';
+import { History } from './features/history/history';
 import { authGuard, guestGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -14,4 +15,5 @@ export const routes: Routes = [
   { path: 'contact', component: Contact, data: { theme: 'light' } },
   { path: 'login', component: Login, data: { theme: 'light' }, canActivate: [guestGuard] },
   { path: 'app', component: OneToOne, data: { theme: 'dark' }, canActivate: [authGuard] },
+  { path: 'history', component: History, data: { theme: 'dark' }, canActivate: [authGuard] },
 ];
