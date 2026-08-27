@@ -1,5 +1,10 @@
 # Progress Log
 
+## 2026-08-27 — Debug script: list Neon users from the command line
+
+- Added `apps/api/src/scripts/list-users.ts` — prints every row in the `users` table (`pnpm --filter api exec ts-node src/scripts/list-users.ts`). Reuses the same `neon-http` driver + `dns-override` the app itself uses, so it works from this machine even though the Neon web console's own DNS lookup can't (browser-side DNS issue, not a code one — see the entry below). This was the script used last session to confirm a user's row was actually saved when the Neon console showed a fetch error.
+- Also used this session to answer the user's question about whether conversation history is tracked anywhere: confirmed by reading `apps/api/src/db/schema.ts` and grepping `apps/api/src` for "history"/"conversation" that **no such table or code exists yet** — `users` is still the only table. Nothing is tracked in Sarvam's account either (its APIs are stateless, called per-request). History was previously only discussed/designed, never built — noting this here since it came up as a point of confusion.
+
 ## 2026-08-27 — Account avatar in the toolbar
 
 - Shared toolbar's account-menu trigger (`app.html`/`app.ts`) now shows the signed-in user's Google profile photo (`auth.user()?.photoURL`) instead of a generic icon, when one exists. Falls back to the plain `account_circle` icon for email/password accounts (no `photoURL`) or if the image fails to load (tracked via a `photoFailed` signal set on the `<img>`'s `(error)` event — Google's photo URLs occasionally 429).
