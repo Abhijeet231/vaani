@@ -20,7 +20,7 @@ const auth: Auth = getAuth(firebaseApp);
 
 export interface DbUser {
   plan: 'trial' | 'paid' | 'expired';
-  usageCount: number;
+  turnsBalance: number;
 }
 
 @Injectable({ providedIn: 'root' })

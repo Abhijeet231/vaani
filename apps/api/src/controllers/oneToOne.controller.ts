@@ -3,9 +3,8 @@ import type { SarvamAI } from 'sarvamai';
 import { transcribeAudio } from '../services/transcription.service';
 import { translateText } from '../services/translation.service';
 import { synthesizeSpeech } from '../services/speech.service';
-import { incrementUsageCount } from '../models/user.model';
+import { spendTurn } from '../models/user.model';
 import { createConversation } from '../models/conversation.model';
-import { TRIAL_TURN_LIMIT } from '../config/limits';
 
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
   if (!req.dbUser) {
@@ -34,14 +33,14 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       targetLanguageCode,
     });
 
-    // A turn is "you got a translation back" — count it even if the history
+    // A turn is "you got a translation back" — spend it even if the history
     // save below fails, since the Sarvam call already happened either way.
-    let usageCount = req.dbUser.usageCount + 1;
+    let turnsBalance = req.dbUser.turnsBalance - 1;
     try {
-      const updated = await incrementUsageCount(req.dbUser.id);
-      if (updated) usageCount = updated.usageCount;
+      const updated = await spendTurn(req.dbUser.id);
+      if (updated) turnsBalance = updated.turnsBalance;
     } catch (usageErr) {
-      console.error('Failed to increment usage count:', usageErr);
+      console.error('Failed to spend turn:', usageErr);
     }
 
     try {
@@ -56,11 +55,7 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       console.error('Failed to save conversation history:', saveErr);
     }
 
-    res.status(200).json({
-      transcript,
-      translatedText,
-      usage: req.dbUser.plan === 'trial' ? { used: usageCount, limit: TRIAL_TURN_LIMIT } : null,
-    });
+    res.status(200).json({ transcript, translatedText, turnsBalance });
   } catch (err) {
     next(err);
   }

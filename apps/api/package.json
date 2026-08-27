@@ -17,6 +17,7 @@
     "drizzle-orm": "^0.45.2",
     "express": "^4.21.2",
     "firebase-admin": "^14.3.0",
+    "razorpay": "^2.9.8",
     "sarvamai": "^1.1.8",
     "undici": "^8.10.0",
     "ws": "^8.21.3"

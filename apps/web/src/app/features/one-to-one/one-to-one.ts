@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,10 +9,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LANGUAGES, TTS_SUPPORTED_LANGUAGE_CODES } from './languages';
 import { AuthService } from '../../core/auth.service';
-
-// Mirrors apps/api/src/config/limits.ts's TRIAL_TURN_LIMIT — no shared
-// package between web/api yet, so kept in sync manually for this one value.
-const TRIAL_TURN_LIMIT = 10;
 
 interface Turn {
   id: string;
@@ -26,12 +23,13 @@ interface Turn {
 interface TranslateAudioResponse {
   transcript: string;
   translatedText: string;
-  usage: { used: number; limit: number } | null;
+  turnsBalance: number;
 }
 
 @Component({
   selector: 'app-one-to-one',
   imports: [
+    RouterLink,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -54,10 +52,7 @@ export class OneToOne {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly turns = signal<Turn[]>([]);
 
-  protected readonly trialLimitReached = computed(() => {
-    const user = this.auth.dbUser();
-    return user?.plan === 'trial' && user.usageCount >= TRIAL_TURN_LIMIT;
-  });
+  protected readonly noTurnsLeft = computed(() => (this.auth.dbUser()?.turnsBalance ?? 1) <= 0);
 
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
@@ -74,7 +69,7 @@ export class OneToOne {
       return;
     }
 
-    if (this.trialLimitReached()) {
+    if (this.noTurnsLeft()) {
       return;
     }
 
@@ -134,19 +129,15 @@ export class OneToOne {
             },
             ...existing,
           ]);
-          if (response.usage) {
-            const user = this.auth.dbUser();
-            if (user) this.auth.dbUser.set({ ...user, usageCount: response.usage.used });
-          }
+          const user = this.auth.dbUser();
+          if (user) this.auth.dbUser.set({ ...user, turnsBalance: response.turnsBalance });
           this.isProcessing.set(false);
         },
         error: (error: HttpErrorResponse) => {
-          if (error.status === 403 && error.error?.error === 'trial_limit_reached') {
+          if (error.status === 403 && error.error?.error === 'no_turns_left') {
             const user = this.auth.dbUser();
-            if (user) this.auth.dbUser.set({ ...user, usageCount: error.error.limit });
-            this.errorMessage.set(
-              `You've used all ${error.error.limit} free translations. Upgrades aren't available yet — check back soon.`
-            );
+            if (user) this.auth.dbUser.set({ ...user, turnsBalance: 0 });
+            this.errorMessage.set("You're out of translations. Buy a recharge pack to keep going.");
           } else {
             this.errorMessage.set(error.error?.error ?? 'Translation failed. Please try again.');
           }

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { findOrCreateUser } from '../models/user.model';
-import { TRIAL_TURN_LIMIT } from '../config/limits';
 
 // Runs after requireAuth. Loads the caller's row (attached as req.dbUser so
-// the controller doesn't have to look it up again) and blocks trial users
-// who've used their free turns — before we spend anything on a Sarvam call.
+// the controller doesn't have to look it up again) and blocks anyone with no
+// turns left — before we spend anything on a Sarvam call. Applies the same
+// way to trial and paid users: it's all one balance, topped up by packs.
 export async function requireUsageAvailable(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (!req.user) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -18,12 +18,8 @@ export async function requireUsageAvailable(req: Request, res: Response, next: N
       displayName: req.user.name,
     });
 
-    if (user.plan === 'trial' && user.usageCount >= TRIAL_TURN_LIMIT) {
-      res.status(403).json({
-        error: 'trial_limit_reached',
-        used: user.usageCount,
-        limit: TRIAL_TURN_LIMIT,
-      });
+    if (user.turnsBalance <= 0) {
+      res.status(403).json({ error: 'no_turns_left', balance: user.turnsBalance });
       return;
     }
 

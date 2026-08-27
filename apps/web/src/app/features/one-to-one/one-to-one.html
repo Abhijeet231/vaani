@@ -40,16 +40,16 @@
         mat-fab
         type="button"
         [color]="isRecording() ? 'warn' : 'primary'"
-        [disabled]="isProcessing() || trialLimitReached()"
+        [disabled]="isProcessing() || noTurnsLeft()"
         (click)="toggleRecording()"
       >
         <mat-icon>{{ isRecording() ? 'stop' : 'mic' }}</mat-icon>
       </button>
 
-      @if (trialLimitReached()) {
-        <span class="text-sm opacity-70"
-          >You've used all your free translations. Upgrades aren't available yet — check back
-          soon.</span
+      @if (noTurnsLeft()) {
+        <span class="text-sm opacity-70 text-center"
+          >You're out of translations. <a routerLink="/pricing" class="underline">Buy a recharge
+          pack</a> to keep going.</span
         >
       } @else if (isProcessing()) {
         <div class="flex items-center gap-2 text-sm opacity-70">
