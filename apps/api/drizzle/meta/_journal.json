@@ -15,6 +15,13 @@
       "when": 1787854540960,
       "tag": "0001_keen_wendell_vaughn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787856866714,
+      "tag": "0002_unusual_peter_quill",
+      "breakpoints": true
     }
   ]
 }

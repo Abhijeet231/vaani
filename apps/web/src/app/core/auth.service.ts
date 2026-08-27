@@ -18,12 +18,21 @@ import { firebaseConfig } from './firebase.config';
 const firebaseApp = initializeApp(firebaseConfig);
 const auth: Auth = getAuth(firebaseApp);
 
+export interface DbUser {
+  plan: 'trial' | 'paid' | 'expired';
+  usageCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
 
   readonly user = signal<User | null>(null);
   readonly ready = signal(false);
+  // Mirrors the Neon `users` row (plan/usageCount) — set on every sync, and
+  // updateable straight from a translate response so we don't need a second
+  // round trip just to refresh the count after a turn.
+  readonly dbUser = signal<DbUser | null>(null);
 
   constructor() {
     onAuthStateChanged(auth, (user) => {
@@ -62,6 +71,7 @@ export class AuthService {
 
   // Upserts the DB row for the just-authenticated user (default plan: trial).
   private async syncUser(): Promise<void> {
-    await firstValueFrom(this.http.post('/api/auth/sync', {}));
+    const response = await firstValueFrom(this.http.post<{ user: DbUser }>('/api/auth/sync', {}));
+    this.dbUser.set(response.user);
   }
 }

@@ -1,4 +1,4 @@
-import { index, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const planEnum = pgEnum('plan', ['trial', 'paid', 'expired']);
 
@@ -8,6 +8,7 @@ export const users = pgTable('users', {
   email: text('email'),
   displayName: text('display_name'),
   plan: planEnum('plan').notNull().default('trial'),
+  usageCount: integer('usage_count').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

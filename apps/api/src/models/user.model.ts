@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { getDb } from '../config/db';
 import { users } from '../db/schema';
 
@@ -28,4 +28,15 @@ export async function findOrCreateUser(input: FindOrCreateUserInput) {
     .returning();
 
   return created;
+}
+
+// Atomic increment (read-then-write would race two concurrent translate calls).
+export async function incrementUsageCount(userId: string) {
+  const db = getDb();
+  const [updated] = await db
+    .update(users)
+    .set({ usageCount: sql`${users.usageCount} + 1` })
+    .where(eq(users.id, userId))
+    .returning();
+  return updated;
 }

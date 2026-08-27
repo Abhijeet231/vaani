@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LANGUAGES, TTS_SUPPORTED_LANGUAGE_CODES } from './languages';
+import { AuthService } from '../../core/auth.service';
+
+// Mirrors apps/api/src/config/limits.ts's TRIAL_TURN_LIMIT — no shared
+// package between web/api yet, so kept in sync manually for this one value.
+const TRIAL_TURN_LIMIT = 10;
 
 interface Turn {
   id: string;
@@ -21,6 +26,7 @@ interface Turn {
 interface TranslateAudioResponse {
   transcript: string;
   translatedText: string;
+  usage: { used: number; limit: number } | null;
 }
 
 @Component({
@@ -38,6 +44,7 @@ interface TranslateAudioResponse {
 })
 export class OneToOne {
   private readonly http = inject(HttpClient);
+  protected readonly auth = inject(AuthService);
 
   protected readonly languages = LANGUAGES;
   protected readonly sourceLanguage = signal('hi-IN');
@@ -46,6 +53,11 @@ export class OneToOne {
   protected readonly isProcessing = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly turns = signal<Turn[]>([]);
+
+  protected readonly trialLimitReached = computed(() => {
+    const user = this.auth.dbUser();
+    return user?.plan === 'trial' && user.usageCount >= TRIAL_TURN_LIMIT;
+  });
 
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
@@ -59,6 +71,10 @@ export class OneToOne {
   protected async toggleRecording(): Promise<void> {
     if (this.isRecording()) {
       this.mediaRecorder?.stop();
+      return;
+    }
+
+    if (this.trialLimitReached()) {
       return;
     }
 
@@ -118,10 +134,22 @@ export class OneToOne {
             },
             ...existing,
           ]);
+          if (response.usage) {
+            const user = this.auth.dbUser();
+            if (user) this.auth.dbUser.set({ ...user, usageCount: response.usage.used });
+          }
           this.isProcessing.set(false);
         },
         error: (error: HttpErrorResponse) => {
-          this.errorMessage.set(error.error?.error ?? 'Translation failed. Please try again.');
+          if (error.status === 403 && error.error?.error === 'trial_limit_reached') {
+            const user = this.auth.dbUser();
+            if (user) this.auth.dbUser.set({ ...user, usageCount: error.error.limit });
+            this.errorMessage.set(
+              `You've used all ${error.error.limit} free translations. Upgrades aren't available yet — check back soon.`
+            );
+          } else {
+            this.errorMessage.set(error.error?.error ?? 'Translation failed. Please try again.');
+          }
           this.isProcessing.set(false);
         },
       });

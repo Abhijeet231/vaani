@@ -3,11 +3,12 @@ import type { SarvamAI } from 'sarvamai';
 import { transcribeAudio } from '../services/transcription.service';
 import { translateText } from '../services/translation.service';
 import { synthesizeSpeech } from '../services/speech.service';
-import { findOrCreateUser } from '../models/user.model';
+import { incrementUsageCount } from '../models/user.model';
 import { createConversation } from '../models/conversation.model';
+import { TRIAL_TURN_LIMIT } from '../config/limits';
 
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
-  if (!req.user) {
+  if (!req.dbUser) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
@@ -33,14 +34,19 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       targetLanguageCode,
     });
 
+    // A turn is "you got a translation back" — count it even if the history
+    // save below fails, since the Sarvam call already happened either way.
+    let usageCount = req.dbUser.usageCount + 1;
     try {
-      const user = await findOrCreateUser({
-        firebaseUid: req.user.uid,
-        email: req.user.email,
-        displayName: req.user.name,
-      });
+      const updated = await incrementUsageCount(req.dbUser.id);
+      if (updated) usageCount = updated.usageCount;
+    } catch (usageErr) {
+      console.error('Failed to increment usage count:', usageErr);
+    }
+
+    try {
       await createConversation({
-        userId: user.id,
+        userId: req.dbUser.id,
         sourceLanguage: sourceLanguageCode,
         targetLanguage: targetLanguageCode,
         transcript,
@@ -50,7 +56,11 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       console.error('Failed to save conversation history:', saveErr);
     }
 
-    res.status(200).json({ transcript, translatedText });
+    res.status(200).json({
+      transcript,
+      translatedText,
+      usage: req.dbUser.plan === 'trial' ? { used: usageCount, limit: TRIAL_TURN_LIMIT } : null,
+    });
   } catch (err) {
     next(err);
   }
