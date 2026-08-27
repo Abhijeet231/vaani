@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const planEnum = pgEnum('plan', ['trial', 'paid', 'expired']);
 
@@ -10,3 +10,19 @@ export const users = pgTable('users', {
   plan: planEnum('plan').notNull().default('trial'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const conversations = pgTable(
+  'conversations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    sourceLanguage: text('source_language').notNull(),
+    targetLanguage: text('target_language').notNull(),
+    transcript: text('transcript').notNull(),
+    translatedText: text('translated_text').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('conversations_user_id_idx').on(table.userId)],
+);

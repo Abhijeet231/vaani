@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-08-27 — Conversation history: backend (auto-save on translate, list, delete)
+
+- New `conversations` table (`apps/api/src/db/schema.ts`): `id`, `user_id` (FK → `users.id`, indexed), `source_language`, `target_language`, `transcript`, `translated_text`, `created_at`. Migration generated and run against the real Neon DB via the existing `run-migrate.ts` script.
+- `POST /api/one-to-one/translate` and `/speak` now require `requireAuth` — they didn't before, so history couldn't be attributed to a user. The frontend already attaches a bearer token to every `/api/*` call (`auth.interceptor.ts`), so this doesn't change existing app behavior; only anonymous/direct API calls are newly rejected.
+- `translateAudio` (`oneToOne.controller.ts`) now saves a `conversations` row right after a successful translate (same request, no extra round trip — "option A" from the design discussion, chosen over a separate frontend save call). The save is wrapped in its own try/catch so a DB failure never blocks the translation response the user is waiting on, only logs server-side — same fire-and-forget-on-failure pattern as the auth-sync fix from earlier this session.
+- New `GET /api/history` (`{ history: [...] }`, newest-first) and `DELETE /api/history/:id` (204, scoped to the caller's own rows — 404 otherwise), via new `history.controller.ts`/`history.routes.ts` and `models/conversation.model.ts` (`createConversation`/`listConversations`/`deleteConversation`).
+- Verified end-to-end for real, not just `tsc --noEmit`: minted a real Firebase ID token for a throwaway test user (custom token → REST exchange, same project), POSTed real audio through `/translate`, confirmed the row landed in Neon with correct transcript/translation/languages, then exercised `GET /history` (got it back), `DELETE /history/:id` (204), and `GET /history` again (empty) — cleaned up the test user/rows afterward, nothing left behind.
+
+**Pending / not yet built:**
+- Frontend `/history` page — user wants to design it themselves before implementation (same as `/account`, noted in earlier entries).
+- No 30-day auto-purge job yet — discussed approach: filter `created_at` in the `GET` query for now (no scheduler exists in this app), a real periodic delete can wait until it matters.
+- Usage-limit enforcement (5 turns trial / 500 paid) — separate feature, discussed but not started; would reuse the same `requireAuth`-gated routes.
+
 ## 2026-08-27 — Debug script: list Neon users from the command line
 
 - Added `apps/api/src/scripts/list-users.ts` — prints every row in the `users` table (`pnpm --filter api exec ts-node src/scripts/list-users.ts`). Reuses the same `neon-http` driver + `dns-override` the app itself uses, so it works from this machine even though the Neon web console's own DNS lookup can't (browser-side DNS issue, not a code one — see the entry below). This was the script used last session to confirm a user's row was actually saved when the Neon console showed a fetch error.

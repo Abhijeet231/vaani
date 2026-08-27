@@ -3,8 +3,15 @@ import type { SarvamAI } from 'sarvamai';
 import { transcribeAudio } from '../services/transcription.service';
 import { translateText } from '../services/translation.service';
 import { synthesizeSpeech } from '../services/speech.service';
+import { findOrCreateUser } from '../models/user.model';
+import { createConversation } from '../models/conversation.model';
 
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
   const sourceLanguageCode = req.query.source as SarvamAI.SpeechToTextLanguage | undefined;
   const targetLanguageCode = req.query.target as SarvamAI.TranslateTargetLanguage | undefined;
 
@@ -25,6 +32,23 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       sourceLanguageCode: sourceLanguageCode as unknown as SarvamAI.TranslateSourceLanguage,
       targetLanguageCode,
     });
+
+    try {
+      const user = await findOrCreateUser({
+        firebaseUid: req.user.uid,
+        email: req.user.email,
+        displayName: req.user.name,
+      });
+      await createConversation({
+        userId: user.id,
+        sourceLanguage: sourceLanguageCode,
+        targetLanguage: targetLanguageCode,
+        transcript,
+        translatedText,
+      });
+    } catch (saveErr) {
+      console.error('Failed to save conversation history:', saveErr);
+    }
 
     res.status(200).json({ transcript, translatedText });
   } catch (err) {
