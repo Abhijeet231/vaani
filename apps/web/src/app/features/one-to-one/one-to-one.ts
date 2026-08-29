@@ -58,6 +58,7 @@ export class OneToOne {
   protected readonly isProcessing = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly turns = signal<Turn[]>([]);
+  protected readonly autoStopped = signal(false);
 
   protected readonly noTurnsLeft = computed(() => (this.auth.dbUser()?.turnsBalance ?? 1) <= 0);
   protected readonly turnsBalance = computed(() => this.auth.dbUser()?.turnsBalance ?? null);
@@ -70,6 +71,7 @@ export class OneToOne {
   private silenceCheckIntervalId: number | null = null;
   private recordingStartedAt = 0;
   private silenceStartedAt: number | null = null;
+  private everSpoke = false;
 
   protected flipDirection(): void {
     const source = this.sourceLanguage();
@@ -90,6 +92,7 @@ export class OneToOne {
     }
 
     this.errorMessage.set(null);
+    this.autoStopped.set(false);
 
     let stream: MediaStream;
     try {
@@ -110,7 +113,18 @@ export class OneToOne {
 
     this.mediaRecorder.onstop = () => {
       stream.getTracks().forEach((track) => track.stop());
+      const spoke = this.everSpoke;
       this.stopSilenceDetection();
+
+      if (!spoke) {
+        // Never crossed the loudness threshold at all — nothing worth sending,
+        // so skip the Sarvam call rather than spend a turn on dead air.
+        this.isRecording.set(false);
+        this.autoStopped.set(false);
+        this.errorMessage.set("Didn't catch any speech — try recording again.");
+        return;
+      }
+
       const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
       const blob = new Blob(this.audioChunks, { type: mimeType });
       this.sendAudio(blob);
@@ -124,6 +138,7 @@ export class OneToOne {
   private startSilenceDetection(stream: MediaStream): void {
     this.recordingStartedAt = Date.now();
     this.silenceStartedAt = null;
+    this.everSpoke = false;
 
     this.audioContext = new AudioContext();
     const source = this.audioContext.createMediaStreamSource(stream);
@@ -153,10 +168,12 @@ export class OneToOne {
           recordingElapsed >= MIN_RECORDING_BEFORE_AUTO_STOP_MS &&
           this.mediaRecorder?.state === 'recording'
         ) {
+          this.autoStopped.set(true);
           this.mediaRecorder.stop();
         }
       } else {
         this.silenceStartedAt = null;
+        this.everSpoke = true;
       }
     }, 150);
   }

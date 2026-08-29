@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-08-30 — Auto-stop follow-up: visible "why did it stop" cue + skip silent recordings entirely
+
+- User feedback on the auto-stop entry above: silently flipping the record button off with no explanation would look like a glitch, not a feature. Added a new `autoStopped` signal, set right before the silence-triggered `mediaRecorder.stop()` call; the "Translating..." state now reads "Silence detected, stopped — translating..." when it was auto- rather than manually-triggered, reset at the start of every new recording.
+- **Went further per the user's "make more changes if you think of any"**: previously, an all-silence recording (auto-stopped *or* a fast manual tap-then-untap with nothing said) still got sent to Sarvam and spent a turn on empty audio. New `everSpoke` flag, set true the first time loudness ever crosses the silence threshold during a recording; `onstop` now checks it and skips the `sendAudio`/Sarvam call entirely when nothing was ever said, showing "Didn't catch any speech — try recording again." instead — directly addresses the user's original "empty time eating tokens" concern, one step further than just auto-stopping sooner.
+- Worth being explicit about the tradeoff this adds: the "skip if never spoke" check reuses the same volume-threshold heuristic already flagged as needing real-world tuning — a wrong threshold now doesn't just mis-time when it stops, it could occasionally discard a real (very quiet) recording rather than sending it. Same underlying risk as before, just with a bit more riding on getting the threshold right.
+- Verified: `tsc --noEmit` clean, dev server hot-reloaded with no errors. Same mic-permission automation limitation as the entry above — not exercised with a real microphone yet.
+
 ## 2026-08-30 — Auto-stop recording on silence (1-1 mode)
 
 - User's concern: dead air at the end of a recording still gets sent to and billed by Sarvam, since recording was manual tap-to-stop only. Added silence-based auto-stop instead of a full VAD model/library — proportionate for the actual problem (skip obviously-dead air, not detect speech precisely).
