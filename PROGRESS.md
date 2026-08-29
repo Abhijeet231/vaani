@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-08-29 — Fixed two real Render build failures (corepack, pnpm build-script policy)
+
+- First `vaani-api` deploy attempt failed instantly: `corepack enable` (in `render.yaml`'s buildCommand) tried to overwrite `/usr/bin/pnpm`, which is pre-installed and read-only on Render's Node image (`EROFS: read-only file system, unlink '/usr/bin/pnpm'`). Fix: dropped `corepack enable` from the buildCommand — Render already has pnpm on `PATH`, it isn't needed.
+- Second attempt failed further in, during `pnpm install --frozen-lockfile`: `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: @parcel/watcher, lmdb, msgpackr-extract` — a newer pnpm security default that blocks postinstall/build scripts for unrecognized dependencies, and errors out (exit 1) rather than just warning when it can't prompt interactively (a fresh, non-interactive CI environment like Render's). This didn't surface locally because the local `node_modules` already had these built from before — reproduced for real by running a clean install in an isolated scratch copy of the workspace, confirmed exit 1, then confirmed exit 0 after the fix.
+- All three flagged packages are `drizzle-kit`'s own dev-time dependencies (its file-watcher and local cache), never touched by the actual deployed server (`pnpm --filter api build`/`start` don't invoke drizzle-kit) — so the fix is to explicitly mark them as not needing their native builds, not to approve them. This pnpm version keys that off `pnpm-workspace.yaml`'s `allowBuilds` map (already had 3 approved entries from earlier work) rather than `package.json`'s `pnpm.onlyBuiltDependencies`/`ignoredBuiltDependencies` — tried the latter first, confirmed empirically it had no effect on this pnpm version before switching to the right mechanism. Added `'@parcel/watcher': false`, `lmdb: false`, `msgpackr-extract: false` alongside the existing entries.
+- Verified for real, not just locally: reproduced the exact failure in a clean, isolated copy of the workspace (fresh `node_modules`, no build cache to mask it), confirmed `pnpm install --frozen-lockfile` exits 1 before the fix and 0 after, then confirmed `pnpm --filter api build` also succeeds in that same clean environment — as close to Render's actual conditions as achievable locally.
+
+**Pending / not yet built:**
+- **User: push this commit, then trigger another Render deploy** (Manual sync on the Blueprint, or it may auto-deploy from the push) — two real bugs fixed, but neither has actually succeeded on Render yet.
+- If a *third* failure surfaces, it's likely the `pnpm --filter api build`/`start` step itself or a missing env var, not the install step anymore — the install path has now been verified clean end-to-end locally.
+
 ## 2026-08-29 — Minor: label comments added to `schema.ts` table definitions
 
 - User hand-edited `apps/api/src/db/schema.ts` directly, adding a one-line comment above each table (`// User Schema`, `// Purchase Schema`, `// Conversation Schema`). No functional/schema change, no migration needed.
