@@ -3,7 +3,7 @@ services:
     name: vaani-api
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter api build
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api build
     startCommand: pnpm --filter api start
     envVars:
       - key: NODE_ENV
