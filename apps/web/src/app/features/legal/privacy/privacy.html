@@ -1,0 +1,63 @@
+<section class="max-w-3xl mx-auto px-6 pt-16 pb-12 md:pt-24">
+  <p class="text-accent-ink text-sm font-medium mb-4">Privacy Policy</p>
+  <h1 class="font-display text-3xl md:text-4xl leading-tight text-balance mb-6">
+    What vaani collects, and why.
+  </h1>
+  <p class="text-ink-muted">
+    Last updated 2026-08-30. vaani is an early-stage product — this page will be kept
+    up to date as what's built changes, rather than left to drift from reality.
+  </p>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 py-12 border-t border-border">
+  <h2 class="font-display text-2xl mb-4">What we collect</h2>
+  <ul class="text-ink-muted list-disc pl-5 flex flex-col gap-2">
+    <li>Your email and display name, from signing in with Google or email/password (via Firebase Authentication).</li>
+    <li>
+      Audio you record to translate — sent to Sarvam AI for processing (speech-to-text,
+      translation, and text-to-speech) and not kept as audio afterward; only the resulting
+      transcript and translated text are stored.
+    </li>
+    <li>Conversation history — the transcript and translation text of each turn, kept until you delete it from the History page.</li>
+    <li>Usage and purchase records — your remaining translation balance and a record of any recharge packs you buy, to run the product and show you your own history.</li>
+  </ul>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 py-12 border-t border-border">
+  <h2 class="font-display text-2xl mb-4">Who else sees it</h2>
+  <p class="text-ink-muted mb-4">
+    vaani is built on a small number of specific providers, each doing one job:
+  </p>
+  <ul class="text-ink-muted list-disc pl-5 flex flex-col gap-2">
+    <li><strong class="text-ink">Firebase (Google)</strong> — sign-in and identity.</li>
+    <li><strong class="text-ink">Neon</strong> — hosts the database where your account and history live.</li>
+    <li><strong class="text-ink">Sarvam AI</strong> — processes audio for transcription, translation, and speech output.</li>
+    <li><strong class="text-ink">Razorpay</strong> — processes payments for recharge packs; vaani never sees or stores your card/UPI details directly.</li>
+  </ul>
+  <p class="text-ink-muted mt-4">
+    We don't sell your data, and we don't share it with anyone outside of what's needed to
+    run the product above.
+  </p>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 py-12 border-t border-border">
+  <h2 class="font-display text-2xl mb-4">Your controls</h2>
+  <p class="text-ink-muted">
+    You can delete any conversation from your History at any time. To ask about or delete
+    other data we hold on your account, contact us at
+    <a href="mailto:{{ contactEmail }}" class="text-accent-ink no-underline hover:underline">{{
+      contactEmail
+    }}</a>.
+  </p>
+</section>
+
+<section class="max-w-3xl mx-auto px-6 py-12 border-t border-border">
+  <h2 class="font-display text-2xl mb-4">Questions</h2>
+  <p class="text-ink-muted">
+    Reach us at
+    <a href="mailto:{{ contactEmail }}" class="text-accent-ink no-underline hover:underline">{{
+      contactEmail
+    }}</a>
+    for anything about how your data is handled.
+  </p>
+</section>

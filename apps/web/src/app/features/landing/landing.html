@@ -27,8 +27,29 @@
       <div class="vh-nav-actions">
         <a routerLink="/login" class="vh-nav-login" [style.display]="navLoginDisplay()">Log in</a>
         <a routerLink="/app" class="vh-nav-cta">{{ isAuthed() ? 'Open vaani' : 'Start free' }}</a>
+        <button
+          type="button"
+          class="vh-nav-menu-btn"
+          [style.display]="navMenuButtonDisplay()"
+          (click)="toggleMobileMenu()"
+          aria-label="Open menu"
+        >
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </div>
+
+    @if (mobileMenuOpen()) {
+      <div class="vh-nav-mobile-panel">
+        <a routerLink="/about" (click)="closeMobileMenu()">About</a>
+        <a routerLink="/contact" (click)="closeMobileMenu()">Contact</a>
+        <a routerLink="/pricing" (click)="closeMobileMenu()">Pricing</a>
+        @if (!isAuthed()) {
+          <a routerLink="/login" (click)="closeMobileMenu()">Log in</a>
+        }
+      </div>
+    }
   </nav>
 
   <canvas class="vh-sparks" data-role="sparks" aria-hidden="true"></canvas>

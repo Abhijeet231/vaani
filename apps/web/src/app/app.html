@@ -1,4 +1,4 @@
-<div [class]="themeClass()">
+<div [class]="themeClass()" class="flex flex-col min-h-screen">
   @if (!hideChrome()) {
     <mat-toolbar class="border-b border-border! flex! items-center justify-between px-4! md:px-6!">
       <a routerLink="/" class="wordmark no-underline text-inherit!">{{ title() }}</a>
@@ -42,7 +42,7 @@
               <mat-icon>account_circle</mat-icon>
             }
           </button>
-          <mat-menu #userMenu="matMenu">
+          <mat-menu #userMenu="matMenu" [class]="themeClass()">
             <div class="px-4 py-2 text-sm text-ink-muted">{{ userLabel() }}</div>
             <a mat-menu-item routerLink="/app">Translate</a>
             <a mat-menu-item routerLink="/history">History</a>
@@ -64,7 +64,7 @@
       >
         <mat-icon>menu</mat-icon>
       </button>
-      <mat-menu #mobileMenu="matMenu">
+      <mat-menu #mobileMenu="matMenu" [class]="themeClass()">
         <a mat-menu-item routerLink="/about">About</a>
         <a mat-menu-item routerLink="/pricing">Pricing</a>
         <a mat-menu-item routerLink="/contact">Contact</a>
@@ -80,7 +80,9 @@
     </mat-toolbar>
   }
 
-  <main>
+  <main class="flex-1">
     <router-outlet />
   </main>
+
+  <app-footer />
 </div>

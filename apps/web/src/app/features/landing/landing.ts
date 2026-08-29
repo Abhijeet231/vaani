@@ -290,6 +290,7 @@ export class Landing implements AfterViewInit, OnDestroy {
 
   protected readonly navScrolled = signal(false);
   protected readonly navCompact = signal(false);
+  protected readonly mobileMenuOpen = signal(false);
   protected readonly lineStep = signal(0);
   protected readonly langIndex = signal(0);
   protected readonly langAuto = signal(true);
@@ -370,6 +371,15 @@ export class Landing implements AfterViewInit, OnDestroy {
   protected readonly navLoginDisplay = computed(() =>
     this.navCompact() || this.isAuthed() ? 'none' : 'inline'
   );
+  protected readonly navMenuButtonDisplay = computed(() => (this.navCompact() ? 'inline-flex' : 'none'));
+
+  protected toggleMobileMenu(): void {
+    this.mobileMenuOpen.update((open) => !open);
+  }
+
+  protected closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
 
   protected readonly panelLabel = computed(() => STEP_LABELS[this.stepIndex()]);
   protected readonly panelIndex = computed(() => `0${this.stepIndex() + 1} / 04`);
@@ -512,7 +522,10 @@ export class Landing implements AfterViewInit, OnDestroy {
       }
       const compact = nav.getBoundingClientRect().width < 660;
       if (scrolled !== this.navScrolled()) this.navScrolled.set(scrolled);
-      if (compact !== this.navCompact()) this.navCompact.set(compact);
+      if (compact !== this.navCompact()) {
+        this.navCompact.set(compact);
+        if (!compact) this.mobileMenuOpen.set(false);
+      }
     };
 
     this.onScroll = checkNav;

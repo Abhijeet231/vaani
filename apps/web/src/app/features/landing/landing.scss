@@ -136,6 +136,55 @@
   }
 }
 
+.vh-nav-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  span {
+    width: 18px;
+    height: 2px;
+    background: #edebf7;
+    border-radius: 1px;
+  }
+}
+
+.vh-nav-mobile-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #17161a;
+  border: 1px solid #3b3849;
+  border-radius: 14px;
+  padding: 10px;
+  min-width: 160px;
+
+  a {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 14px;
+    color: #edebf7;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: rgba(146, 169, 225, 0.12);
+    }
+  }
+}
+
 // ---- cursor sparks ----
 
 .vh-sparks {

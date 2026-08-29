@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './core/auth.service';
+import { Footer } from './shared/footer/footer';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ import { AuthService } from './core/auth.service';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    Footer,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
