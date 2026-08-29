@@ -26,6 +26,13 @@ interface TranslateAudioResponse {
   turnsBalance: number;
 }
 
+// Volume-threshold silence detection, not real speech detection — good enough
+// to stop sending dead air to Sarvam without pulling in a VAD model/library.
+// Starting defaults; may need tuning once used for real.
+const SILENCE_RMS_THRESHOLD = 0.02;
+const SILENCE_DURATION_MS = 1500;
+const MIN_RECORDING_BEFORE_AUTO_STOP_MS = 1000;
+
 @Component({
   selector: 'app-one-to-one',
   imports: [
@@ -58,6 +65,12 @@ export class OneToOne {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
 
+  private audioContext: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private silenceCheckIntervalId: number | null = null;
+  private recordingStartedAt = 0;
+  private silenceStartedAt: number | null = null;
+
   protected flipDirection(): void {
     const source = this.sourceLanguage();
     this.sourceLanguage.set(this.targetLanguage());
@@ -66,7 +79,9 @@ export class OneToOne {
 
   protected async toggleRecording(): Promise<void> {
     if (this.isRecording()) {
-      this.mediaRecorder?.stop();
+      if (this.mediaRecorder?.state === 'recording') {
+        this.mediaRecorder.stop();
+      }
       return;
     }
 
@@ -95,6 +110,7 @@ export class OneToOne {
 
     this.mediaRecorder.onstop = () => {
       stream.getTracks().forEach((track) => track.stop());
+      this.stopSilenceDetection();
       const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
       const blob = new Blob(this.audioChunks, { type: mimeType });
       this.sendAudio(blob);
@@ -102,6 +118,58 @@ export class OneToOne {
 
     this.mediaRecorder.start();
     this.isRecording.set(true);
+    this.startSilenceDetection(stream);
+  }
+
+  private startSilenceDetection(stream: MediaStream): void {
+    this.recordingStartedAt = Date.now();
+    this.silenceStartedAt = null;
+
+    this.audioContext = new AudioContext();
+    const source = this.audioContext.createMediaStreamSource(stream);
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 2048;
+    source.connect(this.analyser);
+
+    const data = new Uint8Array(this.analyser.fftSize);
+    this.silenceCheckIntervalId = window.setInterval(() => {
+      if (!this.analyser) return;
+      this.analyser.getByteTimeDomainData(data);
+
+      let sumSquares = 0;
+      for (const byte of data) {
+        const amplitude = (byte - 128) / 128;
+        sumSquares += amplitude * amplitude;
+      }
+      const rms = Math.sqrt(sumSquares / data.length);
+
+      const now = Date.now();
+      if (rms < SILENCE_RMS_THRESHOLD) {
+        this.silenceStartedAt ??= now;
+        const silenceElapsed = now - this.silenceStartedAt;
+        const recordingElapsed = now - this.recordingStartedAt;
+        if (
+          silenceElapsed >= SILENCE_DURATION_MS &&
+          recordingElapsed >= MIN_RECORDING_BEFORE_AUTO_STOP_MS &&
+          this.mediaRecorder?.state === 'recording'
+        ) {
+          this.mediaRecorder.stop();
+        }
+      } else {
+        this.silenceStartedAt = null;
+      }
+    }, 150);
+  }
+
+  private stopSilenceDetection(): void {
+    if (this.silenceCheckIntervalId !== null) {
+      clearInterval(this.silenceCheckIntervalId);
+      this.silenceCheckIntervalId = null;
+    }
+    this.audioContext?.close().catch(() => {});
+    this.audioContext = null;
+    this.analyser = null;
+    this.silenceStartedAt = null;
   }
 
   private sendAudio(blob: Blob): void {

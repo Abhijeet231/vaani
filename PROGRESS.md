@@ -1,5 +1,17 @@
 # Progress Log
 
+## 2026-08-30 — Auto-stop recording on silence (1-1 mode)
+
+- User's concern: dead air at the end of a recording still gets sent to and billed by Sarvam, since recording was manual tap-to-stop only. Added silence-based auto-stop instead of a full VAD model/library — proportionate for the actual problem (skip obviously-dead air, not detect speech precisely).
+- `one-to-one.ts`: while recording, the same `MediaStream` already feeding `MediaRecorder` is also run through a Web Audio `AnalyserNode` (`startSilenceDetection`). Every 150ms, computes RMS loudness from the waveform data; if it stays under a threshold (`SILENCE_RMS_THRESHOLD = 0.02`) for 1.5 continuous seconds (`SILENCE_DURATION_MS`) *and* at least 1 second has passed since recording started (`MIN_RECORDING_BEFORE_AUTO_STOP_MS` — otherwise someone pausing before speaking gets cut off instantly), it calls the same `mediaRecorder.stop()` path as a manual tap. Loudness above the threshold resets the silence timer. `stopSilenceDetection` (called from `onstop`, so it fires on auto-stop *and* manual stop) clears the polling interval and closes the `AudioContext`.
+- These are volume-threshold heuristic defaults, not tuned against real speech/mic/room conditions — flagged as likely needing adjustment once actually used, not presented as validated numbers.
+- Small related correctness fix: since auto-stop can now call `.stop()` around the same time as a manual tap, guarded both call sites with `mediaRecorder.state === 'recording'` — calling `.stop()` on an already-inactive recorder throws `InvalidStateError`, a race that technically pre-existed (a fast manual double-tap could already hit it) but auto-stop made meaningfully more likely.
+- Updated the recording status text to mention the new behavior ("...or pause and it'll stop on its own") rather than leaving it silently discoverable only by accident.
+- Verified: `tsc --noEmit` clean, dev server hot-reloaded with no errors. **Not verified with a real microphone in a real browser** — same long-standing automation limitation as every other mic-permission-gated feature in this log (`getUserMedia`'s native browser prompt isn't reachable by this environment's browser automation). The threshold/duration constants in particular need a real-world listen, not just a compile check.
+
+**Pending / not yet built:**
+- **User: test this for real** — record with pauses, confirm it stops after ~1.5s of silence without cutting off mid-sentence on a normal speaking pace, and adjust `SILENCE_RMS_THRESHOLD`/`SILENCE_DURATION_MS` in `one-to-one.ts` if it feels too twitchy or too slow.
+
 ## 2026-08-30 — Fixed production 500: malformed FIREBASE_PRIVATE_KEY on Render
 
 - The Render deploy going "Live" didn't mean it worked — signed-in pages (`/app`'s turns chip, `/account`'s stats and purchase history) were all silently broken in production, no local repro. Root cause found from Render's live logs (not guessed): `FirebaseAppError: Failed to parse private key` / `error:1E08010C:DECODER routines::unsupported`, thrown inside `getFirebaseAuth()` — called from `requireAuth`, so **every** authenticated request 500'd before ever reaching the database. That's why both symptoms traced to one cause: `/auth/sync` (which populates the frontend's `dbUser`) failed the same way, silently (it's fire-and-forget by design), so the chip never appeared; `/account` surfaced the same failure loudly since its purchases call isn't fire-and-forget.
