@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-08-30 — Real contact email swapped in (was `TODO@vaani.app`)
+
+- User gave the real address (`ghoshabhijeet778@gmail.com`), motivated by wanting the live site to look complete before submitting it to Razorpay for their live-key review — a visible `TODO@vaani.app` on the Contact page would have been an obvious red flag.
+- Single source of truth paid off here: only one place actually needed changing — `CONTACT_EMAIL` in `contact.ts` — since `/privacy`, `/terms`, and `/refund-policy` all already import it rather than hardcoding their own copy. Confirmed via a repo-wide search that no other file hardcoded the old placeholder.
+- Verified for real in a browser on all four pages that display it (`/contact`, `/privacy`, `/terms`, `/refund-policy`) — checked the rendered page text on each, not just the source file.
+
 ## 2026-08-30 — Fixed the real language-mismatch risk: auto-detect + self-correct instead of blindly trusting the language picker
 
 - Follow-up to the earlier-flagged risk: `translateAudio` used to force `language_code: <user's selected source>` on every Saaras call, so someone who picked Hindi but spoke English/Tamil/anything else got a garbled transcript with no indication anything was wrong.

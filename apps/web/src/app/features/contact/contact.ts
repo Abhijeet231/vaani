@@ -3,8 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Reveal } from '../../shared/reveal.directive';
 
-// TODO: swap for the real contact address once confirmed (placeholder for now).
-export const CONTACT_EMAIL = 'TODO@vaani.app';
+export const CONTACT_EMAIL = 'ghoshabhijeet778@gmail.com';
 
 @Component({
   selector: 'app-contact',
