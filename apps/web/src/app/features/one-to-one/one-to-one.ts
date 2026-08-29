@@ -18,12 +18,17 @@ interface Turn {
   translatedText: string;
   audioUrl: string | null;
   isSynthesizing: boolean;
+  // Present only when Sarvam detected a different language than selected and
+  // vaani translated from that instead — lets the turn card show what
+  // actually happened rather than silently pretending the selection was used.
+  selectedSourceLanguage: string | null;
 }
 
 interface TranslateAudioResponse {
   transcript: string;
   translatedText: string;
   turnsBalance: number;
+  detectedSourceLanguage?: string;
 }
 
 // Volume-threshold silence detection, not real speech detection — good enough
@@ -203,15 +208,17 @@ export class OneToOne {
       })
       .subscribe({
         next: (response) => {
+          const corrected = response.detectedSourceLanguage;
           this.turns.update((existing) => [
             {
               id: crypto.randomUUID(),
-              sourceLanguage,
+              sourceLanguage: corrected ?? sourceLanguage,
               targetLanguage,
               transcript: response.transcript,
               translatedText: response.translatedText,
               audioUrl: null,
               isSynthesizing: false,
+              selectedSourceLanguage: corrected ? sourceLanguage : null,
             },
             ...existing,
           ]);

@@ -85,6 +85,11 @@
       <mat-card class="w-full p-4 rounded-xl!">
         <div class="text-xs opacity-60 mb-2">
           {{ languageLabel(turn.sourceLanguage) }} &rarr; {{ languageLabel(turn.targetLanguage) }}
+          @if (turn.selectedSourceLanguage) {
+            <span class="text-accent-ink">
+              &middot; detected instead of {{ languageLabel(turn.selectedSourceLanguage) }}
+            </span>
+          }
         </div>
         <div class="text-sm opacity-70 mb-1">{{ turn.transcript }}</div>
         <div class="flex items-center gap-2">

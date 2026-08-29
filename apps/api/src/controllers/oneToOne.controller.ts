@@ -7,6 +7,11 @@ import { spendTurn } from '../models/user.model';
 import { createConversation } from '../models/conversation.model';
 import { SUPPORTED_LANGUAGE_CODES } from '../config/languages';
 
+// Below this, a detected language is too uncertain to trust over what the
+// user actually selected — better to fall back to their choice than
+// self-correct on a guess.
+const MIN_DETECTION_CONFIDENCE = 0.5;
+
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
   if (!req.dbUser) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -32,10 +37,33 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
   }
 
   try {
-    const transcript = await transcribeAudio({ audio: req.body, languageCode: sourceLanguageCode });
+    const { transcript, detectedLanguageCode, languageProbability } = await transcribeAudio({
+      audio: req.body,
+    });
+
+    // Saaras is asked to auto-detect (see transcription.service.ts) so we can
+    // check what it actually heard against what the user selected. If it
+    // confidently heard a different (and still-supported) language, use that
+    // instead of blindly translating from the wrong source — that would
+    // otherwise silently produce a garbled result. Detected === target is
+    // excluded since "translate X to X" is never useful; trust the user's
+    // selection in that case instead.
+    let effectiveSourceLanguage: string = sourceLanguageCode;
+    let detectedSourceLanguage: string | undefined;
+    if (
+      detectedLanguageCode &&
+      detectedLanguageCode !== sourceLanguageCode &&
+      detectedLanguageCode !== targetLanguageCode &&
+      SUPPORTED_LANGUAGE_CODES.has(detectedLanguageCode) &&
+      (languageProbability ?? 0) >= MIN_DETECTION_CONFIDENCE
+    ) {
+      effectiveSourceLanguage = detectedLanguageCode;
+      detectedSourceLanguage = detectedLanguageCode;
+    }
+
     const translatedText = await translateText({
       text: transcript,
-      sourceLanguageCode: sourceLanguageCode as unknown as SarvamAI.TranslateSourceLanguage,
+      sourceLanguageCode: effectiveSourceLanguage as unknown as SarvamAI.TranslateSourceLanguage,
       targetLanguageCode,
     });
 
@@ -52,7 +80,7 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
     try {
       await createConversation({
         userId: req.dbUser.id,
-        sourceLanguage: sourceLanguageCode,
+        sourceLanguage: effectiveSourceLanguage,
         targetLanguage: targetLanguageCode,
         transcript,
         translatedText,
@@ -61,7 +89,7 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
       console.error('Failed to save conversation history:', saveErr);
     }
 
-    res.status(200).json({ transcript, translatedText, turnsBalance });
+    res.status(200).json({ transcript, translatedText, turnsBalance, detectedSourceLanguage });
   } catch (err) {
     next(err);
   }

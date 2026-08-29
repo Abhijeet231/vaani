@@ -10,18 +10,31 @@ export interface SaarasStream {
 
 export interface TranscribeAudioParams {
     audio: Buffer;
-    languageCode: SarvamAI.SpeechToTextLanguage;
 }
 
-export async function transcribeAudio({ audio, languageCode }: TranscribeAudioParams): Promise<string> {
+export interface TranscribeAudioResult {
+    transcript: string;
+    // The language Saaras actually heard — only meaningful because we always
+    // call with language_code "unknown" below, which is what makes it report
+    // this back at all (per Sarvam's docs, it's omitted once you pass a
+    // specific language_code instead of asking it to detect).
+    detectedLanguageCode: string | null;
+    languageProbability: number | null;
+}
+
+export async function transcribeAudio({ audio }: TranscribeAudioParams): Promise<TranscribeAudioResult> {
     const response = await sarvamClient.speechToText.transcribe({
         file: audio,
         model: "saaras:v3",
         mode: "transcribe",
-        language_code: languageCode,
+        language_code: "unknown",
     });
 
-    return response.transcript;
+    return {
+        transcript: response.transcript,
+        detectedLanguageCode: response.language_code ?? null,
+        languageProbability: response.language_probability ?? null,
+    };
 }
 
 export async function openSaarasStream(
