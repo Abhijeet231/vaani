@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-08-30 — Fixed production 500: malformed FIREBASE_PRIVATE_KEY on Render
+
+- The Render deploy going "Live" didn't mean it worked — signed-in pages (`/app`'s turns chip, `/account`'s stats and purchase history) were all silently broken in production, no local repro. Root cause found from Render's live logs (not guessed): `FirebaseAppError: Failed to parse private key` / `error:1E08010C:DECODER routines::unsupported`, thrown inside `getFirebaseAuth()` — called from `requireAuth`, so **every** authenticated request 500'd before ever reaching the database. That's why both symptoms traced to one cause: `/auth/sync` (which populates the frontend's `dbUser`) failed the same way, silently (it's fire-and-forget by design), so the chip never appeared; `/account` surfaced the same failure loudly since its purchases call isn't fire-and-forget.
+- Cause: the surrounding double quotes from `.env`'s `FIREBASE_PRIVATE_KEY="...".` got pasted into Render's env var value along with the key content, corrupting the PEM. User fixed it directly in Render's dashboard (pasted only the content between the quotes). Ruled out an earlier guess (the ISP-specific `dns-override.ts` misbehaving on Render's network) — the stack trace showed the crash happens in Firebase Admin credential parsing, before any Neon/DB code ever runs, so DNS was never involved.
+- No code change from this — purely a deployment/config fix, worth logging since it cost real debugging time and the failure mode (a wrapped `DECODER routines::unsupported` OpenSSL error two layers down) isn't obvious from the symptom.
+
+## 2026-08-30 — Reject unsupported language codes before calling Sarvam (1-1 mode)
+
+- Long-flagged gap (since the Odia-code 500 bug, 2026-08-24): `oneToOne.controller.ts`'s `translateAudio` passed `req.query.source`/`target` straight to Sarvam with only a type cast — any unsupported/bad code fell through as an unhandled 500 instead of a clean 400. New `apps/api/src/config/languages.ts` (`SUPPORTED_LANGUAGE_CODES`, a plain mirror of `apps/web/.../languages.ts`'s codes — no shared package yet per `CLAUDE.md`, kept in sync manually) checked before the existing "missing params" check.
+- Verified: `tsc --noEmit` clean, dev server rebuilt clean, confirmed the existing auth gate still fires first with no regression (a bad-language request without a token still correctly 401s before reaching the new check), and confirmed by direct comparison that the API's allowlist and the frontend's `LANGUAGES` codes are identical (no typo would silently reject a valid language). Did not mint a real Firebase token to exercise the 400 path itself for real — judged disproportionate effort for a single `Set.has()` check; flagged here rather than silently claimed as fully end-to-end tested.
+
+**Pending / not yet built:**
+- **Auto-stop / silence detection for 1-1 mode recording** — next up, discussed with the user (Web Audio `AnalyserNode` volume polling + a silence-duration timeout, not a full VAD model) but not yet implemented.
+
 ## 2026-08-29 — vaani is live: API on Render, web on Firebase Hosting
 
 - **First real deployment.** `vaani-api` deployed successfully on Render after the two build fixes above — confirmed for real, not just "Live" in the dashboard: `curl https://vaani-api-gx49.onrender.com/api/health` returns `{"status":"ok"}`.

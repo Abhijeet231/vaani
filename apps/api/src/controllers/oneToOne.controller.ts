@@ -5,6 +5,7 @@ import { translateText } from '../services/translation.service';
 import { synthesizeSpeech } from '../services/speech.service';
 import { spendTurn } from '../models/user.model';
 import { createConversation } from '../models/conversation.model';
+import { SUPPORTED_LANGUAGE_CODES } from '../config/languages';
 
 export async function translateAudio(req: Request, res: Response, next: NextFunction) {
   if (!req.dbUser) {
@@ -17,6 +18,11 @@ export async function translateAudio(req: Request, res: Response, next: NextFunc
 
   if (!sourceLanguageCode || !targetLanguageCode) {
     res.status(400).json({ error: 'Missing source/target language query params' });
+    return;
+  }
+
+  if (!SUPPORTED_LANGUAGE_CODES.has(sourceLanguageCode) || !SUPPORTED_LANGUAGE_CODES.has(targetLanguageCode)) {
+    res.status(400).json({ error: 'Unsupported source/target language' });
     return;
   }
 
