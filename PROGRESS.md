@@ -1,5 +1,9 @@
 # Progress Log
 
+## 2026-08-29 — Minor: label comments added to `schema.ts` table definitions
+
+- User hand-edited `apps/api/src/db/schema.ts` directly, adding a one-line comment above each table (`// User Schema`, `// Purchase Schema`, `// Conversation Schema`). No functional/schema change, no migration needed.
+
 ## 2026-08-29 — Deployment prep: API on Render, web on Firebase Hosting
 
 - Decided with the user: deploy now rather than build multi-speaker mode next — auth/payments/usage/history/account are all shipped, and deployment is the critical path to two things currently stuck (Razorpay live keys need a real reachable site for KYC; the payment webhook needs a public HTTPS URL, can't point at localhost). No domain yet — deploying to free-tier subdomains for now, a real domain can point at either service later (ties into the existing "swap `TODO_DOMAIN` before launch" reminder).

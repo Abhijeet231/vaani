@@ -3,6 +3,7 @@ import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 export const planEnum = pgEnum('plan', ['trial', 'paid', 'expired']);
 export const purchaseStatusEnum = pgEnum('purchase_status', ['created', 'paid', 'failed']);
 
+// User Schema
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   firebaseUid: text('firebase_uid').notNull().unique(),
@@ -17,6 +18,7 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Purchase Schema
 export const purchases = pgTable(
   'purchases',
   {
@@ -35,6 +37,7 @@ export const purchases = pgTable(
   (table) => [index('purchases_user_id_idx').on(table.userId)],
 );
 
+// Conversation Schema 
 export const conversations = pgTable(
   'conversations',
   {
