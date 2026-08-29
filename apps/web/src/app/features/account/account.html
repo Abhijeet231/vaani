@@ -1,0 +1,77 @@
+<div class="flex flex-col gap-8 p-6 max-w-3xl mx-auto w-full">
+  <div class="flex items-center gap-4">
+    @if (userPhoto() && !photoFailed()) {
+      <img
+        [src]="userPhoto()"
+        (error)="photoFailed.set(true)"
+        alt=""
+        class="w-14 h-14 rounded-full object-cover"
+      />
+    } @else {
+      <mat-icon style="font-size: 56px; width: 56px; height: 56px">account_circle</mat-icon>
+    }
+    <div>
+      <p class="text-lg font-medium">{{ displayName() || email() || 'Your account' }}</p>
+      @if (displayName() && email()) {
+        <p class="text-sm opacity-70">{{ email() }}</p>
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-3">
+    <mat-card class="p-5 rounded-xl!">
+      <p class="text-xs opacity-60 mb-1">Plan</p>
+      <p class="text-2xl font-medium capitalize">{{ auth.dbUser()?.plan ?? '—' }}</p>
+    </mat-card>
+    <mat-card class="p-5 rounded-xl!">
+      <p class="text-xs opacity-60 mb-1">Turns left</p>
+      <p class="text-2xl font-medium">{{ auth.dbUser()?.turnsBalance ?? '—' }}</p>
+    </mat-card>
+    <mat-card class="p-5 rounded-xl!">
+      <p class="text-xs opacity-60 mb-1">Lifetime translations</p>
+      <p class="text-2xl font-medium">{{ auth.dbUser()?.usageCount ?? '—' }}</p>
+    </mat-card>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <a mat-flat-button color="primary" routerLink="/pricing">Buy more turns</a>
+    <a mat-stroked-button routerLink="/history">View conversation history</a>
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <h2 class="text-lg font-medium">Purchase history</h2>
+
+    @if (isLoadingPurchases()) {
+      <div class="flex items-center gap-2 text-sm opacity-70">
+        <mat-spinner diameter="18" />
+        Loading...
+      </div>
+    } @else if (purchaseError()) {
+      <span class="text-sm text-red-600">{{ purchaseError() }}</span>
+    } @else if (purchases().length === 0) {
+      <span class="text-sm opacity-70"
+        >No purchases yet. <a routerLink="/pricing" class="underline">Buy a recharge pack</a> to see it
+        here.</span
+      >
+    } @else {
+      <div class="flex flex-col gap-3">
+        @for (purchase of purchases(); track purchase.id) {
+          <mat-card class="w-full p-4 rounded-xl!">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="font-medium">{{ purchase.packLabel }} &middot; {{ purchase.turns }} turns</p>
+                <p class="text-xs opacity-60">{{ purchase.createdAt | date: 'medium' }}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-medium">₹{{ rupees(purchase.amountInPaise) }}</p>
+                <span class="status-badge" [class]="'status-badge--' + purchase.status">{{
+                  purchase.status
+                }}</span>
+              </div>
+            </div>
+          </mat-card>
+        }
+      </div>
+    }
+  </div>
+</div>

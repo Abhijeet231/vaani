@@ -1,0 +1,24 @@
+.status-badge {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: capitalize;
+
+  &--paid {
+    background: rgba(94, 189, 132, 0.16);
+    color: #5ebd84;
+  }
+
+  &--created {
+    background: rgba(224, 158, 95, 0.16);
+    color: #e09e5f;
+  }
+
+  &--failed {
+    background: rgba(224, 95, 95, 0.16);
+    color: #e05f5f;
+  }
+}

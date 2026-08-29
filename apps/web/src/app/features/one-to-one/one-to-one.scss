@@ -1,0 +1,23 @@
+// Deliberately pulls the landing page's lavender accent (#92a9e1) rather than
+// this page's own brass theme — an explicit one-off per the user's ask
+// (2026-08-29), not a token swap. Low-balance state doesn't reuse Material's
+// `warn` color since that's the same red already used for the recording
+// stop-button; a distinct amber avoids implying "the app is doing something
+// dangerous" when it's really just a nudge to top up.
+.turns-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(146, 169, 225, 0.14);
+  color: #92a9e1;
+  border: 1px solid rgba(146, 169, 225, 0.35);
+
+  &--low {
+    background: rgba(224, 158, 95, 0.16);
+    color: #e09e5f;
+    border-color: rgba(224, 158, 95, 0.4);
+  }
+}

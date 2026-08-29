@@ -53,6 +53,7 @@ export class OneToOne {
   protected readonly turns = signal<Turn[]>([]);
 
   protected readonly noTurnsLeft = computed(() => (this.auth.dbUser()?.turnsBalance ?? 1) <= 0);
+  protected readonly turnsBalance = computed(() => this.auth.dbUser()?.turnsBalance ?? null);
 
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];

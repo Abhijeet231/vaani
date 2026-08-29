@@ -16,6 +16,14 @@ export async function createPurchase(input: CreatePurchaseInput) {
   return created;
 }
 
+export async function listPurchasesByUser(userId: string) {
+  const db = getDb();
+  return db.query.purchases.findMany({
+    where: eq(purchases.userId, userId),
+    orderBy: (purchase, { desc }) => [desc(purchase.createdAt)],
+  });
+}
+
 export async function findPurchaseByOrderId(razorpayOrderId: string) {
   const db = getDb();
   return db.query.purchases.findFirst({ where: eq(purchases.razorpayOrderId, razorpayOrderId) });

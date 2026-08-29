@@ -3,11 +3,46 @@ import { getRazorpay } from '../config/razorpay';
 import { env } from '../config/env';
 import { getPack, RECHARGE_PACKS } from '../config/pricing';
 import { findOrCreateUser, creditTurns } from '../models/user.model';
-import { createPurchase, findPurchaseByOrderId, markPurchasePaid } from '../models/purchase.model';
+import {
+  createPurchase,
+  findPurchaseByOrderId,
+  listPurchasesByUser,
+  markPurchasePaid,
+} from '../models/purchase.model';
 import { verifyRazorpaySignature } from '../services/payment.service';
 
 export function listPacks(_req: Request, res: Response): void {
   res.json({ packs: RECHARGE_PACKS });
+}
+
+export async function listPurchases(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const user = await findOrCreateUser({
+      firebaseUid: req.user.uid,
+      email: req.user.email,
+      displayName: req.user.name,
+    });
+    const purchases = await listPurchasesByUser(user.id);
+
+    res.json({
+      purchases: purchases.map((purchase) => ({
+        id: purchase.id,
+        packId: purchase.packId,
+        packLabel: getPack(purchase.packId)?.label ?? purchase.packId,
+        amountInPaise: purchase.amountInPaise,
+        turns: purchase.turns,
+        status: purchase.status,
+        createdAt: purchase.createdAt,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 export async function createCheckout(req: Request, res: Response, next: NextFunction): Promise<void> {

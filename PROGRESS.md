@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-08-29 — Turns-left indicator on `/app`; new `/account` dashboard
+
+- **`/app` gained a persistent "N turns left" chip**, replacing what was silence right up until the balance hit zero — previously the record button gave no signal at all about remaining turns until the block message appeared at exactly 0. New `turnsBalance` computed in `one-to-one.ts`, rendered in a chip above the language selectors (hidden at 0, since the existing block message already covers that case — `@if` on a falsy `0` naturally does this with no extra logic). Styled with the landing page's lavender accent (`#92a9e1`) rather than `/app`'s own brass theme — an explicit one-off per the user's ask, documented as such in `one-to-one.scss`, not a token-system change.
+- **New `/account` page** (`apps/web/src/app/features/account/`): identity header (photo/name/email off the Firebase user), three stat cards (plan, turns left, lifetime translations via `usageCount`), "Buy more turns" → `/pricing` and "View conversation history" → `/history`, and a purchase-history list (pack, turns, ₹ amount, date, status badge). Route added (`account`, dark theme, `authGuard`-gated) and linked from both the desktop and mobile account menus in the toolbar.
+- Backend: new `GET /api/payments/purchases` (auth-gated, scoped to the caller, newest-first) — `listPurchasesByUser` in `purchase.model.ts`, `listPurchases` controller joins each row with its pack label from `pricing.ts`. `DbUser` (frontend) widened to include `usageCount`, already returned by `/api/auth/sync` but previously untyped/unused on the client.
+- Also updated two stale memory notes from earlier sessions that still described payment/usage-limits as "designed but not built" — they've been built and shipped since 2026-08-28.
+- Verified: `tsc --noEmit` clean on both apps, both dev servers rebuilt without errors, `GET /api/payments/purchases` correctly 401s unauthenticated. **Not visually verified in a signed-in browser session** — same automation limitation noted for other auth-gated pages in this log (login/mic-permission flows aren't clickable by this environment's browser automation).
+
+**Pending / not yet built:**
+- `usageCount` (lifetime translations) on `/account` only refreshes from `/auth/sync` (sign-in or page reload) — it won't live-update after a turn the way `turnsBalance` does. Minor, but worth knowing if it looks stale across tabs.
+- **User: manually check `/account` and the new `/app` chip in a real signed-in session** — automation could prove the code compiles and routes correctly but not eyeball the real layout/colors.
+- `/history` — user raised showing only the signed-in user's own entries; already true today (`listConversations`/`deleteConversation` are scoped to `user.id`, confirmed by re-reading `history.controller.ts`) — flagged as a possible follow-up conversation, not a known gap.
+- Razorpay webhook and live keys — still blocked on deployment (see the 2026-08-28 entry); user asked to be reminded again once deployment starts.
+
 ## 2026-08-28 — Razorpay recharge packs + pricing page; usage model switched from a limit to a balance
 
 - **Decided with the user**: recharge packs, not monthly subscriptions — a purchased pack's turns never expire or reset on a cycle, they just sit in a balance until spent. This replaces the "10 turns then reset" framing from earlier the same day entirely.
