@@ -6,6 +6,9 @@ dist/
 build/
 .angular/
 
+# Firebase CLI local deploy cache
+.firebase/
+
 # Environment variables
 .env
 .env.local

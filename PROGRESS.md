@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-08-29 — vaani is live: API on Render, web on Firebase Hosting
+
+- **First real deployment.** `vaani-api` deployed successfully on Render after the two build fixes above — confirmed for real, not just "Live" in the dashboard: `curl https://vaani-api-gx49.onrender.com/api/health` returns `{"status":"ok"}`.
+- Replaced the `TODO_RENDER_API_URL` placeholder in `environment.production.ts` with the real URL, rebuilt (`pnpm --filter web build` — confirmed via `grep` that the real API URL actually landed in the compiled bundle, not just the source file), and deployed via `firebase deploy --only hosting` (user was already authenticated with the Firebase CLI locally, resolved `vaani-4a691` as the current project automatically from `.firebaserc`).
+- Verified for real: `https://vaani-4a691.web.app` returns 200, and so do deep-linked routes (`/pricing`, `/app`) — confirming the SPA rewrite in `firebase.json` actually works, not just the root path.
+- **Not yet verified**: an actual signed-in user flow against the live deployment (Firebase Auth + cross-origin call to the Render API + Neon write) — everything checked so far is "the servers respond correctly," not "a real login/translate/purchase round-trip works end-to-end in production." CORS is wide open on the API (`cors()` with no options) so the cross-origin call itself shouldn't be blocked, but this hasn't been exercised for real yet.
+
+**Pending / not yet built:**
+- **User: do one real signed-in pass on `https://vaani-4a691.web.app`** — log in, record a translation, check `/account` and `/history` — to confirm the deployed frontend actually reaches the deployed API correctly, not just that both independently respond.
+- Now that both are live and reachable: revisit the Razorpay webhook and applying for live-mode keys — both were blocked specifically on having a public HTTPS URL, which now exists.
+- Render's free tier spins down when idle — first request after inactivity will be slow (cold start), already observed as a real thing to expect, not just a theoretical warning from Render's dashboard.
+- No custom domain yet — both services are on their free subdomains (`*.onrender.com`, `*.web.app`). The pre-existing `TODO_DOMAIN` reminder in `index.html`'s OG tags stays relevant until one is bought.
+
 ## 2026-08-29 — Fixed two real Render build failures (corepack, pnpm build-script policy)
 
 - First `vaani-api` deploy attempt failed instantly: `corepack enable` (in `render.yaml`'s buildCommand) tried to overwrite `/usr/bin/pnpm`, which is pre-installed and read-only on Render's Node image (`EROFS: read-only file system, unlink '/usr/bin/pnpm'`). Fix: dropped `corepack enable` from the buildCommand — Render already has pnpm on `PATH`, it isn't needed.
