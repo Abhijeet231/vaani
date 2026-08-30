@@ -10,18 +10,30 @@ import { Account } from './features/account/account';
 import { Privacy } from './features/legal/privacy/privacy';
 import { Terms } from './features/legal/terms/terms';
 import { RefundPolicy } from './features/legal/refund-policy/refund-policy';
+import { Waitlist } from './features/waitlist/waitlist';
 import { authGuard, guestGuard } from './core/auth.guard';
+import { waitlistGuard } from './core/waitlist.guard';
 
+// waitlistGuard sits first on every route except /waitlist — when
+// environment.waitlistOnly is on it redirects everything there; otherwise it's
+// a pass-through and the route's own guards run as normal.
 export const routes: Routes = [
-  { path: '', component: Landing, data: { theme: 'lavender', hideChrome: true } },
-  { path: 'about', component: About, data: { theme: 'light' } },
-  { path: 'pricing', component: Pricing, data: { theme: 'lavender' } },
-  { path: 'contact', component: Contact, data: { theme: 'light' } },
-  { path: 'privacy', component: Privacy, data: { theme: 'light' } },
-  { path: 'terms', component: Terms, data: { theme: 'light' } },
-  { path: 'refund-policy', component: RefundPolicy, data: { theme: 'light' } },
-  { path: 'login', component: Login, data: { theme: 'light' }, canActivate: [guestGuard] },
-  { path: 'app', component: OneToOne, data: { theme: 'dark' }, canActivate: [authGuard] },
-  { path: 'history', component: History, data: { theme: 'dark' }, canActivate: [authGuard] },
-  { path: 'account', component: Account, data: { theme: 'dark' }, canActivate: [authGuard] },
+  { path: '', component: Landing, data: { theme: 'lavender', hideChrome: true }, canActivate: [waitlistGuard] },
+  { path: 'about', component: About, data: { theme: 'light' }, canActivate: [waitlistGuard] },
+  { path: 'pricing', component: Pricing, data: { theme: 'lavender' }, canActivate: [waitlistGuard] },
+  { path: 'contact', component: Contact, data: { theme: 'light' }, canActivate: [waitlistGuard] },
+  { path: 'privacy', component: Privacy, data: { theme: 'light' }, canActivate: [waitlistGuard] },
+  { path: 'terms', component: Terms, data: { theme: 'light' }, canActivate: [waitlistGuard] },
+  { path: 'refund-policy', component: RefundPolicy, data: { theme: 'light' }, canActivate: [waitlistGuard] },
+  // Always reachable by direct URL — harmless after launch, and it stays
+  // previewable in dev where waitlistOnly is off.
+  {
+    path: 'waitlist',
+    component: Waitlist,
+    data: { theme: 'dark', hideChrome: true, hideFooter: true },
+  },
+  { path: 'login', component: Login, data: { theme: 'light' }, canActivate: [waitlistGuard, guestGuard] },
+  { path: 'app', component: OneToOne, data: { theme: 'dark' }, canActivate: [waitlistGuard, authGuard] },
+  { path: 'history', component: History, data: { theme: 'dark' }, canActivate: [waitlistGuard, authGuard] },
+  { path: 'account', component: Account, data: { theme: 'dark' }, canActivate: [waitlistGuard, authGuard] },
 ];

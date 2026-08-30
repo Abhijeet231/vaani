@@ -1,0 +1,78 @@
+<div class="wl-root">
+  <header class="wl-header">
+    <span class="wl-wordmark">Vaani</span>
+    <span class="wl-tag">CLOSED BETA</span>
+  </header>
+
+  <div class="wl-ticker" aria-hidden="true">
+    <div class="wl-ticker-track">
+      @for (t of ticker; track $index) {
+        <span class="wl-ticker-item" [style.fontFamily]="t.font"
+          >{{ t.word }}<span class="wl-ticker-dot"></span
+        ></span>
+      }
+    </div>
+  </div>
+
+  <section class="wl-hero">
+    <h1 class="wl-headline">
+      Say it once.<br />Land in <em>fourteen</em> languages.
+    </h1>
+    <p class="wl-body">
+      Vaani carries your voice into every Indian language it speaks — same tone, same pace,
+      no dubbing lag. We're opening access in batches.
+    </p>
+
+    <div class="wl-action-row">
+      <div class="wl-slot" aria-live="polite">
+        @if (!done()) {
+          <form class="wl-form" (submit)="onSubmit($event)" novalidate>
+            <label class="wl-sr-only" for="wl-email">Email address</label>
+            <input
+              id="wl-email"
+              class="wl-input"
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="Work email"
+              [value]="email()"
+              (input)="onInput($event)"
+            />
+            <button class="wl-submit" type="submit" [disabled]="submitting()">
+              {{ submitting() ? 'SENDING…' : 'GET ACCESS' }}
+            </button>
+          </form>
+          @if (error()) {
+            <p class="wl-error" role="alert">{{ error() }}</p>
+          }
+        } @else {
+          <div class="wl-confirm">
+            <span class="wl-confirm-dot"></span>
+            <span class="wl-confirm-text"
+              >You're #{{ position() }} in line. Check {{ email() }}.</span
+            >
+          </div>
+        }
+      </div>
+
+      <div class="wl-proof">
+        <div class="wl-avatars">
+          @for (av of avatars; track $index) {
+            <span class="wl-avatar">{{ av }}</span>
+          }
+        </div>
+        <span class="wl-proof-caption">2,418 already waiting</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wl-metrics">
+    @for (m of metrics; track m.label) {
+      <div class="wl-metric">
+        <span class="wl-metric-value">{{ m.value }}</span>
+        <span class="wl-metric-label">{{ m.label }}</span>
+      </div>
+    }
+  </div>
+</div>

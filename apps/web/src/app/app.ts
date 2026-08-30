@@ -72,6 +72,17 @@ export class App {
     { initialValue: false }
   );
 
+  // Most routes keep the shared footer even when hideChrome is true (the landing
+  // page does). The waitlist page is the exception — it stands entirely alone.
+  protected readonly hideFooter = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => this.currentHideFooter()),
+      startWith(this.currentHideFooter())
+    ),
+    { initialValue: false }
+  );
+
   private currentThemeClass(): string {
     const theme = this.route.firstChild?.snapshot.data['theme'] ?? 'dark';
     return `theme-${theme}`;
@@ -79,5 +90,9 @@ export class App {
 
   private currentHideChrome(): boolean {
     return this.route.firstChild?.snapshot.data['hideChrome'] ?? false;
+  }
+
+  private currentHideFooter(): boolean {
+    return this.route.firstChild?.snapshot.data['hideFooter'] ?? false;
   }
 }

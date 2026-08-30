@@ -3,4 +3,8 @@
 // environment.production.ts for the deployed-API case.
 export const environment = {
   apiBaseUrl: '',
+  // When true, every route except /waitlist redirects to /waitlist and the
+  // site's nav/footer are hidden — the pre-launch "waitlist only" mode.
+  // Off in dev so the whole app stays reachable while building.
+  waitlistOnly: false,
 };

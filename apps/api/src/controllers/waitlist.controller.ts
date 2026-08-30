@@ -32,10 +32,10 @@ export async function joinWaitlist(req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    await createWaitlistSignup({ email: email || null, phone: phone || null });
+    const { total } = await createWaitlistSignup({ email: email || null, phone: phone || null });
     // Same response for a fresh signup and a duplicate — no way to probe who's
-    // already on the list.
-    res.status(200).json({ ok: true });
+    // already on the list. `position` is the current list size.
+    res.status(200).json({ ok: true, position: total });
   } catch (err) {
     next(err);
   }
