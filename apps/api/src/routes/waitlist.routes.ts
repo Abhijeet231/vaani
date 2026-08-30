@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { joinWaitlist } from '../controllers/waitlist.controller';
+import { getWaitlistCount, joinWaitlist } from '../controllers/waitlist.controller';
 
 export const waitlistRouter = Router();
 
-// Public — no auth. This is the one endpoint reachable while the site is in
+// Public — no auth. These are the endpoints reachable while the site is in
 // waitlist-only mode.
 waitlistRouter.post('/waitlist', joinWaitlist);
+waitlistRouter.get('/waitlist/count', getWaitlistCount);

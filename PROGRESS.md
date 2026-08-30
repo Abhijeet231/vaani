@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-08-30 — Waitlist "N already waiting" is now real, floored at 37
+
+- Replaced the design's hardcoded "2,418 already waiting" with a live count. New public `GET /api/waitlist/count` → `{ count }` (new `countWaitlistSignups()` in `waitlist.model.ts`, which `createWaitlistSignup` now also reuses). The `/waitlist` page fetches it on init and after a successful signup.
+- Display is `Math.max(WAITING_FLOOR, liveCount)` with `WAITING_FLOOR = 37` (a named const in `waitlist.ts`) — shows "37 already waiting" until real signups pass 37, then tracks the true number. Set the const to 0 to always show the real count. If the count call fails, the floor stands. Number is formatted with `toLocaleString('en-IN')` so it gets a separator once it's large.
+- Verified: `countWaitlistSignups()` returns the right value against real Neon; `GET /api/waitlist/count` returns `{"count":0}` [200] on a temp server instance (the long-running local API on :3000 was started with bare `ts-node`, not nodemon, so it doesn't hot-reload — tested on a throwaway port instead); the page renders "37 already waiting" in dev (count endpoint 404s there → floor holds, as designed). `tsc --noEmit` clean on API, `pnpm --filter web build` clean. Probe rows deleted from Neon.
+
+**Pending / not yet built:**
+- Needs deploy to take effect live: Render auto-deploys the API on push; then `pnpm --filter web build && firebase deploy --only hosting` for the page.
+- The "290ms / 14 / 11" metrics floor is still static design copy (unchanged) — same open question as before.
+
 ## 2026-08-30 — Waitlist frontend: `/waitlist` page + `waitlistOnly` launch flag
 
 - Second slice, on top of the backend entry below. Design came from a Claude Design handoff (`Vaani Waitlist.dc.html`, "Graphite & Jade") imported via the DesignSync MCP — a high-fidelity single-view page: header (wordmark + "CLOSED BETA"), an infinite native-script marquee of the word "listen" in 14 languages, a 76px Piazzolla headline with one jade accent word, the email form, a social-proof cluster, and a 3-cell metrics floor (14 / 11 / 290ms). Recreated in Angular idioms (signals, `@for`/`@if`, scoped `wl-`-prefixed SCSS) rather than porting the design's `{{ }}`/`<sc-for>` runtime, per the handoff's instructions.

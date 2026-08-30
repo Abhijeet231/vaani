@@ -14,6 +14,14 @@ interface WaitlistSignupResult {
   total: number;
 }
 
+export async function countWaitlistSignups(): Promise<number> {
+  const db = getDb();
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(waitlistSignups);
+  return count;
+}
+
 export async function createWaitlistSignup(
   input: CreateWaitlistSignupInput,
 ): Promise<WaitlistSignupResult> {
@@ -23,8 +31,6 @@ export async function createWaitlistSignup(
     .values({ email: input.email ?? null, phone: input.phone ?? null })
     .onConflictDoNothing()
     .returning();
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(waitlistSignups);
-  return { created: created ?? null, total: count };
+  const total = await countWaitlistSignups();
+  return { created: created ?? null, total };
 }

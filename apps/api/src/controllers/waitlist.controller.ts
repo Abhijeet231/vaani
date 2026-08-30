@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { createWaitlistSignup } from '../models/waitlist.model';
+import { countWaitlistSignups, createWaitlistSignup } from '../models/waitlist.model';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Loose E.164-ish: optional leading +, then 7–15 digits.
@@ -36,6 +36,18 @@ export async function joinWaitlist(req: Request, res: Response, next: NextFuncti
     // Same response for a fresh signup and a duplicate — no way to probe who's
     // already on the list. `position` is the current list size.
     res.status(200).json({ ok: true, position: total });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getWaitlistCount(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    res.json({ count: await countWaitlistSignups() });
   } catch (err) {
     next(err);
   }

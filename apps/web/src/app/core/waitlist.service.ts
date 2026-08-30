@@ -16,4 +16,11 @@ export class WaitlistService {
   join(payload: { email?: string; phone?: string }): Promise<WaitlistResponse> {
     return firstValueFrom(this.http.post<WaitlistResponse>('/api/waitlist', payload));
   }
+
+  // Current number of people on the list. Public, unauthenticated.
+  count(): Promise<number> {
+    return firstValueFrom(this.http.get<{ count: number }>('/api/waitlist/count')).then(
+      (r) => r.count,
+    );
+  }
 }
