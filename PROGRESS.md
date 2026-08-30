@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-08-31 — Landing page recolored to "Graphite & Jade"; waitlist count floor dropped; tagline everywhere
+
+- **Landing page → "Graphite & Jade"** (the waitlist page's palette): near-black graphite ground `#0C0E0D`, one lime/jade accent `#A8E06B`, replacing the "Lavender Haze" `#92A9E1` scheme. User's call: **landing only** for now — `/app` stays charcoal + brass, `/pricing` stays lavender, the light marketing pages unchanged. Two accent colours co-exist in the project by design until a wider rollout.
+  - `landing.scss` (~40 colour values) and `landing.ts` (~15 distinct hexes: bg-glyph greys, demo-card accents, canvas spark colour) recolored by direct hex mapping — lavender family → graphite/jade, teal divider peak `#6FD3C0` → jade. `.vh-h1-em` gained `color: #a8e06b` so the headline accent word is jade (the original lavender scheme left it plain white).
+  - New `.theme-graphite` block + `$jade`/`$*-graphite` token vars in `styles.scss`; landing's route `data.theme` changed `'lavender'` → `'graphite'`. Landing uses no Material/Tailwind tokens (all hardcoded hexes), so functionally the theme block only sets the wrapper background/colour, but the `--mat-sys-*`/`--color-*` are filled in to match the other theme blocks for future reuse.
+- **Landing headline** changed "Say it once. Hear it back in theirs." → "The voice that speaks all of *India*." (matches the browser title, footer, and waitlist page).
+- **Waitlist "N already waiting"**: dropped the hardcoded 37 floor — now shows the real `GET /api/waitlist/count` value. `0` → "Be the first in line" (no avatars), `1` → "1 person already waiting", else "N already waiting". The whole social-proof cluster is hidden until the count loads (or if the call fails), so there's never a wrong number on screen.
+- Verified: `pnpm --filter web build` clean; landing rendered end-to-end in a browser at desktop width — hero, languages, "how it differs", FAQ, footer all consistently graphite/jade, headline accent jade, CTA jade, bg glyphs subtly green-tinted. No console errors.
+
+**Pending / not yet built:**
+- `/app`'s turns-left chip (`one-to-one.scss`) and the Razorpay modal colour (`payment.service.ts`) are still lavender `#92A9E1`. The chip's comment says it "pulls the landing page's lavender accent" — now stale since landing moved off lavender. Left as-is per the "landing only" scope; revisit when the recolor rolls out further.
+- Graphite & Jade only covers landing + the waitlist page. Rolling it to `/app`/`/pricing`/light pages is a separate, larger pass (light marketing pages were built for a light ground).
+- Landing recolor checked at desktop width only — the mobile/narrow layout wasn't re-verified (browser can't resize here).
+
 ## 2026-08-30 — Waitlist "N already waiting" is now real, floored at 37
 
 - Replaced the design's hardcoded "2,418 already waiting" with a live count. New public `GET /api/waitlist/count` → `{ count }` (new `countWaitlistSignups()` in `waitlist.model.ts`, which `createWaitlistSignup` now also reuses). The `/waitlist` page fetches it on init and after a successful signup.

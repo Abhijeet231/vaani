@@ -41,12 +41,9 @@ $ink-muted-light: #8a8172;
 $outline-light: #e8e0d0;
 $outline-variant-light: #ddd4c0;
 
-// "Lavender Haze / Soft Graphite", scoped to the landing page only (see
-// app.routes.ts: landing's `data.theme` is 'lavender', not 'light'). Started
-// as a light-ground experiment; the "Vaani Hero" design (see PROGRESS.md)
-// settled it the other way — lavender reads richer against dark graphite than
-// against a light ground, so this is now the full dark palette landing.html
-// actually paints with. Not adopted for /about, /pricing, /contact, or /app.
+// "Lavender Haze / Soft Graphite" — still used by /pricing (app.routes.ts:
+// pricing's `data.theme` is 'lavender'). Was the landing page's palette too
+// until 2026-08-31, when landing moved to "Graphite & Jade" (below).
 $lavender: #92a9e1;
 $on-lavender: #edebf7; // ink on the dark ground
 $accent-ink-lav: #92a9e1; // dark ground gives the raw accent enough contrast to use directly
@@ -57,6 +54,25 @@ $surface-bright-lav: #2c2a33;
 $ink-muted-lav: #9c99ac;
 $outline-lav: #2a2830;
 $outline-variant-lav: #3b3849;
+
+// "Graphite & Jade" — the palette shared with the waitlist page: near-black
+// graphite grounds, one lime/jade accent. Scoped to the landing page for now
+// (app.routes.ts: landing's `data.theme` is 'graphite'). The app, the light
+// marketing pages, and the lavender /pricing page are deliberately unchanged —
+// two accent colours co-exist in the project by design until this is rolled out
+// further. landing.scss hardcodes these same hexes directly for its decorative
+// shades; keep the two in sync.
+$jade: #a8e06b;
+$on-jade: #0c0e0d; // dark ink on the light accent fill
+$accent-ink-graphite: #a8e06b;
+$ground-graphite: #0c0e0d;
+$surface-graphite: #121614;
+$surface-high-graphite: #1e2320;
+$surface-bright-graphite: #2a302c;
+$ink-graphite: #e9ede7;
+$ink-muted-graphite: #96a096;
+$outline-graphite: #2a302c;
+$outline-variant-graphite: #1e2320;
 
 @layer mat-theme {
   html {
@@ -236,6 +252,61 @@ $outline-variant-lav: #3b3849;
     --color-ink-muted: #{$ink-muted-lav};
     --color-accent-ink: #{$accent-ink-lav};
     --color-border: #{$outline-lav};
+  }
+
+  // "Graphite & Jade" — see the token block near the top. Landing-only for now.
+  // Landing paints with hardcoded hexes, so what actually matters here is the
+  // wrapper background/color; the --mat-sys-*/--color-* are filled in to match
+  // the other theme blocks in case the scope widens later.
+  .theme-graphite {
+    color-scheme: dark;
+    min-height: 100%;
+    background-color: #{$ground-graphite};
+    color: #{$ink-graphite};
+
+    --mat-sys-primary: #{$jade};
+    --mat-sys-on-primary: #{$on-jade};
+    --mat-sys-primary-container: #{$surface-high-graphite};
+    --mat-sys-on-primary-container: #{$ink-graphite};
+    --mat-sys-inverse-primary: #{$jade};
+
+    --mat-sys-secondary: #{$ink-muted-graphite};
+    --mat-sys-on-secondary: #{$ground-graphite};
+    --mat-sys-secondary-container: #{$surface-high-graphite};
+    --mat-sys-on-secondary-container: #{$ink-graphite};
+
+    --mat-sys-tertiary: #{$jade};
+    --mat-sys-on-tertiary: #{$on-jade};
+    --mat-sys-tertiary-container: #{$surface-high-graphite};
+    --mat-sys-on-tertiary-container: #{$ink-graphite};
+
+    --mat-sys-surface: #{$ground-graphite};
+    --mat-sys-on-surface: #{$ink-graphite};
+    --mat-sys-on-surface-variant: #{$ink-muted-graphite};
+    --mat-sys-surface-variant: #{$surface-graphite};
+    --mat-sys-surface-container: #{$surface-graphite};
+    --mat-sys-surface-container-low: #{$surface-graphite};
+    --mat-sys-surface-container-lowest: #{$surface-graphite};
+    --mat-sys-surface-container-high: #{$surface-high-graphite};
+    --mat-sys-surface-container-highest: #{$surface-bright-graphite};
+    --mat-sys-surface-dim: #{$ground-graphite};
+    --mat-sys-surface-bright: #{$surface-bright-graphite};
+    --mat-sys-background: #{$ground-graphite};
+    --mat-sys-on-background: #{$ink-graphite};
+
+    --mat-sys-outline: #{$outline-graphite};
+    --mat-sys-outline-variant: #{$outline-variant-graphite};
+
+    --mat-sys-inverse-surface: #{$ink-graphite};
+    --mat-sys-inverse-on-surface: #{$ground-graphite};
+
+    --color-ground: #{$ground-graphite};
+    --color-surface: #{$surface-graphite};
+    --color-surface-high: #{$surface-high-graphite};
+    --color-ink: #{$ink-graphite};
+    --color-ink-muted: #{$ink-muted-graphite};
+    --color-accent-ink: #{$accent-ink-graphite};
+    --color-border: #{$outline-graphite};
   }
 }
 /* Angular Material component theming lives here. Tailwind lives in tailwind.css — do not mix @tailwind/@import "tailwindcss" directives into this file. */

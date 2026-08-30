@@ -1,14 +1,14 @@
-// "Vaani Hero" landing redesign — full dark ground (#1C1B1F) with a lavender
-// (#92A9E1) accent, replacing the previous light-body/dark-hero-band layout.
+// "Vaani Hero" landing — "Graphite & Jade" palette: near-black graphite ground
+// (#0C0E0D) with a single lime/jade accent (#A8E06B), matching the waitlist
+// page. Recolored from the earlier "Lavender Haze" (#92A9E1) scheme 2026-08-31.
 // Colors are hardcoded to the exact design hexes (not the shared --mat-sys-*/
 // --color-* tokens) since most of them are one-off decorative shades — dividers,
 // dimmed mono labels, glow tints — that don't map cleanly onto the small
-// semantic palette used elsewhere in the app. See PROGRESS.md for the note on
-// superseding the "Lavender Haze" light experiment.
+// semantic palette used elsewhere in the app.
 
 :host {
   display: block;
-  background: #1c1b1f;
+  background: #0c0e0d;
 }
 
 // ---- hero ----
@@ -16,7 +16,7 @@
 .vh-hero {
   position: relative;
   min-height: 100vh;
-  background: #1c1b1f;
+  background: #0c0e0d;
   overflow: hidden;
   font-family: Inter, system-ui, sans-serif;
   display: flex;
@@ -78,7 +78,7 @@
   justify-self: start;
   font-family: Piazzolla, Georgia, serif;
   letter-spacing: -0.01em;
-  color: #edebf7;
+  color: #e9ede7;
   transition: font-size 0.3s ease;
   text-decoration: none;
 }
@@ -91,12 +91,12 @@
   a {
     font-family: Inter, system-ui, sans-serif;
     font-size: 14px;
-    color: #9c99ac;
+    color: #96a096;
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #edebf7;
+      color: #e9ede7;
     }
   }
 }
@@ -111,12 +111,12 @@
 .vh-nav-login {
   font-family: Inter, system-ui, sans-serif;
   font-size: 14px;
-  color: #edebf7;
+  color: #e9ede7;
   text-decoration: none;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #92a9e1;
+    color: #a8e06b;
   }
 }
 
@@ -124,15 +124,15 @@
   font-family: Inter, system-ui, sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #1c1b1f;
-  background: #92a9e1;
+  color: #0c0e0d;
+  background: #a8e06b;
   border-radius: 11px;
   padding: 8px 16px;
   text-decoration: none;
   transition: background 0.2s ease;
 
   &:hover {
-    background: #a6b8e8;
+    background: #bce889;
   }
 }
 
@@ -152,7 +152,7 @@
   span {
     width: 18px;
     height: 2px;
-    background: #edebf7;
+    background: #e9ede7;
     border-radius: 1px;
   }
 }
@@ -164,8 +164,8 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: #17161a;
-  border: 1px solid #3b3849;
+  background: #121614;
+  border: 1px solid #2a302c;
   border-radius: 14px;
   padding: 10px;
   min-width: 160px;
@@ -173,14 +173,14 @@
   a {
     font-family: Inter, system-ui, sans-serif;
     font-size: 14px;
-    color: #edebf7;
+    color: #e9ede7;
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
     transition: background 0.15s ease;
 
     &:hover {
-      background: rgba(146, 169, 225, 0.12);
+      background: rgba(168, 224, 107, 0.12);
     }
   }
 }
@@ -224,7 +224,7 @@
     font-size: clamp(40px, 6vw, 76px);
     line-height: 1.24;
     letter-spacing: -0.015em;
-    color: #edebf7;
+    color: #e9ede7;
     text-wrap: pretty;
   }
 }
@@ -236,6 +236,7 @@
 .vh-h1-em {
   display: block;
   font-style: italic;
+  color: #a8e06b; // jade accent, matching the waitlist page's headline
 }
 
 .vh-sub {
@@ -243,7 +244,7 @@
   max-width: 30em;
   font-size: clamp(15px, 1.2vw, 18px);
   line-height: 1.6;
-  color: #9c99ac;
+  color: #96a096;
   text-wrap: pretty;
 }
 
@@ -254,25 +255,25 @@
   align-items: center;
   gap: 8px;
   padding: 6px 14px 6px 6px;
-  border: 1px solid #3b3849;
+  border: 1px solid #2a302c;
   border-radius: 999px;
-  background: rgba(146, 169, 225, 0.05);
+  background: rgba(168, 224, 107, 0.05);
   font-family: Inter, system-ui, sans-serif;
   font-size: 12.5px;
-  color: #9c99ac;
+  color: #96a096;
   text-decoration: none;
   transition:
     border-color 0.2s ease,
     background 0.2s ease;
 
   strong {
-    color: #edebf7;
+    color: #e9ede7;
     font-weight: 600;
   }
 
   &:hover {
-    border-color: #92a9e1;
-    background: rgba(146, 169, 225, 0.1);
+    border-color: #a8e06b;
+    background: rgba(168, 224, 107, 0.1);
   }
 }
 
@@ -291,8 +292,8 @@
 .vh-card {
   width: 100%;
   max-width: 420px;
-  background: #17161a;
-  border: 1px solid #322f3a;
+  background: #121614;
+  border: 1px solid #2a302c;
   border-radius: 12px;
   padding: 19px 22px 22px;
   display: flex;
@@ -320,7 +321,7 @@
     sans-serif;
   font-size: 10px;
   letter-spacing: 0.02em;
-  color: #92a9e1;
+  color: #a8e06b;
   animation: vaaniFadeUp 0.45s ease-out both;
 }
 
@@ -335,7 +336,7 @@
 .vh-bar {
   width: 2px;
   border-radius: 1px;
-  background: #92a9e1;
+  background: #a8e06b;
 }
 
 .vh-card-transcript {
@@ -357,7 +358,7 @@
     sans-serif;
   font-size: 14px;
   line-height: 1.45;
-  color: #edebf7;
+  color: #e9ede7;
   animation: vaaniFadeUp 0.45s ease-out both;
 }
 
@@ -365,7 +366,7 @@
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.06em;
-  color: #9c99ac;
+  color: #96a096;
 }
 
 .vh-cta-button {
@@ -373,8 +374,8 @@
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: #1c1b1f;
-  background: #92a9e1;
+  color: #0c0e0d;
+  background: #a8e06b;
   border: none;
   border-radius: 999px;
   padding: 16px 34px;
@@ -384,7 +385,7 @@
   transition: background 0.2s ease;
 
   &:hover {
-    background: #a6b8e8;
+    background: #bce889;
   }
 }
 
@@ -392,7 +393,7 @@
 
 .vh-section {
   position: relative;
-  background: #1c1b1f;
+  background: #0c0e0d;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
@@ -411,7 +412,7 @@
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: 0.06em;
-  color: #9c99ac;
+  color: #96a096;
 }
 
 .vh-h2 {
@@ -421,19 +422,19 @@
   font-size: clamp(30px, 3.6vw, 44px);
   line-height: 1.3;
   letter-spacing: -0.015em;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-mono {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 10.5px;
   letter-spacing: 0.1em;
-  color: #9c99ac;
+  color: #96a096;
   white-space: nowrap;
 }
 
 .vh-mono-dim {
-  color: #57545f;
+  color: #6f796f;
 }
 
 .vh-panel-head {
@@ -442,7 +443,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 17px 24px 15px;
-  border-bottom: 1px solid #26242c;
+  border-bottom: 1px solid #1a1f1b;
 }
 
 .vh-panel-label {
@@ -475,7 +476,7 @@
 .vh-lang-list {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #2a2830;
+  border-top: 1px solid #1e2320;
 }
 
 .vh-lang-row {
@@ -486,14 +487,14 @@
   width: 100%;
   background: none;
   border: none;
-  border-bottom: 1px solid #2a2830;
+  border-bottom: 1px solid #1e2320;
   padding: 14px 4px;
   cursor: pointer;
   text-align: left;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 
   &:hover {
-    background: #211e28;
+    background: #171c18;
   }
 }
 
@@ -519,9 +520,9 @@
 .vh-lang-panel {
   position: sticky;
   top: 104px;
-  border: 1px solid #3b3849;
+  border: 1px solid #2a302c;
   border-radius: 20px;
-  background: #17161a;
+  background: #121614;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -542,12 +543,12 @@
   flex-wrap: wrap;
   font-size: clamp(36px, 4.6vw, 56px);
   line-height: 1.2;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-sample-block {
   position: relative;
-  border-left: 2px solid #92a9e1;
+  border-left: 2px solid #a8e06b;
   padding: 4px 0 4px 20px;
   display: flex;
   flex-direction: column;
@@ -558,7 +559,7 @@
   display: block;
   font-size: 19px;
   line-height: 1.6;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-sample-en {
@@ -567,11 +568,11 @@
   gap: 11px;
   font-size: 14.5px;
   line-height: 1.6;
-  color: #9c99ac;
+  color: #96a096;
 }
 
 .vh-en-tag {
-  color: #92a9e1;
+  color: #a8e06b;
   font-size: 12px;
   flex: none;
 }
@@ -583,7 +584,7 @@
   gap: 14px;
   margin-top: auto;
   padding-top: 22px;
-  border-top: 1px solid #26242c;
+  border-top: 1px solid #1a1f1b;
 }
 
 .vh-voice-chip {
@@ -646,12 +647,12 @@
 }
 
 .vh-differ-bar {
-  background: #2a2830;
+  background: #1e2320;
   transition: background 0.35s ease;
 }
 
 .vh-differ-bar-on {
-  background: #92a9e1;
+  background: #a8e06b;
 }
 
 .vh-differ-copy {
@@ -666,14 +667,14 @@
     font-size: clamp(19px, 2vw, 23px);
     font-weight: 500;
     line-height: 1.35;
-    color: #edebf7;
+    color: #e9ede7;
   }
 
   p {
     margin: 0;
     font-size: 15.5px;
     line-height: 1.65;
-    color: #9c99ac;
+    color: #96a096;
     max-width: 46ch;
     text-wrap: pretty;
   }
@@ -687,12 +688,12 @@
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.09em;
-  color: #57545f;
+  color: #6f796f;
   transition: color 0.35s ease;
 }
 
 .vh-differ-num-on {
-  color: #92a9e1;
+  color: #a8e06b;
 }
 
 .vh-differ-sticky {
@@ -704,9 +705,9 @@
 }
 
 .vh-differ-panel {
-  border: 1px solid #3b3849;
+  border: 1px solid #2a302c;
   border-radius: 20px;
-  background: #17161a;
+  background: #121614;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -723,7 +724,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #92a9e1;
+  background: #a8e06b;
   animation: vaaniPulse 1.6s ease-in-out infinite;
 }
 
@@ -745,7 +746,7 @@
 .vh-wave-bar {
   flex: 1;
   border-radius: 1px;
-  background: #92a9e1;
+  background: #a8e06b;
   transform-origin: bottom;
 }
 
@@ -757,20 +758,20 @@
 
 .vh-demo-line-divided {
   padding-top: 20px;
-  border-top: 1px solid #26242c;
+  border-top: 1px solid #1a1f1b;
 }
 
 .vh-demo-devanagari {
   font-family: 'Noto Sans Devanagari', serif;
   font-size: 22px;
   line-height: 1.5;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-demo-en {
   font-size: 19px;
   line-height: 1.5;
-  color: #dce3f6;
+  color: #f2f5ef;
 }
 
 .vh-demo-codeswitch {
@@ -796,19 +797,19 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px 18px;
-  border: 1px solid rgba(146, 169, 225, 0.28);
+  border: 1px solid rgba(168, 224, 107, 0.28);
   border-radius: 12px;
-  background: rgba(146, 169, 225, 0.06);
+  background: rgba(168, 224, 107, 0.06);
 }
 
 .vh-demo-box-label {
-  color: #b8c6ee;
+  color: #c7e3a1;
 }
 
 .vh-demo-box-text {
   font-size: 17px;
   line-height: 1.5;
-  color: #dce3f6;
+  color: #f2f5ef;
 }
 
 .vh-demo-tags {
@@ -819,12 +820,12 @@
 
 .vh-tag {
   padding: 6px 12px;
-  border: 1px solid #2f2c39;
+  border: 1px solid #232823;
   border-radius: 999px;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.07em;
-  color: #9c99ac;
+  color: #96a096;
 }
 
 .vh-demo-footer {
@@ -832,11 +833,11 @@
   align-items: center;
   gap: 14px;
   padding-top: 18px;
-  border-top: 1px solid #26242c;
+  border-top: 1px solid #1a1f1b;
 }
 
 .vh-sarvam-label {
-  color: #9c99ac;
+  color: #96a096;
   letter-spacing: 0.08em;
   font-size: 11px;
 }
@@ -860,9 +861,9 @@
 .vh-device-box {
   width: 62px;
   height: 104px;
-  border: 1px solid rgba(146, 169, 225, 0.4);
+  border: 1px solid rgba(168, 224, 107, 0.4);
   border-radius: 12px;
-  background: rgba(146, 169, 225, 0.07);
+  background: rgba(168, 224, 107, 0.07);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -870,7 +871,7 @@
 }
 
 .vh-device-box-dashed {
-  border: 1px dashed #332f3d;
+  border: 1px dashed #2a302c;
   background: none;
   align-items: center;
   padding-bottom: 0;
@@ -886,20 +887,20 @@
 .vh-device-bar {
   width: 2px;
   height: 26px;
-  background: #92a9e1;
+  background: #a8e06b;
   transform-origin: bottom;
 }
 
 .vh-device-caption {
-  color: #b8c6ee;
+  color: #c7e3a1;
 }
 
 .vh-device-them .vh-device-caption {
-  color: #9c99ac;
+  color: #96a096;
 }
 
 .vh-device-noapp {
-  color: #4e4b58;
+  color: #5a625a;
 }
 
 .vh-device-mid {
@@ -912,7 +913,7 @@
 .vh-device-rule {
   width: 1px;
   height: 34px;
-  background: #2f2c39;
+  background: #232823;
 }
 
 .vh-demo-pipeline {
@@ -923,7 +924,7 @@
 .vh-pipeline-track {
   position: relative;
   height: 2px;
-  background: #26242c;
+  background: #1a1f1b;
 }
 
 .vh-pipeline-flow {
@@ -932,7 +933,7 @@
   width: 34px;
   height: 4px;
   border-radius: 2px;
-  background: #92a9e1;
+  background: #a8e06b;
   animation: vaaniFlow 3.4s linear infinite;
 }
 
@@ -948,7 +949,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 15px 0;
-  border-bottom: 1px solid #26242c;
+  border-bottom: 1px solid #1a1f1b;
 }
 
 .vh-pipeline-row-last {
@@ -957,11 +958,11 @@
 
 .vh-pipeline-name {
   font-size: 15.5px;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-pipeline-hint {
-  color: #6f6c7c;
+  color: #7e887e;
   letter-spacing: 0.09em;
 }
 
@@ -980,11 +981,11 @@
 }
 
 .vh-faq-list {
-  border-top: 1px solid #2a2830;
+  border-top: 1px solid #1e2320;
 }
 
 .vh-faq-item {
-  border-bottom: 1px solid #2a2830;
+  border-bottom: 1px solid #1e2320;
 }
 
 .vh-faq-question {
@@ -1001,7 +1002,7 @@
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.45;
-  color: #edebf7;
+  color: #e9ede7;
 }
 
 .vh-faq-icon {
@@ -1009,7 +1010,7 @@
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 18px;
   line-height: 1.3;
-  color: #92a9e1;
+  color: #a8e06b;
   transition: transform 0.22s ease;
   display: inline-block;
   transform: rotate(0deg);
@@ -1026,14 +1027,14 @@
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 15.5px;
   line-height: 1.65;
-  color: #9c99ac;
+  color: #96a096;
   text-wrap: pretty;
 }
 
 // ---- section divider: waveform-baseline hairline between sections ----
 
 .vh-divider {
-  background: #1c1b1f;
+  background: #0c0e0d;
   padding: 0 32px;
 }
 
@@ -1050,7 +1051,7 @@
 .vh-divider-rule {
   flex: 1;
   height: 1px;
-  background: #26242c;
+  background: #1a1f1b;
 }
 
 .vh-divider-tick {
@@ -1059,17 +1060,17 @@
 
 .vh-divider-tick-sm {
   height: 4px;
-  background: #2f2c39;
+  background: #232823;
 }
 
 .vh-divider-tick-md {
   height: 7px;
-  background: #3b3849;
+  background: #2a302c;
 }
 
 .vh-divider-tick-lg {
   height: 11px;
-  background: #6fd3c0;
+  background: #a8e06b;
 }
 
 // ---- keyframes ----
@@ -1155,26 +1156,26 @@
   12% {
     transform: translateX(-2.5px);
     text-shadow:
-      2.5px 0 #92a9e1,
-      -2.5px 0 #6fd3c0;
+      2.5px 0 #a8e06b,
+      -2.5px 0 #a8e06b;
   }
   26% {
     transform: translateX(2.5px);
     text-shadow:
-      -2.5px 0 #92a9e1,
-      2.5px 0 #6fd3c0;
+      -2.5px 0 #a8e06b,
+      2.5px 0 #a8e06b;
   }
   40% {
     transform: translateX(-1.5px);
-    text-shadow: 1.5px 0 #92a9e1;
+    text-shadow: 1.5px 0 #a8e06b;
   }
   54% {
     transform: translateX(1.5px);
-    text-shadow: -1.5px 0 #6fd3c0;
+    text-shadow: -1.5px 0 #a8e06b;
   }
   70% {
     transform: translateX(-0.5px);
-    text-shadow: 0.5px 0 #92a9e1;
+    text-shadow: 0.5px 0 #a8e06b;
   }
   100% {
     transform: none;
@@ -1190,26 +1191,26 @@
   12% {
     transform: translateX(-2.5px);
     text-shadow:
-      2.5px 0 #92a9e1,
-      -2.5px 0 #6fd3c0;
+      2.5px 0 #a8e06b,
+      -2.5px 0 #a8e06b;
   }
   26% {
     transform: translateX(2.5px);
     text-shadow:
-      -2.5px 0 #92a9e1,
-      2.5px 0 #6fd3c0;
+      -2.5px 0 #a8e06b,
+      2.5px 0 #a8e06b;
   }
   40% {
     transform: translateX(-1.5px);
-    text-shadow: 1.5px 0 #92a9e1;
+    text-shadow: 1.5px 0 #a8e06b;
   }
   54% {
     transform: translateX(1.5px);
-    text-shadow: -1.5px 0 #6fd3c0;
+    text-shadow: -1.5px 0 #a8e06b;
   }
   70% {
     transform: translateX(-0.5px);
-    text-shadow: 0.5px 0 #92a9e1;
+    text-shadow: 0.5px 0 #a8e06b;
   }
   100% {
     transform: none;
@@ -1219,19 +1220,19 @@
 
 @keyframes vaaniFlashA {
   from {
-    background: rgba(146, 169, 225, 0.16);
+    background: rgba(168, 224, 107, 0.16);
   }
   to {
-    background: rgba(146, 169, 225, 0);
+    background: rgba(168, 224, 107, 0);
   }
 }
 
 @keyframes vaaniFlashB {
   from {
-    background: rgba(146, 169, 225, 0.16);
+    background: rgba(168, 224, 107, 0.16);
   }
   to {
-    background: rgba(146, 169, 225, 0);
+    background: rgba(168, 224, 107, 0);
   }
 }
 

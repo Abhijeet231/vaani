@@ -184,36 +184,36 @@ const FAQ: FaqItem[] = [
 
 // Decorative background glyph field — 5 rows x 6 cols, brick-offset, aria-hidden.
 const BG_GLYPHS: BgGlyph[] = [
-  { top: '1.0%', left: '1.0%', font: "'Noto Sans Devanagari',serif", size: '9.5vw', color: '#25242A', ch: 'व', anim: 'vaaniFloat', dur: '14s', delay: '0s' },
-  { top: '1.0%', left: '17.4%', font: "'Noto Sans Bengali',serif", size: '12.5vw', color: '#222126', ch: 'অ', anim: 'vaaniDriftA', dur: '19s', delay: '-3s' },
-  { top: '1.0%', left: '33.8%', font: "'Noto Sans Gujarati',serif", size: '11.5vw', color: '#242329', ch: 'ગ', anim: 'vaaniDriftB', dur: '24s', delay: '-6s' },
-  { top: '1.0%', left: '50.2%', font: "'Noto Naskh Arabic',serif", size: '10.5vw', color: '#232227', ch: 'ب', anim: 'vaaniFloat', dur: '16s', delay: '-9s' },
-  { top: '1.0%', left: '66.6%', font: "'Noto Sans Kannada',serif", size: '9.5vw', color: '#25242A', ch: 'ಮ', anim: 'vaaniDriftA', dur: '21s', delay: '-12s' },
-  { top: '1.0%', left: '83.0%', font: "'Noto Sans Gujarati',serif", size: '12.5vw', color: '#222126', ch: 'ધ', anim: 'vaaniDriftB', dur: '26s', delay: '-15s' },
-  { top: '20.5%', left: '8.0%', font: "'Noto Sans Gurmukhi',serif", size: '11.5vw', color: '#242329', ch: 'ਪ', anim: 'vaaniFloat', dur: '18s', delay: '-1s' },
-  { top: '20.5%', left: '24.4%', font: "'Noto Sans Devanagari',serif", size: '10.5vw', color: '#232227', ch: 'ळ', anim: 'vaaniDriftA', dur: '23s', delay: '-4s' },
-  { top: '20.5%', left: '40.8%', font: "'Noto Sans Bengali',serif", size: '9.5vw', color: '#25242A', ch: 'ব', anim: 'vaaniDriftB', dur: '15s', delay: '-7s' },
-  { top: '20.5%', left: '57.2%', font: "'Noto Sans Telugu',serif", size: '12.5vw', color: '#222126', ch: 'ఇ', anim: 'vaaniFloat', dur: '20s', delay: '-10s' },
-  { top: '20.5%', left: '73.6%', font: "'Noto Naskh Arabic',serif", size: '11.5vw', color: '#242329', ch: 'ن', anim: 'vaaniDriftA', dur: '25s', delay: '-13s' },
-  { top: '20.5%', left: '90.0%', font: "'Noto Sans Tamil',serif", size: '10.5vw', color: '#232227', ch: 'த', anim: 'vaaniDriftB', dur: '17s', delay: '-16s' },
-  { top: '40.0%', left: '1.0%', font: "'Noto Sans Malayalam',serif", size: '9.5vw', color: '#25242A', ch: 'ള', anim: 'vaaniFloat', dur: '22s', delay: '-2s' },
-  { top: '40.0%', left: '17.4%', font: "'Noto Sans Gurmukhi',serif", size: '12.5vw', color: '#222126', ch: 'ਸ', anim: 'vaaniDriftA', dur: '14s', delay: '-5s' },
-  { top: '40.0%', left: '33.8%', font: "'Noto Sans Devanagari',serif", size: '11.5vw', color: '#242329', ch: 'व', anim: 'vaaniDriftB', dur: '19s', delay: '-8s' },
-  { top: '40.0%', left: '50.2%', font: "'Noto Sans Bengali',serif", size: '10.5vw', color: '#232227', ch: 'অ', anim: 'vaaniFloat', dur: '24s', delay: '-11s' },
-  { top: '40.0%', left: '66.6%', font: "'Noto Sans Gujarati',serif", size: '9.5vw', color: '#25242A', ch: 'ગ', anim: 'vaaniDriftA', dur: '16s', delay: '-14s' },
-  { top: '40.0%', left: '83.0%', font: "'Noto Naskh Arabic',serif", size: '12.5vw', color: '#222126', ch: 'ب', anim: 'vaaniDriftB', dur: '21s', delay: '0s' },
-  { top: '59.5%', left: '8.0%', font: "'Noto Sans Kannada',serif", size: '11.5vw', color: '#242329', ch: 'ಕ', anim: 'vaaniFloat', dur: '26s', delay: '-3s' },
-  { top: '59.5%', left: '24.4%', font: "'Noto Sans Telugu',serif", size: '10.5vw', color: '#232227', ch: 'త', anim: 'vaaniDriftA', dur: '18s', delay: '-6s' },
-  { top: '59.5%', left: '40.8%', font: "'Noto Sans Gurmukhi',serif", size: '9.5vw', color: '#25242A', ch: 'ਪ', anim: 'vaaniDriftB', dur: '23s', delay: '-9s' },
-  { top: '59.5%', left: '57.2%', font: "'Noto Sans Devanagari',serif", size: '12.5vw', color: '#222126', ch: 'ळ', anim: 'vaaniFloat', dur: '15s', delay: '-12s' },
-  { top: '59.5%', left: '73.6%', font: "'Noto Sans Bengali',serif", size: '11.5vw', color: '#242329', ch: 'ব', anim: 'vaaniDriftA', dur: '20s', delay: '-15s' },
-  { top: '59.5%', left: '90.0%', font: "'Noto Sans Telugu',serif", size: '10.5vw', color: '#232227', ch: 'ఇ', anim: 'vaaniDriftB', dur: '25s', delay: '-1s' },
-  { top: '79.0%', left: '1.0%', font: "'Noto Sans Oriya',serif", size: '9.5vw', color: '#25242A', ch: 'ଓ', anim: 'vaaniFloat', dur: '17s', delay: '-4s' },
-  { top: '79.0%', left: '17.4%', font: "'Noto Sans Tamil',serif", size: '12.5vw', color: '#222126', ch: 'ழ', anim: 'vaaniDriftA', dur: '22s', delay: '-7s' },
-  { top: '79.0%', left: '33.8%', font: "'Noto Sans Malayalam',serif", size: '11.5vw', color: '#242329', ch: 'ള', anim: 'vaaniDriftB', dur: '14s', delay: '-10s' },
-  { top: '79.0%', left: '50.2%', font: "'Noto Sans Gurmukhi',serif", size: '10.5vw', color: '#232227', ch: 'ਸ', anim: 'vaaniFloat', dur: '19s', delay: '-13s' },
-  { top: '79.0%', left: '66.6%', font: "'Noto Sans Devanagari',serif", size: '9.5vw', color: '#25242A', ch: 'व', anim: 'vaaniDriftA', dur: '24s', delay: '-16s' },
-  { top: '79.0%', left: '83.0%', font: "'Noto Sans Bengali',serif", size: '12.5vw', color: '#222126', ch: 'অ', anim: 'vaaniDriftB', dur: '16s', delay: '-2s' },
+  { top: '1.0%', left: '1.0%', font: "'Noto Sans Devanagari',serif", size: '9.5vw', color: '#171C18', ch: 'व', anim: 'vaaniFloat', dur: '14s', delay: '0s' },
+  { top: '1.0%', left: '17.4%', font: "'Noto Sans Bengali',serif", size: '12.5vw', color: '#141813', ch: 'অ', anim: 'vaaniDriftA', dur: '19s', delay: '-3s' },
+  { top: '1.0%', left: '33.8%', font: "'Noto Sans Gujarati',serif", size: '11.5vw', color: '#161A16', ch: 'ગ', anim: 'vaaniDriftB', dur: '24s', delay: '-6s' },
+  { top: '1.0%', left: '50.2%', font: "'Noto Naskh Arabic',serif", size: '10.5vw', color: '#151915', ch: 'ب', anim: 'vaaniFloat', dur: '16s', delay: '-9s' },
+  { top: '1.0%', left: '66.6%', font: "'Noto Sans Kannada',serif", size: '9.5vw', color: '#171C18', ch: 'ಮ', anim: 'vaaniDriftA', dur: '21s', delay: '-12s' },
+  { top: '1.0%', left: '83.0%', font: "'Noto Sans Gujarati',serif", size: '12.5vw', color: '#141813', ch: 'ધ', anim: 'vaaniDriftB', dur: '26s', delay: '-15s' },
+  { top: '20.5%', left: '8.0%', font: "'Noto Sans Gurmukhi',serif", size: '11.5vw', color: '#161A16', ch: 'ਪ', anim: 'vaaniFloat', dur: '18s', delay: '-1s' },
+  { top: '20.5%', left: '24.4%', font: "'Noto Sans Devanagari',serif", size: '10.5vw', color: '#151915', ch: 'ळ', anim: 'vaaniDriftA', dur: '23s', delay: '-4s' },
+  { top: '20.5%', left: '40.8%', font: "'Noto Sans Bengali',serif", size: '9.5vw', color: '#171C18', ch: 'ব', anim: 'vaaniDriftB', dur: '15s', delay: '-7s' },
+  { top: '20.5%', left: '57.2%', font: "'Noto Sans Telugu',serif", size: '12.5vw', color: '#141813', ch: 'ఇ', anim: 'vaaniFloat', dur: '20s', delay: '-10s' },
+  { top: '20.5%', left: '73.6%', font: "'Noto Naskh Arabic',serif", size: '11.5vw', color: '#161A16', ch: 'ن', anim: 'vaaniDriftA', dur: '25s', delay: '-13s' },
+  { top: '20.5%', left: '90.0%', font: "'Noto Sans Tamil',serif", size: '10.5vw', color: '#151915', ch: 'த', anim: 'vaaniDriftB', dur: '17s', delay: '-16s' },
+  { top: '40.0%', left: '1.0%', font: "'Noto Sans Malayalam',serif", size: '9.5vw', color: '#171C18', ch: 'ള', anim: 'vaaniFloat', dur: '22s', delay: '-2s' },
+  { top: '40.0%', left: '17.4%', font: "'Noto Sans Gurmukhi',serif", size: '12.5vw', color: '#141813', ch: 'ਸ', anim: 'vaaniDriftA', dur: '14s', delay: '-5s' },
+  { top: '40.0%', left: '33.8%', font: "'Noto Sans Devanagari',serif", size: '11.5vw', color: '#161A16', ch: 'व', anim: 'vaaniDriftB', dur: '19s', delay: '-8s' },
+  { top: '40.0%', left: '50.2%', font: "'Noto Sans Bengali',serif", size: '10.5vw', color: '#151915', ch: 'অ', anim: 'vaaniFloat', dur: '24s', delay: '-11s' },
+  { top: '40.0%', left: '66.6%', font: "'Noto Sans Gujarati',serif", size: '9.5vw', color: '#171C18', ch: 'ગ', anim: 'vaaniDriftA', dur: '16s', delay: '-14s' },
+  { top: '40.0%', left: '83.0%', font: "'Noto Naskh Arabic',serif", size: '12.5vw', color: '#141813', ch: 'ب', anim: 'vaaniDriftB', dur: '21s', delay: '0s' },
+  { top: '59.5%', left: '8.0%', font: "'Noto Sans Kannada',serif", size: '11.5vw', color: '#161A16', ch: 'ಕ', anim: 'vaaniFloat', dur: '26s', delay: '-3s' },
+  { top: '59.5%', left: '24.4%', font: "'Noto Sans Telugu',serif", size: '10.5vw', color: '#151915', ch: 'త', anim: 'vaaniDriftA', dur: '18s', delay: '-6s' },
+  { top: '59.5%', left: '40.8%', font: "'Noto Sans Gurmukhi',serif", size: '9.5vw', color: '#171C18', ch: 'ਪ', anim: 'vaaniDriftB', dur: '23s', delay: '-9s' },
+  { top: '59.5%', left: '57.2%', font: "'Noto Sans Devanagari',serif", size: '12.5vw', color: '#141813', ch: 'ळ', anim: 'vaaniFloat', dur: '15s', delay: '-12s' },
+  { top: '59.5%', left: '73.6%', font: "'Noto Sans Bengali',serif", size: '11.5vw', color: '#161A16', ch: 'ব', anim: 'vaaniDriftA', dur: '20s', delay: '-15s' },
+  { top: '59.5%', left: '90.0%', font: "'Noto Sans Telugu',serif", size: '10.5vw', color: '#151915', ch: 'ఇ', anim: 'vaaniDriftB', dur: '25s', delay: '-1s' },
+  { top: '79.0%', left: '1.0%', font: "'Noto Sans Oriya',serif", size: '9.5vw', color: '#171C18', ch: 'ଓ', anim: 'vaaniFloat', dur: '17s', delay: '-4s' },
+  { top: '79.0%', left: '17.4%', font: "'Noto Sans Tamil',serif", size: '12.5vw', color: '#141813', ch: 'ழ', anim: 'vaaniDriftA', dur: '22s', delay: '-7s' },
+  { top: '79.0%', left: '33.8%', font: "'Noto Sans Malayalam',serif", size: '11.5vw', color: '#161A16', ch: 'ള', anim: 'vaaniDriftB', dur: '14s', delay: '-10s' },
+  { top: '79.0%', left: '50.2%', font: "'Noto Sans Gurmukhi',serif", size: '10.5vw', color: '#151915', ch: 'ਸ', anim: 'vaaniFloat', dur: '19s', delay: '-13s' },
+  { top: '79.0%', left: '66.6%', font: "'Noto Sans Devanagari',serif", size: '9.5vw', color: '#171C18', ch: 'व', anim: 'vaaniDriftA', dur: '24s', delay: '-16s' },
+  { top: '79.0%', left: '83.0%', font: "'Noto Sans Bengali',serif", size: '12.5vw', color: '#141813', ch: 'অ', anim: 'vaaniDriftB', dur: '16s', delay: '-2s' },
 ];
 
 function heroBars(): Bar[] {
@@ -310,10 +310,10 @@ export class Landing implements AfterViewInit, OnDestroy {
         lang,
         index: n,
         active,
-        tone: active ? '#EDEBF7' : '#9C99AC',
-        tagTone: lang.voice ? (active ? '#92A9E1' : '#57545F') : '#57545F',
+        tone: active ? '#E9EDE7' : '#96A096',
+        tagTone: lang.voice ? (active ? '#A8E06B' : '#6F796F') : '#6F796F',
         tag: lang.voice ? 'voice' : 'text',
-        bar: active ? '#92A9E1' : 'transparent',
+        bar: active ? '#A8E06B' : 'transparent',
         glitch: active ? `${parityA ? 'vaaniGlitchA' : 'vaaniGlitchB'} .42s steps(1,end) both` : 'none',
         flash: active ? `${parityA ? 'vaaniFlashA' : 'vaaniFlashB'} .6s ease both` : 'none',
         pop: active ? 'vaaniBarPop .32s cubic-bezier(.2,.8,.3,1) both' : 'none',
@@ -325,18 +325,18 @@ export class Landing implements AfterViewInit, OnDestroy {
     const p = this.scramble();
     const al = this.activeLang();
     if (/[؀-ۿ]/.test(al.script)) {
-      return [{ ch: al.script, tone: p ? '#4E4B58' : '#EDEBF7' }];
+      return [{ ch: al.script, tone: p ? '#5A625A' : '#E9EDE7' }];
     }
     const real = graphemes(al.script);
     if (!p) {
-      return real.map((ch) => ({ ch: ch === ' ' ? ' ' : ch, tone: '#EDEBF7' }));
+      return real.map((ch) => ({ ch: ch === ' ' ? ' ' : ch, tone: '#E9EDE7' }));
     }
     const pool = graphemes(al.sample).filter((c) => c.trim() && !'?,.،؟'.includes(c));
     const settled = Math.floor(real.length * p);
     return real.map((ch, k) => {
-      if (k < settled) return { ch: ch === ' ' ? ' ' : ch, tone: '#EDEBF7' };
+      if (k < settled) return { ch: ch === ' ' ? ' ' : ch, tone: '#E9EDE7' };
       const r = pool.length ? pool[Math.floor(Math.random() * pool.length)] : ch;
-      return { ch: r, tone: '#4E4B58' };
+      return { ch: r, tone: '#5A625A' };
     });
   });
 
@@ -352,8 +352,8 @@ export class Landing implements AfterViewInit, OnDestroy {
       'max-width': on ? '1080px' : 'none',
       height: on ? '58px' : '72px',
       'border-radius': on ? '16px' : '0px',
-      'background-color': on ? 'rgba(28,27,31,0.92)' : 'rgba(28,27,31,0)',
-      'border-color': on ? '#3B3849' : 'rgba(59,56,73,0)',
+      'background-color': on ? 'rgba(12,14,13,0.92)' : 'rgba(12,14,13,0)',
+      'border-color': on ? '#2A302C' : 'rgba(42,48,44,0)',
     };
   });
 
@@ -391,8 +391,8 @@ export class Landing implements AfterViewInit, OnDestroy {
 
   protected readonly activeMeta = computed(() => (this.activeLang().voice ? 'text and voice' : 'text only'));
   protected readonly activeIndex = computed(() => `${String(this.langIndex() + 1).padStart(2, '0')} / 14`);
-  protected readonly activeDot = computed(() => (this.activeLang().voice ? '#92A9E1' : '#57545F'));
-  protected readonly chipColor = computed(() => (this.activeLang().voice ? '#B8C6EE' : '#9C99AC'));
+  protected readonly activeDot = computed(() => (this.activeLang().voice ? '#A8E06B' : '#6F796F'));
+  protected readonly chipColor = computed(() => (this.activeLang().voice ? '#C7E3A1' : '#96A096'));
   protected readonly activeVoiceLabel = computed(() =>
     this.activeLang().voice ? 'spoken playback available' : 'text output only'
   );
@@ -705,7 +705,7 @@ export class Landing implements AfterViewInit, OnDestroy {
         ctx.globalAlpha = p.alpha * k * k;
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);
-        ctx.fillStyle = '#92A9E1';
+        ctx.fillStyle = '#A8E06B';
         ctx.font = p.size + 'px ' + p.font;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';

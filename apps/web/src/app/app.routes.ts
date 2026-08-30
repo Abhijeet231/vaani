@@ -18,7 +18,7 @@ import { waitlistGuard } from './core/waitlist.guard';
 // environment.waitlistOnly is on it redirects everything there; otherwise it's
 // a pass-through and the route's own guards run as normal.
 export const routes: Routes = [
-  { path: '', component: Landing, data: { theme: 'lavender', hideChrome: true }, canActivate: [waitlistGuard] },
+  { path: '', component: Landing, data: { theme: 'graphite', hideChrome: true }, canActivate: [waitlistGuard] },
   { path: 'about', component: About, data: { theme: 'light' }, canActivate: [waitlistGuard] },
   { path: 'pricing', component: Pricing, data: { theme: 'lavender' }, canActivate: [waitlistGuard] },
   { path: 'contact', component: Contact, data: { theme: 'light' }, canActivate: [waitlistGuard] },
