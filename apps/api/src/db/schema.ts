@@ -37,7 +37,20 @@ export const purchases = pgTable(
   (table) => [index('purchases_user_id_idx').on(table.userId)],
 );
 
-// Conversation Schema 
+// Waitlist Schema
+export const waitlistSignups = pgTable('waitlist_signups', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  // At least one of email/phone is set (enforced in the controller, not the DB).
+  // Nullable columns can hold many NULLs, so `.unique()` still allows rows that
+  // provide only the other field.
+  email: text('email').unique(),
+  phone: text('phone').unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  // Set once the live link has been sent to this person.
+  notifiedAt: timestamp('notified_at', { withTimezone: true }),
+});
+
+// Conversation Schema
 export const conversations = pgTable(
   'conversations',
   {

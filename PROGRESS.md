@@ -1,5 +1,17 @@
 # Progress Log
 
+## 2026-08-30 — Waitlist backend: `waitlist_signups` table + public `POST /api/waitlist`
+
+- First slice of a pre-launch waitlist. Plan discussed with the user: a build-time `waitlistOnly` flag will later gate the live site down to a single public waitlist page; this entry is the backend only ("do the backend first").
+- **New `waitlist_signups` table** (`schema.ts`): `id`, `email` (nullable, unique), `phone` (nullable, unique), `created_at`, `notified_at` (nullable — set once the live link is sent). Nullable + `.unique()` is deliberate: Postgres allows many NULLs, so a row that provides only phone (or only email) is fine, and neither value can be entered twice. "At least one of email/phone" is enforced in the controller, not the DB. Migration `0004_lean_deadpool.sql` generated and applied to Neon via the existing `run-migrate.ts` script.
+- **New public endpoint `POST /api/waitlist`** (`waitlist.routes.ts` → `waitlist.controller.ts` → `waitlist.model.ts`) — no `requireAuth`, since this is the one route meant to work while the site is in waitlist-only mode. Controller: trims + lowercases email, strips spaces/`()`-/ from phone, validates each against a loose regex (`PHONE_RE` = optional `+` then 7–15 digits), 400s if both are empty or a provided value is malformed. Honeypot `website` field → silently 200 without storing. Duplicate email/phone → `onConflictDoNothing` in the model, controller returns the same `{ ok: true }` as a fresh signup (no list-membership enumeration).
+- Verified end-to-end against the running dev server + real Neon: empty body and bad email/phone all 400 with the right message; a valid mixed-case/spaced email and a spaced `+91` phone both 200 and land normalized (`waitlist.test+1@example.com`, `+919876543210`); a repeat email 200s without creating a second row; the honeypot request 200s and stores nothing — confirmed by querying the table (exactly 2 rows, bot absent). Test rows deleted afterward, throwaway scripts removed. `tsc --noEmit` clean.
+
+**Pending / not yet built:**
+- **Frontend**: the `waitlistOnly` flag (in `environment.production.ts`, off in dev) + a `waitlistGuard` redirecting every route except `/waitlist` (and probably `/privacy`/`/terms`/`/refund-policy`, plus signed-in users) to a new short `/waitlist` page with the email-or-phone form. Not started.
+- No admin view of signups yet — read them straight from Neon (`select * from waitlist_signups`) for now.
+- `notified_at` column exists but nothing sets it — no send-the-link flow yet.
+
 ## 2026-08-30 — Real contact email swapped in (was `TODO@vaani.app`)
 
 - User gave the real address (`ghoshabhijeet778@gmail.com`), motivated by wanting the live site to look complete before submitting it to Razorpay for their live-key review — a visible `TODO@vaani.app` on the Contact page would have been an obvious red flag.
