@@ -56,14 +56,18 @@
         }
       </div>
 
-      <div class="wl-proof">
-        <div class="wl-avatars">
-          @for (av of avatars; track $index) {
-            <span class="wl-avatar">{{ av }}</span>
+      @if (hasCount()) {
+        <div class="wl-proof">
+          @if (showAvatars()) {
+            <div class="wl-avatars">
+              @for (av of avatars; track $index) {
+                <span class="wl-avatar">{{ av }}</span>
+              }
+            </div>
           }
+          <span class="wl-proof-caption">{{ proofText() }}</span>
         </div>
-        <span class="wl-proof-caption">{{ waitingLabel() }} already waiting</span>
-      </div>
+      }
     </div>
   </section>
 

@@ -25,11 +25,6 @@ const TICKER: TickerWord[] = [
   { word: 'listen', font: 'Piazzolla, Georgia, serif' },
 ];
 
-// Shown as the "N already waiting" number until real signups exceed it, at which
-// point the live count from GET /api/waitlist/count takes over. Set to 0 to
-// always show the true number.
-const WAITING_FLOOR = 37;
-
 @Component({
   selector: 'app-waitlist',
   imports: [],
@@ -57,11 +52,18 @@ export class Waitlist implements OnInit {
   protected readonly error = signal('');
   protected readonly position = signal<number | null>(null);
 
-  // Live list size, floored at WAITING_FLOOR for display.
-  private readonly liveCount = signal(0);
-  protected readonly waitingLabel = computed(() =>
-    Math.max(WAITING_FLOOR, this.liveCount()).toLocaleString('en-IN'),
-  );
+  // Real signup count from GET /api/waitlist/count. null until it loads (or if
+  // the call fails) — the social-proof cluster is hidden while it's null.
+  private readonly liveCount = signal<number | null>(null);
+  protected readonly hasCount = computed(() => this.liveCount() !== null);
+  protected readonly showAvatars = computed(() => (this.liveCount() ?? 0) > 0);
+  protected readonly proofText = computed(() => {
+    const n = this.liveCount();
+    if (n === null) return '';
+    if (n === 0) return 'Be the first in line';
+    if (n === 1) return '1 person already waiting';
+    return `${n.toLocaleString('en-IN')} already waiting`;
+  });
 
   private readonly waitlist = inject(WaitlistService);
 
@@ -70,7 +72,7 @@ export class Waitlist implements OnInit {
       .count()
       .then((count) => this.liveCount.set(count))
       .catch(() => {
-        /* keep the floor if the count call fails */
+        /* leave liveCount null — the social-proof cluster just stays hidden */
       });
   }
 
