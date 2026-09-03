@@ -1,75 +1,90 @@
-<div class="flex flex-col gap-8 p-6 max-w-3xl mx-auto w-full">
-  <div class="flex items-center gap-4">
-    @if (userPhoto() && !photoFailed()) {
-      <img
-        [src]="userPhoto()"
-        (error)="photoFailed.set(true)"
-        alt=""
-        class="w-14 h-14 rounded-full object-cover"
-      />
-    } @else {
-      <mat-icon style="font-size: 56px; width: 56px; height: 56px">account_circle</mat-icon>
-    }
-    <div>
-      <p class="text-lg font-medium">{{ displayName() || email() || 'Your account' }}</p>
-      @if (displayName() && email()) {
-        <p class="text-sm opacity-70">{{ email() }}</p>
+<div class="account flex flex-col gap-8 px-6 py-10 max-w-3xl mx-auto w-full">
+  <header class="flex items-center gap-4">
+    <div class="avatar-ring">
+      @if (userPhoto() && !photoFailed()) {
+        <img
+          [src]="userPhoto()"
+          (error)="photoFailed.set(true)"
+          alt=""
+          class="w-14 h-14 rounded-full object-cover"
+        />
+      } @else {
+        <mat-icon style="font-size: 40px; width: 40px; height: 40px">account_circle</mat-icon>
       }
     </div>
+    <div class="min-w-0">
+      <p class="text-lg font-medium truncate">{{ displayName() || email() || 'Your account' }}</p>
+      @if (displayName() && email()) {
+        <p class="text-sm text-ink-muted truncate">{{ email() }}</p>
+      }
+    </div>
+  </header>
+
+  <div class="grid gap-3 sm:grid-cols-3">
+    <mat-card class="stat-card p-5 rounded-xl!">
+      <mat-icon class="stat-icon">workspace_premium</mat-icon>
+      <p class="stat-label">Plan</p>
+      <p class="stat-value capitalize">{{ auth.dbUser()?.plan ?? '—' }}</p>
+    </mat-card>
+    <mat-card class="stat-card p-5 rounded-xl!">
+      <mat-icon class="stat-icon">bolt</mat-icon>
+      <p class="stat-label">Turns left</p>
+      <p class="stat-value">{{ auth.dbUser()?.turnsBalance ?? '—' }}</p>
+    </mat-card>
+    <mat-card class="stat-card p-5 rounded-xl!">
+      <mat-icon class="stat-icon">translate</mat-icon>
+      <p class="stat-label">Lifetime translations</p>
+      <p class="stat-value">{{ auth.dbUser()?.usageCount ?? '—' }}</p>
+    </mat-card>
   </div>
 
-  <div class="grid gap-4 sm:grid-cols-3">
-    <mat-card class="p-5 rounded-xl!">
-      <p class="text-xs opacity-60 mb-1">Plan</p>
-      <p class="text-2xl font-medium capitalize">{{ auth.dbUser()?.plan ?? '—' }}</p>
-    </mat-card>
-    <mat-card class="p-5 rounded-xl!">
-      <p class="text-xs opacity-60 mb-1">Turns left</p>
-      <p class="text-2xl font-medium">{{ auth.dbUser()?.turnsBalance ?? '—' }}</p>
-    </mat-card>
-    <mat-card class="p-5 rounded-xl!">
-      <p class="text-xs opacity-60 mb-1">Lifetime translations</p>
-      <p class="text-2xl font-medium">{{ auth.dbUser()?.usageCount ?? '—' }}</p>
-    </mat-card>
-  </div>
+  @if (lowBalance()) {
+    <div class="rounded-xl border border-accent-ink/30 bg-accent-ink/5 px-4 py-3 text-sm">
+      You're running low on turns.
+      <a routerLink="/pricing" class="text-accent-ink underline">Top up</a> to keep translating.
+    </div>
+  }
 
   <div class="flex flex-wrap gap-3">
     <a mat-flat-button color="primary" routerLink="/pricing">Buy more turns</a>
-    <a mat-stroked-button routerLink="/history">View conversation history</a>
+    <a mat-stroked-button routerLink="/history">Conversation history</a>
   </div>
 
   <div class="flex flex-col gap-3">
-    <h2 class="text-lg font-medium">Purchase history</h2>
+    <h2 class="font-display text-lg">Purchase history</h2>
 
     @if (isLoadingPurchases()) {
-      <div class="flex items-center gap-2 text-sm opacity-70">
+      <div class="flex items-center gap-2 text-sm text-ink-muted">
         <mat-spinner diameter="18" />
-        Loading...
+        Loading…
       </div>
     } @else if (purchaseError()) {
-      <span class="text-sm text-red-600">{{ purchaseError() }}</span>
+      <div class="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        {{ purchaseError() }}
+      </div>
     } @else if (purchases().length === 0) {
-      <span class="text-sm opacity-70"
-        >No purchases yet. <a routerLink="/pricing" class="underline">Buy a recharge pack</a> to see it
-        here.</span
-      >
+      <div class="rounded-xl border border-dashed border-border px-4 py-6 text-sm text-ink-muted">
+        No purchases yet.
+        <a routerLink="/pricing" class="text-accent-ink underline">Buy a recharge pack</a>
+        and it'll show up here.
+      </div>
     } @else {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col divide-y divide-border rounded-xl border border-border overflow-hidden">
         @for (purchase of purchases(); track purchase.id) {
-          <mat-card class="w-full p-4 rounded-xl!">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="font-medium">{{ purchase.packLabel }} &middot; {{ purchase.turns }} turns</p>
-                <p class="text-xs opacity-60">{{ purchase.createdAt | date: 'medium' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="font-medium">₹{{ rupees(purchase.amountInPaise) }}</p>
-                <span class="status-badge" [class]="'status-badge--' + purchase.status">{{
-                  purchase.status
-                }}</span>
-              </div>
+          <div class="flex items-center justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <p class="font-medium truncate">{{ purchase.packLabel }}</p>
+              <p class="text-xs text-ink-muted">
+                {{ purchase.turns }} turns · {{ purchase.createdAt | date: 'mediumDate' }}
+              </p>
             </div>
-          </mat-card>
+            <div class="text-right shrink-0">
+              <p class="font-medium">₹{{ rupees(purchase.amountInPaise) }}</p>
+              <span class="status-badge" [class]="'status-badge--' + purchase.status">{{
+                purchase.status
+              }}</span>
+            </div>
+          </div>
         }
       </div>
     }

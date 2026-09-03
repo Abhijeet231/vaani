@@ -1,0 +1,37 @@
+<dl>
+  <dt>Operated by</dt>
+  <dd>
+    @if (isPlaceholder(info.legalName)) {
+      <span class="ph-pill">proprietor's legal name — to be added before launch</span>
+    } @else {
+      {{ info.legalName }}
+    }
+    <span class="dd-muted">({{ info.entityType }})</span>
+  </dd>
+
+  <dt>Address</dt>
+  <dd>
+    @if (isPlaceholder(info.address)) {
+      <span class="ph-pill">operating address — to be added before launch</span>
+    } @else {
+      {{ info.address }}
+    }
+  </dd>
+
+  <dt>Phone</dt>
+  <dd>
+    @if (isPlaceholder(info.phone)) {
+      <span class="ph-pill">phone number — to be added before launch</span>
+    } @else {
+      <a [href]="'tel:' + info.phone">{{ info.phone }}</a>
+    }
+  </dd>
+
+  <dt>Email</dt>
+  <dd><a [href]="'mailto:' + email">{{ email }}</a></dd>
+
+  @if (info.gstin) {
+    <dt>GSTIN</dt>
+    <dd>{{ info.gstin }}</dd>
+  }
+</dl>

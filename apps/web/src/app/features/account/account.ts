@@ -49,6 +49,13 @@ export class Account implements OnInit {
   protected readonly isLoadingPurchases = signal(true);
   protected readonly purchaseError = signal<string | null>(null);
 
+  // Nudge to top up while there are still a few turns left (0 is already covered
+  // by the block message on /app).
+  protected readonly lowBalance = computed(() => {
+    const balance = this.auth.dbUser()?.turnsBalance;
+    return typeof balance === 'number' && balance > 0 && balance <= 3;
+  });
+
   ngOnInit(): void {
     this.http.get<PurchasesResponse>('/api/payments/purchases').subscribe({
       next: (response) => {

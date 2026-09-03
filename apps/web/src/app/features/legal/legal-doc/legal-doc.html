@@ -1,0 +1,20 @@
+<article class="legal-doc max-w-3xl mx-auto px-6 pt-16 pb-24 md:pt-24">
+  <p class="text-accent-ink text-sm font-medium mb-3">{{ kicker() }}</p>
+  <h1 class="font-display text-3xl md:text-4xl leading-tight text-balance mb-4">{{ title() }}</h1>
+  <p class="text-ink-muted text-sm">Last updated {{ updated() }}</p>
+
+  <nav class="legal-doc__nav" aria-label="Legal documents">
+    @for (link of links; track link.path) {
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="is-active"
+        class="legal-doc__nav-link no-underline"
+        >{{ link.label }}</a
+      >
+    }
+  </nav>
+
+  <div class="legal-doc__body">
+    <ng-content />
+  </div>
+</article>

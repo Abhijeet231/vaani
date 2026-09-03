@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CONTACT_EMAIL } from '../../contact/contact';
+import { CONTACT_EMAIL } from '../../../core/site-info';
+import { LegalDoc } from '../legal-doc/legal-doc';
+import { BusinessIdentity } from '../business-identity/business-identity';
 
 @Component({
   selector: 'app-terms',
-  imports: [RouterLink],
+  imports: [RouterLink, LegalDoc, BusinessIdentity],
   templateUrl: './terms.html',
 })
 export class Terms {

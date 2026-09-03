@@ -1,3 +1,41 @@
+.avatar-ring {
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stat-icon {
+  color: var(--color-accent-ink);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  margin-bottom: 0.4rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .status-badge {
   display: inline-block;
   margin-top: 0.25rem;

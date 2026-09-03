@@ -4,10 +4,10 @@ import { CONTACT_EMAIL } from '../../../core/site-info';
 import { LegalDoc } from '../legal-doc/legal-doc';
 
 @Component({
-  selector: 'app-refund-policy',
+  selector: 'app-shipping',
   imports: [RouterLink, LegalDoc],
-  templateUrl: './refund-policy.html',
+  templateUrl: './shipping.html',
 })
-export class RefundPolicy {
+export class Shipping {
   protected readonly contactEmail = CONTACT_EMAIL;
 }
