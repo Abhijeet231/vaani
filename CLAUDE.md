@@ -9,11 +9,11 @@ vaani is a live speech-translation app driven from a single signed-in owner's de
 Two modes, both scoped to one owner session with no accounts/data for the other party:
 
 - **1-1 conversation mode** — owner sets a language direction (e.g. Hindi → Kannada), records, and gets a live translated transcript in the target language. To let the other person reply, the owner flips the direction (Kannada → Hindi) on the same device/session — it's a manual per-turn toggle, not two separate participant accounts.
-- **Multi-speaker mode** — owner records in a room with multiple people talking; the app auto-detects the number of distinct speakers (diarization) and produces a live translated transcript labeled by speaker (Speaker 1, Speaker 2, ...). Speaker labels are ephemeral to that session, not persisted identities.
+- **Multi-speaker mode — PARKED (2026-09-03), not built.** The original plan was: owner records in a room with several people, the app diarizes and produces a transcript labeled by speaker. Deferred indefinitely; revisit only if there's real demand after launch. 1-1 is the product that ships.
 
-**Planned addition, 1-1 mode only (not yet built):** speak the translated text aloud using Sarvam's Bulbul TTS model, alongside the live transcript, so the other person can listen instead of only reading. Deliberately scoped to 1-1 mode — multi-speaker mode stays transcript-only for now, since speaking a diarized multi-person translation aloud is a separate, harder problem not being tackled yet.
+**Spoken output is built.** The translated text is spoken aloud with Sarvam's Bulbul TTS via `POST /api/one-to-one/speak`, with a per-turn play button in `/app`. Bulbul covers 11 of the 14 languages, so the button is gated on `TTS_SUPPORTED_LANGUAGE_CODES` — don't assume every entry in `LANGUAGES` can be spoken.
 
-Current focus: get a working end-to-end model for both modes (no persistence) before adding accounts or a database. Auth and DB are deliberately deferred — see below.
+Current focus: launch 1-1. Auth, database, payments and history are all shipped (see Tech stack); what's left is business/legal setup rather than features — see the pending list at the top of [PROGRESS.md](PROGRESS.md).
 
 ## Structure
 
@@ -33,13 +33,14 @@ Each app has its own `CLAUDE.md` with app-specific conventions:
 
 ## Tech stack
 
-- **apps/web** — Angular 22 (standalone components, no NgModules), Angular Material (M3, azure-blue prebuilt theme), Tailwind CSS v4, SCSS, signals for state.
+- **apps/web** — Angular 22 (standalone components, no NgModules), Angular Material (M3, one dark "Graphite & Jade" theme defined in `styles.scss`), Tailwind CSS v4, SCSS, signals for state.
 - **apps/api** — Node.js, Express, TypeScript, nodemon + ts-node for dev, dotenv for config.
 - **Tooling** — pnpm workspaces (`apps/*`). No shared/packages directory yet — add one only when web and api actually need to share code (e.g. types).
-- **Speech/translation** — Sarvam AI: Saaras STT for transcription (validated in Phase 1), Mayura for text translation (validated in Phase 1). Bulbul TTS planned for spoken output in 1-1 mode — not yet implemented.
-- **Database (planned, not yet implemented)** — Postgres via Drizzle ORM, hosted on NeonDB.
-- **Auth (planned, not yet implemented)** — Firebase Auth.
-- Both are intentionally deferred: the priority is a working, polished 1-1 / multi-speaker model first; accounts and persistence get added when the app goes public (targeted ~1 month out from 2026-08-15).
+- **Speech/translation** — Sarvam AI: Saaras STT for transcription, Mayura for text translation, Bulbul TTS for spoken output. All three are wired and in use.
+- **Database** — Postgres via Drizzle ORM on NeonDB. Shipped: `users`, `purchases`, `conversations`, `waitlist_signups`.
+- **Auth** — Firebase Auth, **Google sign-in only** (email/password was removed 2026-09-08 — see `login.ts` for why). `requireAuth` additionally rejects tokens without `email_verified`.
+- **Payments** — Razorpay recharge packs credited onto a `turnsBalance`; new accounts get `FREE_TRIAL_TURNS`. Still on test keys — live keys need KYC.
+- **Rate limiting** — `express-rate-limit`, three layers (global per-IP, a tight one on the public waitlist POST, and a per-user one on the Sarvam-spending routes). The API sets `trust proxy` for Render; don't remove it or every caller looks like the proxy.
 
 ## Commands (run from repo root)
 

@@ -1,5 +1,30 @@
 # Progress Log
 
+## 2026-09-08 (later) — Launch hardening: Google-only sign-in, rate limiting, CORS lockdown, real OG URLs
+
+Pre-launch security/abuse pass. The pending list at the bottom of this entry is
+the current authoritative one — earlier entries' pending lists are historical.
+
+- **Sign-in is Google-only.** Email/password removed from `auth.service.ts` and `login.ts` (user's call, after weighing it against enforced verification). Reason: every new account is a free grant of Sarvam calls billed to us, and throwaway addresses made that farmable — Gmail treats `user+1@`, `user+2@` and `u.s.e.r@` as one inbox, so even enforced email verification wouldn't have stopped one person minting accounts. A Google account is much harder to mass-create, and it drops a signup form, a password-reset flow and email deliverability from the product. `/login` is now one button.
+- **`requireAuth` rejects `email_verified: false`.** Google always reports verified, so this never trips in normal use — it's there because removing the UI doesn't disable the provider in the Firebase project, and anyone can still create an unverified account straight against Firebase's REST API. **Action for the user: disable the Email/Password provider in the Firebase Console** — the code change alone doesn't close that door.
+- **`FREE_TRIAL_TURNS` 10 → 3, and it now actually does something.** The constant was dead code: `findOrCreateUser` never set `turnsBalance`, so new users silently got the *column default* of 10. It's now passed explicitly at insert, making the constant the single source of truth and avoiding a migration to change it.
+- **Rate limiting** (`middleware/rate-limit.middleware.ts`, new) in three layers: a loose per-IP flood guard on all of `/api` (120/min); a tight one on `POST /api/waitlist` (5/hr) — it's public and unauthenticated, so it was the easiest thing in the app to abuse, and junk signups would poison the only real pre-launch metric there is; and a per-user one (20/min, keyed on Firebase uid so shared networks don't throttle each other) on the two routes that spend money at Sarvam.
+- **CORS locked down** (`config/cors.ts`, new). Was a bare `cors()`, i.e. `Access-Control-Allow-Origin: *`. Now an allowlist (both Firebase Hosting origins + `localhost:4200`), any localhost port in non-production, and requests with no `Origin` at all (curl, health checks, server-to-server) still pass — CORS protects browser users from other *sites*, it isn't authentication. A blocked origin returns 403, not 500.
+- **`app.set('trust proxy', 1)`** — Render terminates TLS at a proxy, so without this every request shares one IP and the per-IP limiters would throttle the whole internet as a single client. Set to `1`, not `true`, so a caller can't spoof `X-Forwarded-For` past the limiter.
+- **OG tags now point at a real origin** — all four `TODO_DOMAIN` occurrences replaced with `https://vaani-4a691.web.app`, the live Firebase Hosting address. One-line swap when a custom domain is bought.
+- **Stale docs corrected in `CLAUDE.md`** — it still described Bulbul TTS, the database and Firebase Auth as "planned, not yet implemented" when all three shipped weeks ago, and multi-speaker as upcoming rather than parked. This is the file loaded into context automatically every session, so a wrong claim there is worse than a missing one.
+- Verified: API `tsc --noEmit` clean; `pnpm --filter web build` clean. **Initial bundle 583 kB → 461.86 kB — under the 500 kB budget for the first time**, since dropping the login form took `MatFormField`/`MatInput`/`FormsModule` off the eager path. Ran the API and confirmed against it directly: allowed origin gets its ACAO header, `evil.com` gets 403, no-Origin passes, unauthenticated translate gets 401, `RateLimit-Policy: 120;w=60` present, and the waitlist limiter let 5 through then returned 429. The 5 probe rows were deleted from Neon afterwards (count back to 16).
+
+**Pending / not yet built (authoritative):**
+- **User action, cannot be done in code:** disable the Email/Password provider in the Firebase Console; add HTTP referrer restrictions to the Firebase web API key in Google Cloud Console.
+- **`apps/web/public/og-image.png` (1200x630) still doesn't exist**, so the `og:image` / `twitter:image` URLs 404 and link previews render without an image.
+- **Razorpay webhook still missing** — crediting depends on the browser completing `/payments/verify`, so a user who pays and closes the tab is charged and gets nothing. Highest-priority launch item.
+- **Still on Razorpay test keys.** Test payments produce a *valid* signature and credit real turns, and the test card numbers are public — so do not flip `waitlistOnly` off while on test keys.
+- Fill the real `BUSINESS_INFO` values in `core/site-info.ts`; flip `waitlistOnly` at launch.
+- The rate limiters use an in-memory store — correct for a single Render instance, would need Redis if it ever scales out.
+- Not deployed: commits since `c067700` are unpushed.
+- Multi-speaker mode remains parked (2026-09-03).
+
 ## 2026-09-08 — Graphite & Jade is now the only theme; `/app` redesigned; `/not-found` added
 
 - **One palette, app-wide.** "Graphite & Jade" (`#0C0E0D` ground, `#A8E06B` jade) replaces the four schemes that used to co-exist — "Slate Minimal" charcoal+brass (`/app`, `/history`, `/account`), its light variant (marketing + legal pages), and "Lavender Haze" (`/pricing`). Since every page is now the same dark theme, the **route-driven theme system is gone entirely**: `data: { theme }` removed from all 13 routes, and `themeClass`/`currentThemeClass` deleted from `app.ts`. The `--mat-sys-*` overrides are set once on `html` instead, so Material overlays inherit them too. `styles.scss` went 243 lines lighter (−243/+50).
@@ -11,8 +36,11 @@
 - Verified: `pnpm --filter web build` passes. Initial bundle **642 kB → 583 kB** (the deleted theme CSS), so the 500 kB budget warning is now 83 kB over instead of 142 kB.
 - **Related, outside this repo:** the legal-document product discussed this session was split out as **saral** — its own Next.js app at `D:\side projects\saral` (GitHub `Abhijeet231/saral`), reusing vaani's Sarvam/Razorpay/Neon layers via a separate `saral` Postgres schema on the same Neon instance. vaani itself moved to `D:\side projects\vaani`.
 
+- **Browser-verified after the above was first written** (dev server + live API, signed-in session). Rendered `/`, `/waitlist`, `/about`, `/contact`, `/pricing`, `/privacy`, `/login`, `/app`, `/history`, `/account` and a bad URL: all one dark theme, no light/lavender leftovers, landing and waitlist unchanged. `/history` and `/account` checked **populated** with real Neon data (5 saved turns, real purchase rows) — the state the 2026-09-03 entry left unverified. On `/app`: the direction menu renders all 14 native scripts with the selected one in jade; the turns chip, low-balance nudge and out-of-turns block all render in their intended amber/red; the recording state (jade stop square, two live rings) was driven directly since this environment has no mic. `/login` sits behind `guestGuard` and the browser was signed in, so it was previewed via a throwaway unguarded route, since removed. `tsc --noEmit` clean.
+- Also added a jade `:focus-visible` ring on `/app` — every control there is a bare `<button>`, so keyboard focus was showing the UA's white outline.
+
 **Pending / not yet built:**
-- `/app` and `/pricing` redesigns were verified by a production build only — **not** eyeballed in a browser this pass, and not checked at mobile width.
+- Chrome on Windows won't size a window below ~486 CSS px, so the `/app` 30rem breakpoint couldn't be triggered by resizing — the stacked layout was confirmed by applying the same declarations directly, which verifies the rules but not the breakpoint firing. Still worth an eyeball on a real phone, along with landing/waitlist (a long-standing item).
 - Still open from before: fill the real `BUSINESS_INFO` values in `core/site-info.ts`; swap `TODO_DOMAIN` in `index.html`'s OG tags; add the Razorpay webhook so crediting doesn't depend on the browser; flip `waitlistOnly` at launch.
 - Multi-speaker mode remains parked (2026-09-03 decision).
 

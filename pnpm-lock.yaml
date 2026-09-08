@@ -25,6 +25,9 @@ importers:
       express:
         specifier: ^4.21.2
         version: 4.22.2
+      express-rate-limit:
+        specifier: ^8.7.0
+        version: 8.7.0(express@4.22.2)
       firebase-admin:
         specifier: ^14.3.0
         version: 14.3.0(@firebase/app-compat@0.5.17)(@firebase/app@0.16.1)
@@ -2811,6 +2814,12 @@ packages:
 
   express-rate-limit@8.6.2:
     resolution: {integrity: sha512-YH4ru+eOJxQABscKFfRCy9R7x9QFGdezclVMwwgFFndzS2Xnm0uo6B0ABZsLhcpeptGv2qvuJVWlQr9gQZoC3A==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express: '>= 4.11'
+
+  express-rate-limit@8.7.0:
+    resolution: {integrity: sha512-hOwV7WOxXfjRpAM1DSJWZDXx3GhplwD8IfwuwvogD8i1Qnkgosw/H45s4ZnFAUHDAhPjlY9hLBvJhKmGMyY26g==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -6718,6 +6727,14 @@ snapshots:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       express: 5.2.1
+      ip-address: 10.5.0
+    transitivePeerDependencies:
+      - supports-color
+
+  express-rate-limit@8.7.0(express@4.22.2):
+    dependencies:
+      debug: 4.4.3(supports-color@5.5.0)
+      express: 4.22.2
       ip-address: 10.5.0
     transitivePeerDependencies:
       - supports-color

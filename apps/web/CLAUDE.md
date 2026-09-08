@@ -18,6 +18,12 @@ Two systems, two files, kept deliberately separate:
 
 Both are wired into `angular.json`'s `styles` array in that order (`styles.scss` then `tailwind.css`). Tailwind is configured via PostCSS (`.postcssrc.json` → `@tailwindcss/postcss`), which is what the Angular CLI's esbuild builder picks up automatically.
 
+### One theme, no per-route theme class
+
+The app has exactly one palette — "Graphite & Jade", a dark theme (near-black graphite grounds, one lime/jade accent `#a8e06b`). It is set once on `html` in `styles.scss` as `--mat-sys-*` overrides, mirrored numerically by the `@theme` tokens in `tailwind.css` (`--color-ground`, `--color-ink`, `--color-accent-ink`, `--color-danger`, ...). Keep the two files in sync when changing a value.
+
+There is deliberately no route-driven theme class any more: the app used to carry four palettes (charcoal+brass for the app screens, a light variant for marketing, lavender for `/pricing`, graphite for landing) switched by a `data.theme` on each route. That was collapsed on 2026-09-08. Style new pages from the tokens — do not hardcode hexes outside `landing.scss`/`waitlist.scss`, which paint their own decorative shades and are the one documented exception.
+
 **Convention:** use Angular Material for complex/behavioral components — dialogs, date pickers, tables, menus, snackbars, form controls. Use Tailwind for layout, spacing, sizing, and any custom UI that isn't a Material component. Don't reach for a custom `.scss` file to do what a Tailwind utility class already does.
 
 **Cascade order — why it's set up this way, and the one gotcha:**

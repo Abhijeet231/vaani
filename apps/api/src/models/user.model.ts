@@ -1,6 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { getDb } from '../config/db';
 import { users } from '../db/schema';
+import { FREE_TRIAL_TURNS } from '../config/pricing';
 
 interface FindOrCreateUserInput {
   firebaseUid: string;
@@ -24,6 +25,10 @@ export async function findOrCreateUser(input: FindOrCreateUserInput) {
       firebaseUid: input.firebaseUid,
       email: input.email,
       displayName: input.displayName,
+      // Set explicitly rather than leaning on the column default, so the trial
+      // size is one constant in the codebase instead of a number that can only
+      // be changed with a migration.
+      turnsBalance: FREE_TRIAL_TURNS,
     })
     .returning();
 

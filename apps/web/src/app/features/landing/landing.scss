@@ -614,109 +614,123 @@
 }
 
 .vh-differ-head {
-  margin-bottom: 24px;
+  margin-bottom: 34px;
 }
 
-.vh-differ-grid {
+// Switcher rail. auto-fit rather than a width breakpoint — this stylesheet has
+// none: four tabs across, two when tight, one on a phone.
+.vh-differ-rail {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  gap: 0 64px;
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0 4px;
+  margin-bottom: 26px;
 }
 
-.vh-differ-steps {
+.vh-differ-tab {
   display: flex;
   flex-direction: column;
-  // Extra scroll room after the last step so the centered sticky panel isn't
-  // forced up against the nav as it runs out of container to center within.
-  padding-bottom: 30vh;
-}
+  align-items: flex-start;
+  gap: 9px;
+  padding: 18px 22px 18px 0;
+  border: 0;
+  border-top: 2px solid #1e2320;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.35s ease;
 
-.vh-differ-step {
-  min-height: 66vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 40px 0;
-}
-
-.vh-differ-step-inner {
-  display: grid;
-  grid-template-columns: 2px 1fr;
-  gap: 0 22px;
-}
-
-.vh-differ-bar {
-  background: #1e2320;
-  transition: background 0.35s ease;
-}
-
-.vh-differ-bar-on {
-  background: #a8e06b;
-}
-
-.vh-differ-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  opacity: 0.4;
-  transition: opacity 0.35s ease;
-
-  h3 {
-    margin: 0;
-    font-size: clamp(19px, 2vw, 23px);
-    font-weight: 500;
-    line-height: 1.35;
-    color: #e9ede7;
-  }
-
-  p {
-    margin: 0;
-    font-size: 15.5px;
-    line-height: 1.65;
-    color: #96a096;
-    max-width: 46ch;
-    text-wrap: pretty;
+  &:focus-visible {
+    outline: 2px solid #a8e06b;
+    outline-offset: 3px;
   }
 }
 
-.vh-differ-copy-on {
-  opacity: 1;
-}
-
-.vh-differ-num {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.09em;
+.vh-differ-tab-num,
+.vh-differ-tab-label {
   color: #6f796f;
   transition: color 0.35s ease;
 }
 
-.vh-differ-num-on {
-  color: #a8e06b;
+.vh-differ-tab-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.09em;
 }
 
-.vh-differ-sticky {
-  // Centered in the viewport (not pinned near the top) so it clears the
-  // floating nav pill at every scroll position instead of sliding under it.
-  position: sticky;
-  top: 50%;
-  transform: translateY(-50%);
+.vh-differ-tab-label {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.vh-differ-panel {
+.vh-differ-tab:hover:not(.vh-differ-tab-on) {
+  border-top-color: #2a302c;
+
+  .vh-differ-tab-label {
+    color: #96a096;
+  }
+}
+
+.vh-differ-tab-on {
+  border-top-color: #a8e06b;
+  cursor: default;
+
+  .vh-differ-tab-num {
+    color: #a8e06b;
+  }
+
+  .vh-differ-tab-label {
+    color: #e9ede7;
+  }
+}
+
+// Copy left, live demo right; same auto-fit — they stack copy-first when narrow.
+.vh-differ-stage {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   border: 1px solid #2a302c;
   border-radius: 20px;
   background: #121614;
   overflow: hidden;
+}
+
+.vh-differ-lede {
   display: flex;
   flex-direction: column;
-  min-height: 360px;
-  max-height: calc(100vh - 56px);
+  justify-content: center;
+  gap: 16px;
+  padding: 46px 40px;
+  // One fade for the whole lede; the template recreates it per tab.
+  animation: vaaniBubbleIn 0.4s ease both;
+}
 
-  .vh-panel-head {
-    padding: 17px 22px 15px;
-  }
+.vh-differ-lede-title {
+  margin: 0;
+  font-family: Piazzolla, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(25px, 2.6vw, 33px);
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  color: #e9ede7;
+}
+
+.vh-differ-lede-body {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: #96a096;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+// Demo half. A darker ground, not a divider rule, so it reads as its own
+// surface whether it sits beside the copy or under it.
+.vh-differ-panel {
+  display: flex;
+  flex-direction: column;
+  background: #0f1211;
+  min-height: 360px;
 }
 
 .vh-pulse-dot {

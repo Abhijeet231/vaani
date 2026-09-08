@@ -190,32 +190,47 @@
       <h2 class="vh-h2">Not just another translate app.</h2>
     </div>
 
-    <div class="vh-differ-grid">
-      <div class="vh-differ-steps">
-        @for (step of differSteps; track step.num; let i = $index) {
-          <div class="vh-differ-step" [attr.data-step]="i">
-            <div class="vh-differ-step-inner">
-              <span class="vh-differ-bar" [class.vh-differ-bar-on]="stepIndex() === i"></span>
-              <div class="vh-differ-copy" [class.vh-differ-copy-on]="stepIndex() === i">
-                <span class="vh-differ-num" [class.vh-differ-num-on]="stepIndex() === i">{{
-                  step.num
-                }}</span>
-                <h3>{{ step.title }}</h3>
-                <p>{{ step.body }}</p>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
+    <div class="vh-differ-rail" role="tablist" aria-label="How vaani differs">
+      @for (step of differSteps; track step.num; let i = $index) {
+        <button
+          type="button"
+          role="tab"
+          class="vh-differ-tab"
+          [class.vh-differ-tab-on]="stepIndex() === i"
+          [id]="'vh-differ-tab-' + i"
+          [attr.aria-selected]="stepIndex() === i"
+          aria-controls="vh-differ-stage"
+          (click)="selectStep(i)"
+        >
+          <span class="vh-differ-tab-num">{{ step.num }}</span>
+          <span class="vh-differ-tab-label">{{ stepLabels[i] }}</span>
+        </button>
+      }
+    </div>
 
-      <div class="vh-differ-sticky">
-        <div class="vh-differ-panel">
-          <div class="vh-panel-head">
-            <span class="vh-mono vh-panel-label">
-              <span class="vh-pulse-dot"></span>{{ panelLabel() }}
-            </span>
-            <span class="vh-mono vh-mono-dim">{{ panelIndex() }}</span>
-          </div>
+    <div
+      class="vh-differ-stage"
+      id="vh-differ-stage"
+      role="tabpanel"
+      [attr.aria-labelledby]="'vh-differ-tab-' + stepIndex()"
+    >
+      <!-- Looped over a single-item array so switching tabs actually recreates
+           this block — a plain interpolation would swap the text without ever
+           re-running the fade the demo panel opposite it gets. -->
+      @for (step of [activeStep()]; track step.num) {
+        <div class="vh-differ-lede">
+          <h3 class="vh-differ-lede-title">{{ step.title }}</h3>
+          <p class="vh-differ-lede-body">{{ step.body }}</p>
+        </div>
+      }
+
+      <div class="vh-differ-panel">
+        <div class="vh-panel-head">
+          <span class="vh-mono vh-panel-label">
+            <span class="vh-pulse-dot"></span>
+          </span>
+          <span class="vh-mono vh-mono-dim">{{ panelIndex() }}</span>
+        </div>
 
           @switch (stepIndex()) {
             @case (0) {
@@ -315,7 +330,6 @@
               </div>
             }
           }
-        </div>
       </div>
     </div>
   </div>

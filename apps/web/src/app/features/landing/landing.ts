@@ -286,6 +286,7 @@ export class Landing implements AfterViewInit, OnDestroy {
   protected readonly heroBars = HERO_BARS;
   protected readonly waveBars = WAVE_BARS;
   protected readonly differSteps = DIFFER_STEPS;
+  protected readonly stepLabels = STEP_LABELS;
   protected readonly faq = FAQ;
 
   protected readonly navScrolled = signal(false);
@@ -297,7 +298,11 @@ export class Landing implements AfterViewInit, OnDestroy {
   protected readonly scramble = signal(0);
   protected readonly faqOpen = signal<number | null>(null);
   protected readonly stepIndex = signal(0);
+  // The difference tabs cycle on their own until the reader picks one — without
+  // it most visitors would only ever see claim 01. Same pattern as langAuto.
+  protected readonly stepAuto = signal(true);
 
+  protected readonly activeStep = computed(() => DIFFER_STEPS[this.stepIndex()]);
   protected readonly activeLine = computed(() => LINES[this.lineStep() % LINES.length]);
   protected readonly activeLang = computed(() => LANGS[this.langIndex()]);
 
@@ -381,7 +386,6 @@ export class Landing implements AfterViewInit, OnDestroy {
     this.mobileMenuOpen.set(false);
   }
 
-  protected readonly panelLabel = computed(() => STEP_LABELS[this.stepIndex()]);
   protected readonly panelIndex = computed(() => `0${this.stepIndex() + 1} / 04`);
 
   protected readonly faqRows = computed(() => {
@@ -405,7 +409,6 @@ export class Landing implements AfterViewInit, OnDestroy {
   private badgeEl: HTMLElement | null = null;
   private canvasEl: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
-  private stepEls: HTMLElement[] = [];
 
   private particles: Particle[] = [];
   private raf: number | null = null;
@@ -416,14 +419,13 @@ export class Landing implements AfterViewInit, OnDestroy {
   private navRO: ResizeObserver | null = null;
   private onMove: ((e: PointerEvent) => void) | null = null;
   private onScroll: (() => void) | null = null;
-  private onStepScroll: (() => void) | null = null;
   private resize: (() => void) | null = null;
 
   private lineTimer: ReturnType<typeof setInterval> | null = null;
   private langTimer: ReturnType<typeof setInterval> | null = null;
   private scrTimer: ReturnType<typeof setInterval> | null = null;
   private navPoll: ReturnType<typeof setInterval> | null = null;
-  private stepPoll: ReturnType<typeof setInterval> | null = null;
+  private stepTimer: ReturnType<typeof setInterval> | null = null;
 
   private reducedMotion = false;
 
@@ -437,7 +439,6 @@ export class Landing implements AfterViewInit, OnDestroy {
     this.cardEl = root.querySelector<HTMLElement>('[data-role="card"]');
     this.badgeEl = root.querySelector<HTMLElement>('.vh-powered-badge');
     this.canvasEl = root.querySelector<HTMLCanvasElement>('[data-role="sparks"]');
-    this.stepEls = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
 
     this.lineTimer = setInterval(() => {
       this.lineStep.update((s) => (s + 1) % LINES.length);
@@ -450,8 +451,13 @@ export class Landing implements AfterViewInit, OnDestroy {
       }
     }, 2800);
 
+    this.stepTimer = setInterval(() => {
+      if (this.stepAuto()) {
+        this.stepIndex.update((i) => (i + 1) % DIFFER_STEPS.length);
+      }
+    }, 5200);
+
     this.initNav();
-    this.initSteps();
     this.initSparks();
   }
 
@@ -460,16 +466,11 @@ export class Landing implements AfterViewInit, OnDestroy {
     if (this.langTimer) clearInterval(this.langTimer);
     if (this.scrTimer) clearInterval(this.scrTimer);
     if (this.navPoll) clearInterval(this.navPoll);
-    if (this.stepPoll) clearInterval(this.stepPoll);
+    if (this.stepTimer) clearInterval(this.stepTimer);
 
     if (this.onScroll) {
       window.removeEventListener('scroll', this.onScroll, true);
       document.removeEventListener('scroll', this.onScroll, true);
-    }
-    if (this.onStepScroll) {
-      window.removeEventListener('scroll', this.onStepScroll, true);
-      document.removeEventListener('scroll', this.onStepScroll, true);
-      window.removeEventListener('resize', this.onStepScroll);
     }
     this.navRO?.disconnect();
     this.teardownSparks();
@@ -483,6 +484,17 @@ export class Landing implements AfterViewInit, OnDestroy {
     }
     this.langIndex.set(n);
     this.startScramble();
+  }
+
+  // Picking a difference tab stops the cycle for good — once the reader is
+  // driving, having the panel move under them is worse than useless.
+  protected selectStep(i: number): void {
+    this.stepAuto.set(false);
+    if (this.stepTimer) {
+      clearInterval(this.stepTimer);
+      this.stepTimer = null;
+    }
+    this.stepIndex.set(i);
   }
 
   protected toggleFaq(i: number): void {
@@ -535,39 +547,6 @@ export class Landing implements AfterViewInit, OnDestroy {
     this.navRO = new ResizeObserver(checkNav);
     this.navRO.observe(nav);
     checkNav();
-  }
-
-  private initSteps(): void {
-    const els = this.stepEls;
-    if (!els.length) return;
-
-    const checkSteps = () => {
-      const mid = (window.innerHeight || document.documentElement.clientHeight || 0) / 2;
-      let best = 0;
-      let bestDist = Infinity;
-      els.forEach((el, i) => {
-        if (bestDist === -1) return;
-        const r = el.getBoundingClientRect();
-        if (r.top <= mid && r.bottom >= mid) {
-          best = i;
-          bestDist = -1;
-          return;
-        }
-        const d = Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid));
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      if (best !== this.stepIndex()) this.stepIndex.set(best);
-    };
-
-    this.onStepScroll = checkSteps;
-    window.addEventListener('scroll', this.onStepScroll, { passive: true, capture: true });
-    document.addEventListener('scroll', this.onStepScroll, { passive: true, capture: true });
-    window.addEventListener('resize', this.onStepScroll, { passive: true });
-    this.stepPoll = setInterval(checkSteps, 150);
-    checkSteps();
   }
 
   // ---- cursor spark field: draws a stray script glyph flying up from the pointer ----

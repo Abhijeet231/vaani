@@ -5,10 +5,8 @@ import {
   Auth,
   GoogleAuthProvider,
   User,
-  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
@@ -50,16 +48,9 @@ export class AuthService {
     });
   }
 
+  // The only sign-in method — see login.ts for why email/password was removed.
   async signInWithGoogle(): Promise<void> {
     await signInWithPopup(auth, new GoogleAuthProvider());
-  }
-
-  async signUpWithEmail(email: string, password: string): Promise<void> {
-    await createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  async signInWithEmail(email: string, password: string): Promise<void> {
-    await signInWithEmailAndPassword(auth, email, password);
   }
 
   async signOut(): Promise<void> {

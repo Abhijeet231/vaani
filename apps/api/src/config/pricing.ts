@@ -8,7 +8,13 @@ export interface RechargePack {
 // Recharge packs, not subscriptions — turns are credited once and never
 // expire or reset on a cycle. New signups start with the free trial amount
 // below; buying a pack just adds more to the same balance.
-export const FREE_TRIAL_TURNS = 10;
+//
+// Lowered 10 -> 3 (2026-09-08). Every new account is a free grant of Sarvam
+// calls billed to us, so the trial has to be small enough that farming
+// accounts isn't worth anyone's time, while still being enough to prove the
+// product. `findOrCreateUser` applies this explicitly, so the `turns_balance`
+// column default is no longer what new users actually get.
+export const FREE_TRIAL_TURNS = 3;
 
 export const RECHARGE_PACKS: RechargePack[] = [
   { id: 'starter', label: 'Starter', priceInPaise: 9900, turns: 150 },
