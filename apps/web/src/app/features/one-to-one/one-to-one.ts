@@ -1,11 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LANGUAGES, TTS_SUPPORTED_LANGUAGE_CODES } from './languages';
 import { AuthService } from '../../core/auth.service';
@@ -38,17 +36,22 @@ const SILENCE_RMS_THRESHOLD = 0.02;
 const SILENCE_DURATION_MS = 1500;
 const MIN_RECORDING_BEFORE_AUTO_STOP_MS = 1000;
 
+// The same RMS loop drives both the auto-stop timer and the record button's
+// live level rings, so it polls fast enough to animate (60ms) rather than at
+// the 150ms that was plenty for silence detection alone. All the auto-stop
+// maths is timestamp-based, so the rate change doesn't affect when it fires.
+const LEVEL_POLL_INTERVAL_MS = 60;
+// RMS sits near 0.02 at silence and rarely clears 0.25 for normal speech at
+// arm's length, so that's what maps to a "full" ring rather than a
+// theoretical 1.0 nobody ever reaches.
+const LEVEL_FULL_SCALE_RMS = 0.25;
+// Exponential smoothing on the displayed level — raw per-frame RMS is jittery
+// enough to make the rings flicker.
+const LEVEL_SMOOTHING = 0.6;
+
 @Component({
   selector: 'app-one-to-one',
-  imports: [
-    RouterLink,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule],
   templateUrl: './one-to-one.html',
   styleUrl: './one-to-one.scss',
 })
@@ -64,9 +67,15 @@ export class OneToOne {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly turns = signal<Turn[]>([]);
   protected readonly autoStopped = signal(false);
+  // 0..1 live mic loudness while recording — drives the record button's rings.
+  protected readonly micLevel = signal(0);
 
   protected readonly noTurnsLeft = computed(() => (this.auth.dbUser()?.turnsBalance ?? 1) <= 0);
   protected readonly turnsBalance = computed(() => this.auth.dbUser()?.turnsBalance ?? null);
+  protected readonly lowBalance = computed(() => {
+    const balance = this.turnsBalance();
+    return balance !== null && balance > 0 && balance <= 3;
+  });
 
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
@@ -144,6 +153,7 @@ export class OneToOne {
     this.recordingStartedAt = Date.now();
     this.silenceStartedAt = null;
     this.everSpoke = false;
+    this.micLevel.set(0);
 
     this.audioContext = new AudioContext();
     const source = this.audioContext.createMediaStreamSource(stream);
@@ -163,6 +173,11 @@ export class OneToOne {
       }
       const rms = Math.sqrt(sumSquares / data.length);
 
+      const target = Math.min(1, rms / LEVEL_FULL_SCALE_RMS);
+      this.micLevel.update(
+        (previous) => previous * LEVEL_SMOOTHING + target * (1 - LEVEL_SMOOTHING)
+      );
+
       const now = Date.now();
       if (rms < SILENCE_RMS_THRESHOLD) {
         this.silenceStartedAt ??= now;
@@ -180,7 +195,7 @@ export class OneToOne {
         this.silenceStartedAt = null;
         this.everSpoke = true;
       }
-    }, 150);
+    }, LEVEL_POLL_INTERVAL_MS);
   }
 
   private stopSilenceDetection(): void {
@@ -192,6 +207,7 @@ export class OneToOne {
     this.audioContext = null;
     this.analyser = null;
     this.silenceStartedAt = null;
+    this.micLevel.set(0);
   }
 
   private sendAudio(blob: Blob): void {
@@ -241,6 +257,10 @@ export class OneToOne {
 
   protected languageLabel(code: string): string {
     return this.languages.find((lang) => lang.code === code)?.label ?? code;
+  }
+
+  protected languageNative(code: string): string {
+    return this.languages.find((lang) => lang.code === code)?.native ?? '';
   }
 
   protected ttsSupported(code: string): boolean {

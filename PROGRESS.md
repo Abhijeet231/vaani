@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-09-08 — Graphite & Jade is now the only theme; `/app` redesigned; `/not-found` added
+
+- **One palette, app-wide.** "Graphite & Jade" (`#0C0E0D` ground, `#A8E06B` jade) replaces the four schemes that used to co-exist — "Slate Minimal" charcoal+brass (`/app`, `/history`, `/account`), its light variant (marketing + legal pages), and "Lavender Haze" (`/pricing`). Since every page is now the same dark theme, the **route-driven theme system is gone entirely**: `data: { theme }` removed from all 13 routes, and `themeClass`/`currentThemeClass` deleted from `app.ts`. The `--mat-sys-*` overrides are set once on `html` instead, so Material overlays inherit them too. `styles.scss` went 243 lines lighter (−243/+50).
+- `tailwind.css`'s `@theme` block recolored to match, and gained `--color-danger` / `--color-warn` / `--color-success` tokens.
+- **Razorpay checkout modal recolored** `#92A9E1` → `#A8E06B` — closes the stale-lavender pending item logged 2026-08-31.
+- **`/app` redesign** (`one-to-one.html` +257, `one-to-one.scss` +509). Dropped `MatCard`/`MatFormField`/`MatSelect` in favour of `MatMenu` for the direction picker. New **live mic-level rings** on the record button: the existing RMS loop now also feeds a `micLevel` signal, polling at 60ms instead of 150ms so it animates (all auto-stop maths is timestamp-based, so the faster rate doesn't change when it fires), scaled against `LEVEL_FULL_SCALE_RMS = 0.25` — real speech at arm's length never approaches a theoretical 1.0 — and exponentially smoothed to stop the rings flickering. Added a `lowBalance` computed (fires at 1–3 turns left), matching `/account`.
+- **Languages now carry their own script.** `Language` gained a `native` field, populated for all 14 (हिन्दी, ಕನ್ನಡ, தமிழ், …), with a `languageNative()` helper. The person being translated *for* often can't read the English name and is frequently the one handed the phone to check the direction.
+- **New `/not-found`** catch-all (`features/not-found/`), lazy-loaded, with `waitlistGuard` still first so a bad URL in waitlist-only mode lands on `/waitlist` rather than 404-ing a site that isn't public yet.
+- Verified: `pnpm --filter web build` passes. Initial bundle **642 kB → 583 kB** (the deleted theme CSS), so the 500 kB budget warning is now 83 kB over instead of 142 kB.
+- **Related, outside this repo:** the legal-document product discussed this session was split out as **saral** — its own Next.js app at `D:\side projects\saral` (GitHub `Abhijeet231/saral`), reusing vaani's Sarvam/Razorpay/Neon layers via a separate `saral` Postgres schema on the same Neon instance. vaani itself moved to `D:\side projects\vaani`.
+
+**Pending / not yet built:**
+- `/app` and `/pricing` redesigns were verified by a production build only — **not** eyeballed in a browser this pass, and not checked at mobile width.
+- Still open from before: fill the real `BUSINESS_INFO` values in `core/site-info.ts`; swap `TODO_DOMAIN` in `index.html`'s OG tags; add the Razorpay webhook so crediting doesn't depend on the browser; flip `waitlistOnly` at launch.
+- Multi-speaker mode remains parked (2026-09-03 decision).
+
 ## 2026-09-03 — Legal pages: business identity + Shipping policy + shared shell; `/history` & `/account` design pass; routes lazy-loaded
 
 - **Business identity across the legal + contact pages.** New `apps/web/src/app/core/site-info.ts` is now the single home for `CONTACT_EMAIL` plus a new `BUSINESS_INFO` (legal name, entity type, address, phone, GSTIN) — vaani is run by an individual as a **sole proprietor**, so the block is worded that way. The name/address/phone values are deliberate `PLACEHOLDER_*` strings; `isPlaceholder()` makes each one render as a visible amber "to be added before launch" pill so nothing fake or blank ships unnoticed. `contact.ts` re-exports `CONTACT_EMAIL` for the old import paths; the legal `.ts` files now import from `core/site-info`.

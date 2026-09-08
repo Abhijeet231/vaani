@@ -9,19 +9,23 @@
 @import "tailwindcss";
 
 /*
- * vaani brand tokens ("Slate Minimal") — kept numerically in sync with the
+ * vaani brand tokens ("Graphite & Jade") — kept numerically in sync with the
  * --mat-sys-* overrides in styles.scss so Tailwind utilities (bg-ground,
- * text-ink-muted, font-display, ...) and Material components share one palette.
+ * text-ink-muted, text-accent-ink, font-display, ...) and Material components
+ * share one palette. There is only one theme; see styles.scss for why.
  */
 @theme {
-  --color-ground: #17181c;
-  --color-surface: #1f2025;
-  --color-surface-high: #232429;
-  --color-ink: #ededef;
-  --color-ink-muted: #9b9ca3;
-  --color-brass: #c9a15c;
-  --color-accent-ink: #c9a15c;
-  --color-border: #2a2b30;
+  --color-ground: #0c0e0d;
+  --color-surface: #121614;
+  --color-surface-high: #1e2320;
+  --color-ink: #e9ede7;
+  --color-ink-muted: #96a096;
+  --color-jade: #a8e06b;
+  --color-accent-ink: #a8e06b;
+  --color-border: #2a302c;
+  --color-danger: #e86a6a;
+  --color-warn: #e0a35f;
+  --color-success: #7fce9a;
   --font-display: "Piazzolla", ui-serif, serif;
   --font-body: "Hanken Grotesk", ui-sans-serif, sans-serif;
 }

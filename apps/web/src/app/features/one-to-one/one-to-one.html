@@ -1,116 +1,195 @@
-<div class="flex flex-col items-center gap-6 p-6 max-w-xl mx-auto w-full">
-  <mat-card class="w-full p-4 rounded-xl!">
-    @if (turnsBalance(); as balance) {
-      <div class="flex justify-end mb-3">
-        <span class="turns-chip" [class.turns-chip--low]="balance <= 3">
-          {{ balance }} {{ balance === 1 ? 'turn' : 'turns' }} left
-        </span>
-      </div>
-    }
+<div class="translate">
+  <header class="translate__header">
+    <div class="min-w-0">
+      <h1 class="translate__title">Translate</h1>
+      <p class="translate__subtitle">Speak, and vaani says it back in their language.</p>
+    </div>
 
-    <div class="flex items-center gap-2">
-      <mat-form-field class="flex-1" subscriptSizing="dynamic">
-        <mat-label>From</mat-label>
-        <mat-select
-          [value]="sourceLanguage()"
-          (selectionChange)="sourceLanguage.set($event.value)"
-        >
-          @for (lang of languages; track lang.code) {
-            <mat-option [value]="lang.code">{{ lang.label }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+    @if (turnsBalance(); as balance) {
+      <a routerLink="/account" class="turns-chip" [class.turns-chip--low]="lowBalance()">
+        <span class="turns-chip__dot"></span>
+        {{ balance }} {{ balance === 1 ? 'turn' : 'turns' }} left
+      </a>
+    }
+  </header>
+
+  <section class="console">
+    <!-- Direction bar. Two menu triggers joined by the swap button, rather than
+         two separate form fields — the whole point of 1-1 mode is that this is
+         one direction you flip, not two independent settings. -->
+    <div class="direction">
+      <button
+        type="button"
+        class="direction__side"
+        [matMenuTriggerFor]="sourceMenu"
+        [disabled]="isRecording() || isProcessing()"
+      >
+        <span class="direction__role">You speak</span>
+        <span class="direction__lang">{{ languageLabel(sourceLanguage()) }}</span>
+        <span class="direction__native">{{ languageNative(sourceLanguage()) }}</span>
+      </button>
 
       <button
-        mat-icon-button
         type="button"
+        class="direction__swap"
         aria-label="Swap direction"
+        [disabled]="isRecording() || isProcessing()"
         (click)="flipDirection()"
       >
         <mat-icon>swap_horiz</mat-icon>
       </button>
 
-      <mat-form-field class="flex-1" subscriptSizing="dynamic">
-        <mat-label>To</mat-label>
-        <mat-select
-          [value]="targetLanguage()"
-          (selectionChange)="targetLanguage.set($event.value)"
-        >
-          @for (lang of languages; track lang.code) {
-            <mat-option [value]="lang.code">{{ lang.label }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <div class="flex flex-col items-center gap-3 mt-6">
       <button
-        mat-fab
         type="button"
-        [color]="isRecording() ? 'warn' : 'primary'"
-        [disabled]="isProcessing() || noTurnsLeft()"
-        (click)="toggleRecording()"
+        class="direction__side direction__side--target"
+        [matMenuTriggerFor]="targetMenu"
+        [disabled]="isRecording() || isProcessing()"
       >
-        <mat-icon>{{ isRecording() ? 'stop' : 'mic' }}</mat-icon>
+        <span class="direction__role">They read</span>
+        <span class="direction__lang">{{ languageLabel(targetLanguage()) }}</span>
+        <span class="direction__native">{{ languageNative(targetLanguage()) }}</span>
       </button>
+    </div>
 
-      @if (noTurnsLeft()) {
-        <span class="text-sm opacity-70 text-center"
-          >You're out of translations. <a routerLink="/pricing" class="underline">Buy a recharge
-          pack</a> to keep going.</span
+    <mat-menu #sourceMenu="matMenu">
+      @for (lang of languages; track lang.code) {
+        <button
+          mat-menu-item
+          type="button"
+          [class.is-selected]="lang.code === sourceLanguage()"
+          (click)="sourceLanguage.set(lang.code)"
         >
-      } @else if (isProcessing()) {
-        <div class="flex items-center gap-2 text-sm opacity-70">
-          <mat-spinner diameter="18" />
-          @if (autoStopped()) {
-            Silence detected, stopped — translating...
-          } @else {
-            Translating...
-          }
-        </div>
-      } @else if (isRecording()) {
-        <span class="text-sm opacity-70">Recording... tap to stop, or pause and it'll stop on its own</span>
-      } @else {
-        <span class="text-sm opacity-70">Tap to record</span>
+          {{ lang.label }} <span class="menu-native">{{ lang.native }}</span>
+        </button>
       }
+    </mat-menu>
 
-      @if (errorMessage()) {
-        <span class="text-sm text-red-600">{{ errorMessage() }}</span>
+    <mat-menu #targetMenu="matMenu">
+      @for (lang of languages; track lang.code) {
+        <button
+          mat-menu-item
+          type="button"
+          [class.is-selected]="lang.code === targetLanguage()"
+          (click)="targetLanguage.set(lang.code)"
+        >
+          {{ lang.label }} <span class="menu-native">{{ lang.native }}</span>
+        </button>
+      }
+    </mat-menu>
+
+    <!-- Record control. The two rings scale off the live mic level so there's
+         real feedback that vaani is hearing something, instead of a button that
+         only swaps its icon. -->
+    <div class="recorder">
+      <div
+        class="recorder__rings"
+        [class.is-live]="isRecording()"
+        [style.--level]="micLevel()"
+        aria-hidden="true"
+      >
+        <span class="recorder__ring recorder__ring--outer"></span>
+        <span class="recorder__ring recorder__ring--inner"></span>
+
+        <button
+          type="button"
+          class="recorder__button"
+          [class.is-recording]="isRecording()"
+          [attr.aria-label]="isRecording() ? 'Stop recording' : 'Start recording'"
+          [disabled]="isProcessing() || noTurnsLeft()"
+          (click)="toggleRecording()"
+        >
+          @if (isProcessing()) {
+            <mat-spinner diameter="26" />
+          } @else if (isRecording()) {
+            <span class="recorder__stop"></span>
+          } @else {
+            <mat-icon>mic</mat-icon>
+          }
+        </button>
+      </div>
+
+      <p class="recorder__status" aria-live="polite">
+        @if (noTurnsLeft()) {
+          You're out of translations.
+        } @else if (isProcessing()) {
+          @if (autoStopped()) {
+            Silence detected — translating…
+          } @else {
+            Translating…
+          }
+        } @else if (isRecording()) {
+          Listening… tap to stop, or just pause
+        } @else {
+          Tap to record
+        }
+      </p>
+    </div>
+
+    @if (noTurnsLeft()) {
+      <div class="notice notice--block">
+        <span>Your balance is empty. Recharge packs never expire and start at ₹99.</span>
+        <a routerLink="/pricing" class="notice__action">Buy a pack</a>
+      </div>
+    } @else if (lowBalance()) {
+      <div class="notice">
+        <span>Running low — {{ turnsBalance() }} left.</span>
+        <a routerLink="/pricing" class="notice__action">Top up</a>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <p class="console__error">{{ errorMessage() }}</p>
+    }
+  </section>
+
+  @if (turns().length === 0) {
+    <div class="empty">
+      <mat-icon class="empty__icon">graphic_eq</mat-icon>
+      <p class="empty__text">
+        Your translated turns appear here. Hand the phone over and flip the direction to
+        let them reply.
+      </p>
+    </div>
+  } @else {
+    <div class="turns">
+      @for (turn of turns(); track turn.id) {
+        <article class="turn">
+          <div class="turn__head">
+            <span class="turn__pair">
+              {{ languageLabel(turn.sourceLanguage) }}
+              <mat-icon class="turn__arrow">arrow_forward</mat-icon>
+              {{ languageLabel(turn.targetLanguage) }}
+            </span>
+
+            @if (ttsSupported(turn.targetLanguage)) {
+              <button
+                type="button"
+                class="turn__speak"
+                aria-label="Play translation"
+                [disabled]="turn.isSynthesizing"
+                (click)="playTranslation(turn)"
+              >
+                @if (turn.isSynthesizing) {
+                  <mat-spinner diameter="18" />
+                } @else {
+                  <mat-icon>volume_up</mat-icon>
+                }
+              </button>
+            }
+          </div>
+
+          @if (turn.selectedSourceLanguage) {
+            <p class="turn__corrected">
+              Heard {{ languageLabel(turn.sourceLanguage) }}, not
+              {{ languageLabel(turn.selectedSourceLanguage) }} — translated from what was
+              actually said.
+            </p>
+          }
+
+          <p class="turn__transcript">{{ turn.transcript }}</p>
+          <p class="turn__translation">{{ turn.translatedText }}</p>
+        </article>
       }
     </div>
-  </mat-card>
-
-  <div class="flex flex-col gap-3 w-full">
-    @for (turn of turns(); track turn.id) {
-      <mat-card class="w-full p-4 rounded-xl!">
-        <div class="text-xs opacity-60 mb-2">
-          {{ languageLabel(turn.sourceLanguage) }} &rarr; {{ languageLabel(turn.targetLanguage) }}
-          @if (turn.selectedSourceLanguage) {
-            <span class="text-accent-ink">
-              &middot; detected instead of {{ languageLabel(turn.selectedSourceLanguage) }}
-            </span>
-          }
-        </div>
-        <div class="text-sm opacity-70 mb-1">{{ turn.transcript }}</div>
-        <div class="flex items-center gap-2">
-          <div class="text-lg font-medium flex-1">{{ turn.translatedText }}</div>
-          @if (ttsSupported(turn.targetLanguage)) {
-            <button
-              mat-icon-button
-              type="button"
-              aria-label="Play translation"
-              [disabled]="turn.isSynthesizing"
-              (click)="playTranslation(turn)"
-            >
-              @if (turn.isSynthesizing) {
-                <mat-spinner diameter="20" />
-              } @else {
-                <mat-icon>volume_up</mat-icon>
-              }
-            </button>
-          }
-        </div>
-      </mat-card>
-    }
-  </div>
+  }
 </div>

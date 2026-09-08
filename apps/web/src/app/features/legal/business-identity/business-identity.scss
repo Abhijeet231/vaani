@@ -38,8 +38,8 @@ dd a {
   display: inline-block;
   padding: 0.1rem 0.45rem;
   border-radius: 4px;
-  background: color-mix(in srgb, #e09e5f 18%, transparent);
-  color: #a2652c;
+  background: color-mix(in srgb, var(--color-warn) 18%, transparent);
+  color: var(--color-warn);
   font-size: 0.82em;
   font-weight: 600;
 }

@@ -1,24 +1,29 @@
 export interface Language {
   code: string;
   label: string;
+  // The language's own name in its own script. Shown alongside the English
+  // label in the /app direction picker — the person being translated *for*
+  // often can't read the English name, and they're frequently the one being
+  // handed the phone to check the direction is right.
+  native: string;
 }
 
 // Matches Sarvam's supported BCP-47 codes for Saaras STT / Mayura translate.
 export const LANGUAGES: Language[] = [
-  { code: 'hi-IN', label: 'Hindi' },
-  { code: 'en-IN', label: 'English' },
-  { code: 'bn-IN', label: 'Bengali' },
-  { code: 'kn-IN', label: 'Kannada' },
-  { code: 'ml-IN', label: 'Malayalam' },
-  { code: 'mr-IN', label: 'Marathi' },
-  { code: 'od-IN', label: 'Odia' },
-  { code: 'pa-IN', label: 'Punjabi' },
-  { code: 'ta-IN', label: 'Tamil' },
-  { code: 'te-IN', label: 'Telugu' },
-  { code: 'gu-IN', label: 'Gujarati' },
-  { code: 'as-IN', label: 'Assamese' },
-  { code: 'ur-IN', label: 'Urdu' },
-  { code: 'ne-IN', label: 'Nepali' },
+  { code: 'hi-IN', label: 'Hindi', native: 'हिन्दी' },
+  { code: 'en-IN', label: 'English', native: 'English' },
+  { code: 'bn-IN', label: 'Bengali', native: 'বাংলা' },
+  { code: 'kn-IN', label: 'Kannada', native: 'ಕನ್ನಡ' },
+  { code: 'ml-IN', label: 'Malayalam', native: 'മലയാളം' },
+  { code: 'mr-IN', label: 'Marathi', native: 'मराठी' },
+  { code: 'od-IN', label: 'Odia', native: 'ଓଡ଼ିଆ' },
+  { code: 'pa-IN', label: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
+  { code: 'ta-IN', label: 'Tamil', native: 'தமிழ்' },
+  { code: 'te-IN', label: 'Telugu', native: 'తెలుగు' },
+  { code: 'gu-IN', label: 'Gujarati', native: 'ગુજરાતી' },
+  { code: 'as-IN', label: 'Assamese', native: 'অসমীয়া' },
+  { code: 'ur-IN', label: 'Urdu', native: 'اردو' },
+  { code: 'ne-IN', label: 'Nepali', native: 'नेपाली' },
 ];
 
 // Sarvam's Bulbul TTS supports a smaller language set than STT/translate —

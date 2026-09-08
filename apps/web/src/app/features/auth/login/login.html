@@ -47,7 +47,7 @@
       </mat-form-field>
 
       @if (error()) {
-        <p class="text-sm text-red-600">{{ error() }}</p>
+        <p class="text-sm text-danger">{{ error() }}</p>
       }
 
       <button mat-flat-button color="primary" type="submit" class="w-full!" [disabled]="loading()">

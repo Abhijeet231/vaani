@@ -78,7 +78,7 @@ export class PaymentService {
         name: 'vaani',
         description: `${order.packLabel} recharge pack`,
         order_id: order.orderId,
-        theme: { color: '#92A9E1' },
+        theme: { color: '#A8E06B' },
         modal: { ondismiss: () => reject(new Error('Payment cancelled.')) },
         handler: (response) => {
           firstValueFrom(this.http.post<{ turnsBalance: number }>('/api/payments/verify', response))

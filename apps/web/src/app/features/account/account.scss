@@ -46,17 +46,17 @@
   text-transform: capitalize;
 
   &--paid {
-    background: rgba(94, 189, 132, 0.16);
-    color: #5ebd84;
+    background: color-mix(in srgb, var(--color-success) 16%, transparent);
+    color: var(--color-success);
   }
 
   &--created {
-    background: rgba(224, 158, 95, 0.16);
-    color: #e09e5f;
+    background: color-mix(in srgb, var(--color-warn) 16%, transparent);
+    color: var(--color-warn);
   }
 
   &--failed {
-    background: rgba(224, 95, 95, 0.16);
-    color: #e05f5f;
+    background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+    color: var(--color-danger);
   }
 }
