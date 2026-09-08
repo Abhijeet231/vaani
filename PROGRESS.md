@@ -1,5 +1,20 @@
 # Progress Log
 
+## 2026-09-09 — "How it differs" rebuilt as a feature switcher
+
+- The landing section was a scroll-driven numbered list (four tall `66vh` steps) beside a sticky demo panel. Replaced with a **horizontal tab rail + a two-pane stage**: the four claims as tabs across the top, the active one's title/body in Piazzolla on the left, and the demo panel on the right. Picked by the user from four directions explored on a design canvas (bento grid, comparison ledger, editorial stack, feature switcher).
+- **The four demo panels are unchanged** — waveform, code-switch, two-devices and pipeline are the same `@switch` block as before, just re-hosted. The redesign is structural, not a rewrite of what the section shows.
+- **Interaction**: tabs cycle every 5.2s so a visitor sees more than claim 01, and `selectStep()` kills the timer permanently on the first click (same `langAuto` pattern the language explorer already uses). Real `<button role="tab">`s with `aria-selected`/`aria-controls`, plus a jade `:focus-visible` ring.
+- **Removed `initSteps()`** and its machinery — the old scroll-position tracker (two capture-phase scroll listeners, a resize listener and a 150ms `setInterval` poll) existed only to drive the vertical list, and goes away with it. `panelLabel` went too; the rail carries those labels now.
+- The lede is rendered through `@for (step of [activeStep()]; track step.num)` so switching tabs recreates the element and re-runs its fade — a plain interpolation swaps the text without ever animating.
+- **Rail uses explicit breakpoints (4 / 2x2 / stacked at 900px and 520px), not `auto-fit`** — the first version used `auto-fit` to stay consistent with this stylesheet's breakpoint-free style, but with four tabs that spends the whole ~850–1110px band on a 3+1 wrap with the last tab orphaned on its own row. These are the only width media queries in `landing.scss`.
+- Verified: `tsc --noEmit` clean, `pnpm --filter web build` clean. Driven in a real browser — tabs render, auto-advance works, clicking 04 swaps the panel and the cycle stays stopped for 7s+. Confirmed the change is **bundle-neutral** by building with and without it (461.57 kB vs 461.79 kB initial).
+
+**Pending / not yet built:**
+- `landing.scss` is now **374 bytes over its 16 kB `anyComponentStyle` warning budget** (the error threshold is 20 kB, so builds still pass). The file was already at the ceiling; the rail + stage needs a little more CSS than the list it replaced. Either bump the warning to 18 kB in `angular.json` or leave it — not worth shaving hover/focus states over.
+- The 900px and 520px rail tiers were **not** verified visually: this environment can't resize the real browser window (long-standing). Desktop was checked in-browser; the two narrow tiers are reasoned only.
+- **The FAQ on this same page is now factually wrong** and says so publicly: "Do I need to create an account?" answers "Not right now… no sign-up required", and the privacy answer claims "nothing is saved — there's no account, no history, no database behind it right now." Firebase Auth, the Neon database and `/history` have all shipped since that copy was written. This is a privacy claim on a public page — worth fixing before launch, but the wording is the user's call, so it was left alone.
+
 ## 2026-09-08 (later) — Launch hardening: Google-only sign-in, rate limiting, CORS lockdown, real OG URLs
 
 Pre-launch security/abuse pass. The pending list at the bottom of this entry is

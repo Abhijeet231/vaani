@@ -617,13 +617,27 @@
   margin-bottom: 34px;
 }
 
-// Switcher rail. auto-fit rather than a width breakpoint — this stylesheet has
-// none: four tabs across, two when tight, one on a phone.
+// Switcher rail. Explicit tiers rather than auto-fit (the rest of this file is
+// breakpoint-free): with four tabs, auto-fit spends the whole ~850-1110px band
+// on a 3+1 wrap, orphaning the last tab on its own row. 4 / 2x2 / stacked.
 .vh-differ-rail {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0 4px;
   margin-bottom: 26px;
+}
+
+@media (max-width: 900px) {
+  .vh-differ-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 4px;
+  }
+}
+
+@media (max-width: 520px) {
+  .vh-differ-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .vh-differ-tab {
