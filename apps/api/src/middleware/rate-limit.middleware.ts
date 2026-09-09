@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { Request } from 'express';
 
 // Three limiters, protecting three different things. The in-memory store is
@@ -36,6 +36,10 @@ export const translationLimiter = rateLimit({
   limit: 20,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  keyGenerator: (req: Request) => req.user?.uid ?? req.ip ?? 'unknown',
+  // The IP fallback only applies if this is ever mounted without requireAuth.
+  // It has to go through ipKeyGenerator: a raw req.ip gives every address in an
+  // IPv6 /64 its own bucket, and one client is routinely handed a whole /64, so
+  // the limit would be trivially sidestepped by rotating the low bits.
+  keyGenerator: (req: Request) => req.user?.uid ?? ipKeyGenerator(req.ip ?? 'unknown'),
   message: { error: 'Too many translations in a row. Give it a moment.' },
 });

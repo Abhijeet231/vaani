@@ -24,4 +24,7 @@ export const env = {
   firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY,
   razorpayKeyId: process.env.RAZORPAY_KEY_ID,
   razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
+  // Separate from the key secret above: this one is chosen when the webhook is
+  // registered in the Razorpay dashboard, and signs the webhook request body.
+  razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
 };

@@ -44,6 +44,24 @@ dd a {
   font-weight: 600;
 }
 
+.bio {
+  margin: 0.9rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+
+  a {
+    color: var(--color-accent-ink);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 @media (max-width: 520px) {
   dl {
     grid-template-columns: 1fr;

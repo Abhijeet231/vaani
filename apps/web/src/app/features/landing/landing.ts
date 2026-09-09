@@ -150,7 +150,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: 'Do I need to create an account?',
-    a: 'Not right now. vaani is free and open during early access, no sign-up required.',
+    a: 'Yes — you sign in with Google, which is the only sign-in there is. It takes one tap, and it is what keeps your translation balance and your history attached to you.',
   },
   {
     q: 'What languages does it support?',
@@ -158,11 +158,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: 'Is my conversation recorded or stored anywhere?',
-    a: "No. vaani processes audio to transcribe and translate it, but nothing is saved — there's no account, no history, no database behind it right now.",
-  },
-  {
-    q: 'Can it handle a group conversation, not just two people?',
-    a: 'Not yet. Right now vaani is built for one-on-one conversations. A multi-speaker mode that follows a whole room and labels who said what is planned next.',
+    a: "The audio isn't. It goes to Sarvam AI to be transcribed and translated, and isn't kept as audio afterwards. The text is: each turn's transcript and translation is saved to your account so you can find it again on the History page, and you can delete any of them there whenever you want. The Privacy Policy spells out exactly what's held and who processes it.",
   },
   {
     q: 'Do I have to read the translation, or can I hear it?',
@@ -178,7 +174,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: 'Is there a paid plan?',
-    a: "Not yet. vaani is free while it's in early access. Paid plans, if any, will come later and won't change anything for you until announced.",
+    a: "There's no subscription. Every account starts with a few free translations, and after that you top up with a recharge pack — you buy a number of turns once, they don't expire and nothing resets monthly. See Pricing for the current packs.",
   },
 ];
 

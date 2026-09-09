@@ -4,12 +4,26 @@ import { env } from '../config/env';
 import { getPack, RECHARGE_PACKS } from '../config/pricing';
 import { findOrCreateUser, creditTurns } from '../models/user.model';
 import {
+  claimPurchaseForCrediting,
   createPurchase,
   findPurchaseByOrderId,
   listPurchasesByUser,
-  markPurchasePaid,
+  markPurchaseFailed,
 } from '../models/purchase.model';
-import { verifyRazorpaySignature } from '../services/payment.service';
+import {
+  verifyRazorpaySignature,
+  verifyRazorpayWebhookSignature,
+} from '../services/payment.service';
+
+// Only the handful of fields the handler below reads. Razorpay sends a great
+// deal more, and which sub-entity is populated depends on the event.
+interface RazorpayWebhookEvent {
+  event?: string;
+  payload?: {
+    payment?: { entity?: { id?: string; order_id?: string } };
+    order?: { entity?: { id?: string } };
+  };
+}
 
 export function listPacks(_req: Request, res: Response): void {
   res.json({ packs: RECHARGE_PACKS });
@@ -120,8 +134,8 @@ export async function verifyCheckout(req: Request, res: Response, next: NextFunc
       return;
     }
 
-    // Idempotency: verify can be called more than once (retry, double-click) —
-    // only credit turns the first time a given order is confirmed.
+    // Already settled — by an earlier call of this route, or by the webhook.
+    // Nothing to do but report the balance.
     if (purchase.status === 'paid') {
       res.status(200).json({ turnsBalance: user.turnsBalance });
       return;
@@ -133,11 +147,122 @@ export async function verifyCheckout(req: Request, res: Response, next: NextFunc
       return;
     }
 
-    await markPurchasePaid(purchase.id, razorpay_payment_id);
-    const updated = await creditTurns(user.id, purchase.turns);
+    const credited = await creditPurchaseOnce(purchase.id, purchase.userId, purchase.turns, razorpay_payment_id);
+    if (!credited) {
+      // The webhook landed between the read above and the claim. It already
+      // credited, so re-read rather than reporting the now-stale balance.
+      const fresh = await findOrCreateUser({
+        firebaseUid: req.user.uid,
+        email: req.user.email,
+        displayName: req.user.name,
+      });
+      res.status(200).json({ turnsBalance: fresh.turnsBalance });
+      return;
+    }
 
-    res.status(200).json({ turnsBalance: updated?.turnsBalance ?? user.turnsBalance + purchase.turns });
+    res.status(200).json({ turnsBalance: credited.turnsBalance });
   } catch (err) {
     next(err);
   }
+}
+
+// Razorpay's server-to-server confirmation. This exists because /payments/verify
+// above is driven by the browser: a user who pays and then closes the tab, loses
+// signal or hits a JS error is charged and gets nothing. The webhook is sent by
+// Razorpay independently of that tab and retried on failure, so it is the path
+// that actually guarantees crediting; /verify stays because it is synchronous
+// and lets the UI show the new balance immediately.
+//
+// Unauthenticated by design — the caller is Razorpay, not a signed-in user, and
+// the HMAC over the raw body is what authenticates it.
+export async function handleRazorpayWebhook(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (!env.razorpayWebhookSecret) {
+    // Loud, and a 5xx so Razorpay retries after the secret is configured
+    // instead of dropping the event.
+    console.error('Razorpay webhook received but RAZORPAY_WEBHOOK_SECRET is not set');
+    res.status(503).json({ error: 'Webhook not configured' });
+    return;
+  }
+
+  const signature = req.header('x-razorpay-signature');
+  // express.raw is mounted on this path in app.ts, so the body is the exact
+  // bytes Razorpay signed. If it is anything else the raw parser did not run
+  // and no signature check would be trustworthy.
+  const rawBody = req.body;
+  if (!signature || !Buffer.isBuffer(rawBody)) {
+    res.status(400).json({ error: 'Missing signature or raw body' });
+    return;
+  }
+
+  if (!verifyRazorpayWebhookSignature(rawBody, signature)) {
+    res.status(401).json({ error: 'Invalid webhook signature' });
+    return;
+  }
+
+  let event: RazorpayWebhookEvent;
+  try {
+    event = JSON.parse(rawBody.toString('utf8'));
+  } catch {
+    res.status(400).json({ error: 'Malformed webhook body' });
+    return;
+  }
+
+  const payment = event.payload?.payment?.entity;
+  const orderId = payment?.order_id ?? event.payload?.order?.entity?.id;
+
+  try {
+    switch (event.event) {
+      case 'payment.captured':
+      case 'order.paid': {
+        if (!orderId) break;
+        const purchase = await findPurchaseByOrderId(orderId);
+        // An order we have no row for is not an error worth retrying — it can
+        // be traffic from another integration on the same Razorpay account.
+        if (!purchase) break;
+        const credited = await creditPurchaseOnce(
+          purchase.id,
+          purchase.userId,
+          purchase.turns,
+          payment?.id ?? purchase.razorpayPaymentId ?? 'webhook',
+        );
+        // Razorpay retries the same event, and sends both payment.captured and
+        // order.paid for one payment, so landing here already-credited is the
+        // normal case, not a fault.
+        if (credited) {
+          console.log(`Webhook credited ${purchase.turns} turns for order ${orderId}`);
+        }
+        break;
+      }
+      case 'payment.failed': {
+        if (!orderId) break;
+        const purchase = await findPurchaseByOrderId(orderId);
+        if (purchase) await markPurchaseFailed(purchase.id);
+        break;
+      }
+      default:
+        // Subscribing to extra events in the dashboard shouldn't 4xx here.
+        break;
+    }
+
+    // 2xx tells Razorpay the event is settled. Anything unexpected above throws
+    // to the error handler's 500 instead, which is what makes it retry.
+    res.status(200).json({ received: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// The one place a paid order turns into turns. Both /payments/verify and the
+// webhook route here; either can arrive first and both can arrive at once, so
+// the claim is what decides who credits. A null return means someone else
+// already did it.
+async function creditPurchaseOnce(
+  purchaseId: string,
+  userId: string,
+  turns: number,
+  razorpayPaymentId: string,
+) {
+  const claimed = await claimPurchaseForCrediting(purchaseId, razorpayPaymentId);
+  if (!claimed) return null;
+  return creditTurns(userId, turns);
 }

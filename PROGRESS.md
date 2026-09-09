@@ -1,5 +1,189 @@
 # Progress Log
 
+## 2026-09-09 (evening) — Free trial restored to 10; public identity de-anonymized
+
+**Free trial: 3 → 10, reverted the same day it was cut.** The 2026-09-08 hardening pass
+dropped `FREE_TRIAL_TURNS` 10 → 3 on the theory that every account is a free grant of Sarvam
+calls; on reflection 3 turns is one side of a single exchange — not enough for a new user to
+feel what the product does — and Google-only sign-in (same commit) already makes accounts
+hard to mass-create, so the trial size doesn't need to carry that job too. Reverted to **10**
+in both `apps/api/src/config/pricing.ts` (the actual grant, applied explicitly by
+`findOrCreateUser`) and its web-side mirror `apps/web/src/app/core/site-info.ts`, which feeds
+`/pricing`, the Terms and the landing FAQ.
+
+- The DB column default (`turns_balance` in `schema.ts`) was already, and remains, `10` — it's
+  dead as a grant mechanism (the explicit value always wins) but happens to agree with the
+  constant again now.
+- **Verified live against Neon**, not just read off the constant: ran `findOrCreateUser`
+  against a throwaway `firebaseUid`, confirmed `turnsBalance = 10` came back, deleted the
+  probe row. Done twice (once right after the edit, once again after the dev-server
+  low-memory kill notification, to make sure nothing had reverted).
+
+**vaani's public identity is no longer anonymous-enterprise-shaped.** User's call: the
+"Operated by" block was reading like faceless boilerplate ("proprietor's legal name — to be
+added before launch") when the honest framing is one person building this in the open.
+
+- `CONTACT_EMAIL` changed to `affairstoday69@gmail.com`, replacing `ghoshabhijeet778@gmail.com`
+  everywhere — confirmed by a repo-wide grep that the old address no longer appears anywhere in
+  `apps/web/src` or `apps/api/src`. It was only ever hardcoded in the one constant; every page
+  imports from there, so this was a one-line change with full reach.
+- `BUSINESS_INFO.legalName` filled in for real (`'Abhijeet Ghosh'`, clearing that amber
+  placeholder pill), and `entityType` changed from `'sole proprietor'` to `'Indie developer'`.
+  That's a **display-copy choice, not a legal one** — the formal entity type still gets
+  declared directly in Razorpay's own KYC form, this field is just what visitors read on
+  `/privacy`, `/terms` and `/contact`.
+- New `BUILDER` constant (name, personal site `abhijeetghosh.site`) and a short bio line added
+  to the shared `app-business-identity` component (`business-identity.html/.ts/.scss`), so it
+  renders consistently on all three pages that embed it rather than needing three separate
+  edits: *"vaani is a solo build by Abhijeet Ghosh, an indie developer — a hands-on trial of
+  what Sarvam AI's speech and translation models can do. Follow along... at
+  abhijeetghosh.site."*
+- `address` and `phone` in `BUSINESS_INFO` are **still `PLACEHOLDER_*`** — no real values given
+  yet, still render as visible "to be added before launch" pills, still needed before the
+  Razorpay activation review.
+- Verified: `pnpm --filter web build` clean, no warnings; confirmed in the built JS bundle that
+  the new email and `abhijeetghosh.site` are present and the old email is gone.
+
+**Two of the standing user-action items got done, outside this repo:**
+- **Firebase Console:** Email/Password sign-in provider is now **Disabled** (Google remains
+  **Enabled**) — screenshot-confirmed. Closes the gap the 2026-09-08 entry flagged: removing
+  the login UI hadn't disabled the provider itself, so someone could still have hit Firebase's
+  REST API directly.
+- **Google Cloud Console:** HTTP referrer restrictions set on the Firebase web API key
+  (`...ICNw`), scoped to `https://vaani-4a691.web.app/`, `https://vaani-4a691.firebaseapp.com/`
+  and `http://localhost:4200/`. Saved; Google's own UI warns changes take up to 5 minutes to
+  propagate, and it hasn't been re-tested since (sign-in on either origin) — worth confirming
+  next session.
+
+**Found, not yet acted on: the waitlist has no way to notify anyone.** 16 signups in Neon (all
+email, none phone), `notified_at` exists on the schema but nothing in the codebase ever writes
+it, and there's no email-sending code or provider (no Resend/SendGrid/nodemailer/etc.) anywhere
+in the project. On launch day those 16 people are currently unreachable through the product
+itself.
+
+**Pending / not yet built (authoritative):**
+- **Still not browser-verified.** The Chrome extension has not been connected all session — the
+  corrected FAQ/pricing/Terms copy, the new business-identity bio, and the email change are all
+  type-checked and built but never *seen* rendered. Same open item as last entry, now larger.
+- **Re-verify Google sign-in** on both `localhost:4200` and the deployed site now that the API
+  key's referrer restriction is live, in case it silently broke something.
+- **User action, cannot be done in code:** register the Razorpay webhook (point it at the
+  *deployed* API — confirmed live prod currently 404s on `/api/payments/webhook` since nothing
+  from this session is deployed yet) and set `RAZORPAY_WEBHOOK_SECRET` in Render.
+- **Still on Razorpay test keys** — KYC not started as far as this session can tell. Do not flip
+  `waitlistOnly` off until that's done; test card numbers are public.
+- **`BUSINESS_INFO.address` / `.phone` still placeholders** — real values needed before the
+  Razorpay activation review.
+- **No waitlist notification mechanism** (see above) — needs an email provider wired in before
+  launch has any way to reach the 16 people already waiting.
+- **`apps/web/public/og-image.png` (1200x630) still doesn't exist** — `og:image` /
+  `twitter:image` 404, link previews render with no image.
+- Flip `waitlistOnly` at launch (after the above).
+- The rate limiters use an in-memory store — correct for a single Render instance, would need
+  Redis if it ever scales out.
+- The `/app` 30rem and landing rail 900/520px breakpoints remain reasoned, not seen — Chrome on
+  Windows won't size a window narrow enough. Wants a real phone.
+- **Not deployed** — commits since `c067700` are unpushed, now including everything above.
+- Multi-speaker mode remains parked (2026-09-03).
+
+
+## 2026-09-09 (later) — Razorpay webhook; public copy corrected to match what shipped
+
+**The webhook is built** (`POST /api/payments/webhook`), closing the highest-priority
+launch item. Crediting no longer depends on the browser surviving checkout: a user who
+pays and then closes the tab, loses signal or hits a JS error is now credited anyway,
+because Razorpay posts the event server-to-server and retries until it gets a 2xx.
+`/payments/verify` stays — it's synchronous and lets the UI show the new balance at once —
+so the two are now redundant paths to the same outcome rather than one fragile one.
+
+- **Both paths race, so crediting is claimed, not checked.** `markPurchasePaid` became
+  `claimPurchaseForCrediting`: a conditional `UPDATE ... WHERE status <> 'paid'`. The old
+  read-then-write let `/verify` and the webhook both see `'created'` and credit the pack
+  twice. Postgres serialises the conditional update, so exactly one caller gets a row back
+  and the loser does nothing. `/verify` re-reads the balance on the losing path rather than
+  reporting the stale number it read a moment earlier.
+- **Raw body, scoped to one path.** Razorpay signs the exact bytes it posts, so
+  `express.raw({ type: 'application/json' })` is mounted on `/api/payments/webhook` *before*
+  `express.json()` — whichever parser runs first consumes the stream, and body-parser skips
+  a request another has handled. It's a body parser on a path, not a router, so the routing
+  convention (routers only in `routes/index.ts`) is intact.
+- Unauthenticated by design — the caller is Razorpay, not a browser with a Firebase token.
+  The HMAC over the raw body is the authentication. Missing secret returns **503, not 200**,
+  so events queue for retry instead of being silently dropped while misconfigured.
+- `payment.failed` only moves a row still in `'created'`, so a late failure event can't undo
+  an already-credited capture. Unknown order ids 200 harmlessly (they can be other traffic
+  on the same Razorpay account) rather than 404-ing into a retry loop.
+- **Verified end to end against the running API and real Neon rows** (`scripts/prove-webhook.ts`,
+  kept alongside the other `prove-*` scripts): balance 5 → 155 on `payment.captured`; a
+  retry of the same event *and* a following `order.paid` both left it at 155; an unknown
+  order id and a `payment.failed` on the paid row changed nothing. Probe row deleted and the
+  balance restored to 5 afterwards. Bad signature → 401, no secret → 503.
+- **User action:** add the webhook in the Razorpay dashboard pointing at
+  `<api origin>/api/payments/webhook`, subscribed to `payment.captured`, `order.paid` and
+  `payment.failed`, and put the secret it gives you in `RAZORPAY_WEBHOOK_SECRET`. A
+  local-dev value is in `apps/api/.env`; `.env.example` documents it.
+
+**IPv6 rate-limit bypass fixed.** The API had been logging `ERR_ERL_KEY_GEN_IPV6` at every
+boot. `translationLimiter`'s IP fallback used a raw `req.ip`, which gives every address in an
+IPv6 /64 its own bucket — and one client is routinely handed a whole /64, so the limit could
+be sidestepped by rotating the low bits. Now goes through `ipKeyGenerator`. The warning is
+gone from a clean boot.
+
+**Seven false claims in public copy, corrected.** The 2026-09-09 entry above flagged two in
+the FAQ; a sweep found five more, including a wrong number inside a legal document. All of
+these were true when written and were made false by things that shipped afterwards:
+
+- *"Do I need to create an account?" — "no sign-up required."* Google sign-in has been
+  mandatory since 2026-09-08. Rewritten.
+- *"Is my conversation recorded or stored anywhere?" — "nothing is saved… no database."*
+  Transcripts and translations go to Neon and show on `/history`. This was a **false privacy
+  claim on a public page** and the most serious of the seven. Now says what actually happens:
+  audio isn't kept, the text is, you can delete it, and points at the Privacy Policy.
+  (Checked that the delete claim is real before making it — `DELETE /api/history/:id` and the
+  button in `history.html` both exist.)
+- *Multi-speaker "planned next"* — parked since 2026-09-03. **Question dropped entirely**
+  (user's call, from three options offered).
+- *"Is there a paid plan?" — "Not yet… vaani is free."* Razorpay packs shipped. Rewritten
+  around recharge-not-subscribe.
+- ***"10 free translations" in three places*** — `/pricing`, the Terms, and the FAQ — when
+  `FREE_TRIAL_TURNS` dropped to 3 on 2026-09-08. **The Terms one is a legal document
+  advertising the wrong number.** User chose to state the real figure rather than soften it.
+- *Privacy Policy: "signing in with Google or email/password."* Stale since Google-only.
+
+- **The number now lives in one place on the web side.** New `FREE_TRIAL_TURNS` in
+  `core/site-info.ts`, bound into `/pricing`, the Terms and the FAQ. It's a hand-kept mirror
+  of the API constant (the two apps share no code), but it's why all three drifted together
+  and stayed wrong for a day — one edit changes them now.
+
+- **`landing.scss` budget resolved** — `anyComponentStyle` warning raised 16 kB → 18 kB in
+  `angular.json`, the option the previous entry preferred over shaving hover/focus states.
+  **The production build is now warning-free for the first time in a while**; initial bundle
+  462.13 kB, still under the 500 kB budget.
+- Verified: API `tsc --noEmit` clean, `pnpm --filter web build` clean with **no warnings at
+  all**. Both dev servers run together and answer (`/api/health`, `/api/payments/packs`, the
+  Angular app on 4200).
+
+**Pending / not yet built (authoritative):**
+- **Not browser-verified this session** — the Chrome extension wasn't connected, so the
+  corrected FAQ, `/pricing` and Terms copy has been type-checked and built but not *seen*
+  rendered. Worth an eyeball on the next session that has a browser.
+- **User action, cannot be done in code:** register the Razorpay webhook and set
+  `RAZORPAY_WEBHOOK_SECRET` (see above); disable the Email/Password provider in the Firebase
+  Console; add HTTP referrer restrictions to the Firebase web API key in Google Cloud Console.
+- **Still on Razorpay test keys.** Test payments produce a valid signature and credit real
+  turns, and the test card numbers are public — do not flip `waitlistOnly` off while on test
+  keys. The webhook doesn't change this.
+- **`apps/web/public/og-image.png` (1200x630) still doesn't exist**, so `og:image` /
+  `twitter:image` 404 and link previews render without an image.
+- Fill the real `BUSINESS_INFO` values in `core/site-info.ts`; flip `waitlistOnly` at launch.
+- The rate limiters use an in-memory store — correct for a single Render instance, would need
+  Redis if it ever scales out.
+- The `/app` 30rem and landing rail 900/520px breakpoints remain reasoned, not seen — Chrome
+  on Windows won't size a window narrow enough. Wants a real phone.
+- Not deployed: commits since `c067700` are unpushed.
+- Multi-speaker mode remains parked (2026-09-03).
+
+
 ## 2026-09-09 — "How it differs" rebuilt as a feature switcher
 
 - The landing section was a scroll-driven numbered list (four tall `66vh` steps) beside a sticky demo panel. Replaced with a **horizontal tab rail + a two-pane stage**: the four claims as tabs across the top, the active one's title/body in Piazzolla on the left, and the demo panel on the right. Picked by the user from four directions explored on a design canvas (bento grid, comparison ledger, editorial stack, feature switcher).

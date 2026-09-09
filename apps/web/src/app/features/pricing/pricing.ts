@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Reveal } from '../../shared/reveal.directive';
 import { AuthService } from '../../core/auth.service';
 import { PaymentService } from '../../core/payment.service';
+import { FREE_TRIAL_TURNS } from '../../core/site-info';
 
 interface RechargePack {
   id: string;
@@ -27,6 +28,7 @@ export class Pricing implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly payment = inject(PaymentService);
 
+  protected readonly freeTrialTurns = FREE_TRIAL_TURNS;
   protected readonly packs = signal<RechargePack[]>([]);
   protected readonly buyingPackId = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);

@@ -9,12 +9,15 @@ export interface RechargePack {
 // expire or reset on a cycle. New signups start with the free trial amount
 // below; buying a pack just adds more to the same balance.
 //
-// Lowered 10 -> 3 (2026-09-08). Every new account is a free grant of Sarvam
-// calls billed to us, so the trial has to be small enough that farming
-// accounts isn't worth anyone's time, while still being enough to prove the
-// product. `findOrCreateUser` applies this explicitly, so the `turns_balance`
-// column default is no longer what new users actually get.
-export const FREE_TRIAL_TURNS = 3;
+// 10 -> 3 -> 10 (2026-09-08, then 2026-09-09). Cut to 3 on the theory that
+// every new account is a free grant of Sarvam calls billed to us, but 3 turns
+// is one side of a single exchange — not enough for someone to actually feel
+// what the product does. Restored to 10 on the user's call: Google-only
+// sign-in (same commit as the original cut) already makes accounts hard to
+// mass-create, so the trial size doesn't need to carry that job too.
+// `findOrCreateUser` applies this explicitly, so the `turns_balance` column
+// default (also 10, in schema.ts) is redundant with this but not relied on.
+export const FREE_TRIAL_TURNS = 10;
 
 export const RECHARGE_PACKS: RechargePack[] = [
   { id: 'starter', label: 'Starter', priceInPaise: 9900, turns: 150 },

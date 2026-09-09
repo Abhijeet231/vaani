@@ -19,3 +19,24 @@ export function verifyRazorpaySignature(orderId: string, paymentId: string, sign
   if (expectedBuf.length !== actualBuf.length) return false;
   return crypto.timingSafeEqual(expectedBuf, actualBuf);
 }
+
+// The webhook equivalent. Razorpay signs the exact bytes of the request body
+// with the secret set when the webhook was registered — a different secret to
+// the API key one above — so this must be handed the raw Buffer, never a
+// re-serialised JSON.parse round trip, whose key order and spacing would not
+// match what was signed.
+export function verifyRazorpayWebhookSignature(rawBody: Buffer, signature: string): boolean {
+  if (!env.razorpayWebhookSecret) {
+    throw new Error('RAZORPAY_WEBHOOK_SECRET is not set — add it to apps/api/.env');
+  }
+
+  const expected = crypto
+    .createHmac('sha256', env.razorpayWebhookSecret)
+    .update(rawBody)
+    .digest('hex');
+
+  const expectedBuf = Buffer.from(expected);
+  const actualBuf = Buffer.from(signature);
+  if (expectedBuf.length !== actualBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, actualBuf);
+}

@@ -14,6 +14,14 @@ export const app = express();
 app.set('trust proxy', 1);
 
 app.use(cors(corsOptions));
+
+// Razorpay signs the exact bytes it POSTs to the webhook, so that one route
+// needs the untouched body — express.json() would parse it away and a
+// re-serialised object would not reproduce the signed byte sequence. This is a
+// body parser scoped to one path, not a route: the router itself still lives in
+// routes/index.ts. It must come first, because whichever parser runs first
+// consumes the stream and body-parser skips a request another has handled.
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 app.use('/api', globalLimiter);
