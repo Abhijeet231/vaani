@@ -38,9 +38,11 @@ added before launch") when the honest framing is one person building this in the
   edits: *"vaani is a solo build by Abhijeet Ghosh, an indie developer — a hands-on trial of
   what Sarvam AI's speech and translation models can do. Follow along... at
   abhijeetghosh.site."*
-- `address` and `phone` in `BUSINESS_INFO` are **still `PLACEHOLDER_*`** — no real values given
-  yet, still render as visible "to be added before launch" pills, still needed before the
-  Razorpay activation review.
+- `address` and `phone` **removed from `BUSINESS_INFO` entirely** (user's call, follow-up same
+  evening) rather than left as placeholders — this is a public page, not a KYC form, and those
+  values go directly into Razorpay's dashboard when that review happens rather than needing to
+  be readable by visitors. The "Operated by" block is now just name/entity-type + email + the
+  bio line. Confirmed no other page referenced `.address`/`.phone` before removing them.
 - Verified: `pnpm --filter web build` clean, no warnings; confirmed in the built JS bundle that
   the new email and `abhijeetghosh.site` are present and the old email is gone.
 
@@ -72,8 +74,6 @@ itself.
   from this session is deployed yet) and set `RAZORPAY_WEBHOOK_SECRET` in Render.
 - **Still on Razorpay test keys** — KYC not started as far as this session can tell. Do not flip
   `waitlistOnly` off until that's done; test card numbers are public.
-- **`BUSINESS_INFO.address` / `.phone` still placeholders** — real values needed before the
-  Razorpay activation review.
 - **No waitlist notification mechanism** (see above) — needs an email provider wired in before
   launch has any way to reach the 16 people already waiting.
 - **`apps/web/public/og-image.png` (1200x630) still doesn't exist** — `og:image` /

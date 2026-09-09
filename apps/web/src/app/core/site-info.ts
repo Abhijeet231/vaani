@@ -7,9 +7,12 @@ export const CONTACT_EMAIL = 'affairstoday69@gmail.com';
 // vaani is run by an individual operating as a sole proprietor (no registered
 // company) — Abhijeet Ghosh, building it solo. `legalName` is his real legal
 // name, used as-is (satisfies what Razorpay's activation review wants there).
-// `address` and `phone` are still PLACEHOLDER — real values still needed
-// before that review — see PROGRESS.md. Anything left as a PLACEHOLDER string
-// renders with a visible "to be added" treatment so it can't ship unnoticed.
+//
+// No `address` or `phone` here (user's call, 2026-09-09) — this is a public
+// page, not a KYC form, and those go directly into Razorpay's own dashboard
+// when that review happens; they don't need to be readable by visitors too.
+// `isPlaceholder`/`.ph-pill` stay wired to `legalName` and `gstin` in case
+// either is ever unset back to a PLACEHOLDER string.
 //
 // `entityType` here is deliberately the public-facing framing ("Indie
 // developer") rather than the formal "sole proprietor" — this field is
@@ -18,10 +21,6 @@ export const CONTACT_EMAIL = 'affairstoday69@gmail.com';
 export const BUSINESS_INFO = {
   legalName: 'Abhijeet Ghosh',
   entityType: 'Indie developer',
-  // Operating address — street / area, city, state, PIN, country.
-  address: 'PLACEHOLDER_ADDRESS',
-  // Contact phone in international format, e.g. +91 98XXXXXXXX.
-  phone: 'PLACEHOLDER_PHONE',
   // GSTIN if registered; leave '' if not GST-registered (common for a small
   // proprietorship below the threshold) and the GST line is simply omitted.
   gstin: '',
