@@ -6,9 +6,12 @@ import { Waitlist } from './features/waitlist/waitlist';
 import { authGuard, guestGuard } from './core/auth.guard';
 import { waitlistGuard } from './core/waitlist.guard';
 
-// waitlistGuard sits first on every route except /waitlist — when
-// environment.waitlistOnly is on it redirects everything there; otherwise it's
-// a pass-through and the route's own guards run as normal.
+// waitlistGuard sits on the product surfaces (/, /login, /app, /history,
+// /account) — when environment.waitlistOnly is on it redirects those to
+// /waitlist; otherwise it's a pass-through and the route's own guards run as
+// normal. The marketing/legal routes (about, pricing, contact, privacy, terms,
+// refund-policy, shipping) don't carry it, so they stay reachable pre-launch —
+// e.g. for a payment-provider KYC review that needs live policy URLs.
 //
 // The critical-path screens (landing, waitlist, login, translate) load eagerly;
 // everything else is lazy so it stays out of the initial bundle.
@@ -20,38 +23,31 @@ export const routes: Routes = [
   {
     path: 'about',
     loadComponent: () => import('./features/about/about').then((m) => m.About),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'pricing',
     loadComponent: () => import('./features/pricing/pricing').then((m) => m.Pricing),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'contact',
     loadComponent: () => import('./features/contact/contact').then((m) => m.Contact),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'privacy',
     loadComponent: () => import('./features/legal/privacy/privacy').then((m) => m.Privacy),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'terms',
     loadComponent: () => import('./features/legal/terms/terms').then((m) => m.Terms),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'refund-policy',
     loadComponent: () =>
       import('./features/legal/refund-policy/refund-policy').then((m) => m.RefundPolicy),
-    canActivate: [waitlistGuard],
   },
   {
     path: 'shipping',
     loadComponent: () => import('./features/legal/shipping/shipping').then((m) => m.Shipping),
-    canActivate: [waitlistGuard],
   },
   // Always reachable by direct URL — harmless after launch, and it stays
   // previewable in dev where waitlistOnly is off.
