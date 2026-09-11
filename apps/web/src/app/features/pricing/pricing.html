@@ -25,6 +25,23 @@
   }
 
   <div class="grid gap-6 md:grid-cols-3 items-stretch">
+    @if (loadingPacks()) {
+      @for (i of [0, 1, 2]; track i) {
+        <div class="flex flex-col bg-surface border border-border rounded-2xl p-8 animate-pulse">
+          <div class="h-4 w-20 rounded bg-surface-high mb-3"></div>
+          <div class="h-9 w-24 rounded bg-surface-high mb-3"></div>
+          <div class="h-4 w-32 rounded bg-surface-high mb-6"></div>
+
+          <div class="flex flex-col gap-3 mb-8 flex-1">
+            <div class="h-4 w-full rounded bg-surface-high"></div>
+            <div class="h-4 w-5/6 rounded bg-surface-high"></div>
+            <div class="h-4 w-2/3 rounded bg-surface-high"></div>
+          </div>
+
+          <div class="h-10 w-full rounded-full bg-surface-high"></div>
+        </div>
+      }
+    }
     @for (pack of packs(); track pack.id) {
       <div
         appReveal

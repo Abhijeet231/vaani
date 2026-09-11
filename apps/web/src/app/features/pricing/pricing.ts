@@ -30,6 +30,7 @@ export class Pricing implements OnInit {
 
   protected readonly freeTrialTurns = FREE_TRIAL_TURNS;
   protected readonly packs = signal<RechargePack[]>([]);
+  protected readonly loadingPacks = signal(true);
   protected readonly buyingPackId = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
@@ -38,8 +39,14 @@ export class Pricing implements OnInit {
 
   ngOnInit(): void {
     this.http.get<{ packs: RechargePack[] }>('/api/payments/packs').subscribe({
-      next: (response) => this.packs.set(response.packs),
-      error: () => this.errorMessage.set('Could not load pricing right now.'),
+      next: (response) => {
+        this.packs.set(response.packs);
+        this.loadingPacks.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Could not load pricing right now.');
+        this.loadingPacks.set(false);
+      },
     });
   }
 
