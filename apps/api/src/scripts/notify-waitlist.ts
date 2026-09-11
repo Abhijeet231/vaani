@@ -1,10 +1,11 @@
-// Sends the "vaani is live" email to everyone on the waitlist who hasn't been
+// Sends the "vaani is live" email to waitlist signups who haven't been
 // notified yet, then marks them notified so a re-run only retries failures.
 //
 // Usage:
-//   ts-node src/scripts/notify-waitlist.ts --test you@example.com   (send one preview, no DB writes)
-//   ts-node src/scripts/notify-waitlist.ts --dry-run                (list who WOULD be emailed, sends nothing)
-//   ts-node src/scripts/notify-waitlist.ts                          (the real send)
+//   ts-node src/scripts/notify-waitlist.ts --test you@example.com        (send one preview, no DB writes)
+//   ts-node src/scripts/notify-waitlist.ts --dry-run                     (list who WOULD be emailed, sends nothing)
+//   ts-node src/scripts/notify-waitlist.ts --to a@x.com,b@y.com          (send only to these, if pending)
+//   ts-node src/scripts/notify-waitlist.ts                               (real send, to everyone pending)
 import '../config/dns-override';
 import { and, eq, isNull, isNotNull } from 'drizzle-orm';
 import { getDb } from '../config/db';
@@ -24,11 +25,18 @@ async function main() {
   }
 
   const dryRun = process.argv.includes('--dry-run');
+  const toFlag = process.argv.includes('--to')
+    ? process.argv[process.argv.indexOf('--to') + 1]
+    : null;
+  const onlyEmails = toFlag ? new Set(toFlag.split(',').map((e) => e.trim().toLowerCase())) : null;
 
   const db = getDb();
-  const pending = await db.query.waitlistSignups.findMany({
+  let pending = await db.query.waitlistSignups.findMany({
     where: and(isNull(waitlistSignups.notifiedAt), isNotNull(waitlistSignups.email)),
   });
+  if (onlyEmails) {
+    pending = pending.filter((row) => onlyEmails.has(row.email!.toLowerCase()));
+  }
 
   console.log(`${pending.length} signup(s) pending notification.`);
   if (dryRun) {

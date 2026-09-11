@@ -2,7 +2,7 @@
 // on /contact and the legal pages. Kept in its own module (no component, no
 // Angular imports) so every page can pull from one place without an import cycle.
 
-export const CONTACT_EMAIL = 'affairstoday69@gmail.com';
+export const CONTACT_EMAIL = 'ghoshabhijeet778@gmail.com';
 
 // vaani is run by an individual operating as a sole proprietor (no registered
 // company) — Abhijeet Ghosh, building it solo. `legalName` is his real legal

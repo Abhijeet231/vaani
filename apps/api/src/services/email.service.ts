@@ -20,36 +20,46 @@ function getTransporter() {
 }
 
 const SITE_URL = 'https://vaani-4a691.web.app';
+const SUPPORT_EMAIL = 'ghoshabhijeet778@gmail.com';
 
 function launchEmailHtml(): string {
-  return `<div style="background:#0C0E0D;color:#E8EAE7;font-family:Georgia,'Times New Roman',serif;padding:40px 24px;">
+  return `<div style="background:#0C0E0D;color:#E8EAE7;font-family:Georgia,'Times New Roman',serif;padding:48px 24px;">
   <div style="max-width:480px;margin:0 auto;">
-    <p style="font-size:22px;margin:0 0 24px;">vaani</p>
-    <p style="font-size:17px;line-height:1.6;margin:0 0 16px;">vaani is live.</p>
-    <p style="font-size:15px;line-height:1.6;color:#B7BDB6;margin:0 0 28px;">
-      Thanks for waiting. vaani is a live speech-translation app across 14 Indian languages —
-      speak, and the person in front of you reads (and hears) it in their language.
+    <div style="height:3px;width:40px;background:#A8E06B;border-radius:2px;margin:0 0 28px;"></div>
+    <p style="font-size:22px;margin:0 0 4px;">vaani</p>
+    <p style="font-size:12px;letter-spacing:0.04em;color:#7C837A;margin:0 0 28px;">the voice that speaks all of India</p>
+
+    <p style="font-size:20px;line-height:1.4;margin:0 0 16px;">vaani is live!</p>
+    <p style="font-size:15px;line-height:1.7;color:#B7BDB6;margin:0 0 28px;">
+      Thanks so much for waiting — it means a lot. You can check it out right here:
     </p>
-    <p style="margin:0 0 28px;">
-      <a href="${SITE_URL}" style="background:#A8E06B;color:#0C0E0D;padding:12px 24px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:bold;display:inline-block;">Open vaani</a>
+    <p style="margin:0 0 32px;">
+      <a href="${SITE_URL}" style="background:#A8E06B;color:#0C0E0D;padding:13px 28px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:bold;display:inline-block;">Open vaani</a>
     </p>
-    <p style="font-size:13px;line-height:1.6;color:#7C837A;margin:0;">
-      vaani is a solo build by Abhijeet Ghosh — a hands-on trial of what Sarvam AI's speech and
-      translation models can do.
+    <p style="font-size:14px;line-height:1.7;color:#B7BDB6;margin:0 0 28px;">
+      This is a solo, early build, so if you run into a bug or anything feels off, I'd genuinely
+      love to hear about it — just reply to this email or write to
+      <a href="mailto:${SUPPORT_EMAIL}" style="color:#A8E06B;">${SUPPORT_EMAIL}</a>.
     </p>
+    <p style="font-size:15px;line-height:1.6;margin:0 0 4px;">Thanks again,</p>
+    <p style="font-size:15px;line-height:1.6;color:#B7BDB6;margin:0;">Abhijeet</p>
   </div>
 </div>`;
 }
 
 function launchEmailText(): string {
   return [
-    'vaani is live.',
+    'vaani is live!',
     '',
-    "Thanks for waiting. vaani is a live speech-translation app across 14 Indian languages — speak, and the person in front of you reads (and hears) it in their language.",
+    "Thanks so much for waiting — it means a lot. You can check it out here:",
+    SITE_URL,
     '',
-    `Open vaani: ${SITE_URL}`,
+    "This is a solo, early build, so if you run into a bug or anything feels off, I'd genuinely love to hear about it — just reply to this email or write to " +
+      SUPPORT_EMAIL +
+      '.',
     '',
-    "vaani is a solo build by Abhijeet Ghosh — a hands-on trial of what Sarvam AI's speech and translation models can do.",
+    'Thanks again,',
+    'Abhijeet',
   ].join('\n');
 }
 
