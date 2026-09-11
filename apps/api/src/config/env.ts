@@ -27,4 +27,10 @@ export const env = {
   // Separate from the key secret above: this one is chosen when the webhook is
   // registered in the Razorpay dashboard, and signs the webhook request body.
   razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+
+  // Gmail SMTP, used only by the notify-waitlist script — not by any live route.
+  // gmailAppPassword is a 16-char App Password (requires 2FA on the account),
+  // not the account's login password.
+  gmailUser: process.env.GMAIL_USER,
+  gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
 };
